@@ -7,7 +7,7 @@
 ## 0. Current control status
 
 - Collaboration protocol: **approved**
-- Current project phase: **Stage 1 formally accepted**
+- Current project phase: **Stage 2 authorized and in progress; Stage 1 formally accepted**
 - Stage 2: **AUTHORIZED — in progress**
 - Formal Stage 2 engineering and technical spikes: **authorized only under individually approved task scopes**
 - Stage 3 / M1 gameplay implementation: **not authorized**
