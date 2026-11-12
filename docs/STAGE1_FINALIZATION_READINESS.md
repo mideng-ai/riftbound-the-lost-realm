@@ -24,6 +24,7 @@
 | 38 项未来任务与阶段门 | 完成规划稿 | FIRST_RELEASE_TASK_BREAKDOWN.md |
 | FR-MH-01～15 追踪矩阵 | 完成 | STAGE1_REQUIREMENTS_TRACEABILITY.md |
 | 首版范围冻结审查表 | 完成负责人审查稿 | STAGE1_SCOPE_FREEZE_REVIEW.md；STAGE1_OWNER_REVIEW_PACKET.md v0.3 |
+| Must-have 验收口径审查 | 完成工作稿 | STAGE1_ACCEPTANCE_CRITERIA_AUDIT.md
 | M1 垂直切片边界 | 已定义 | STAGE1_M1_BLUEPRINT.md |
 | 数值验证方式 | 已定义，尚未实测 | STAGE1_NUMERIC_VALIDATION_PLAN.md |
 
@@ -51,7 +52,7 @@ D-207 存档技术方案与 D-210 性能预算按既定安排留在阶段2 Spike
 
 1. 单局完整流程（目标 10–15 分钟）。
 2. 手机触屏与 PC 键鼠双端移动/操作。
-3. 自动普通攻击 + 两种手动特殊技能。
+3. 法杖与魔法剑两种武器普通攻击 + 两种手动特殊技能。
 4. 单一 Dash 闪避。
 5. 行为差异化普通/精英/Boss 阵容（数量待 D-104 最终处理）。
 6. 装备/资源搜刮与稀有度。
@@ -71,7 +72,7 @@ D-207 存档技术方案与 D-210 性能预算按既定安排留在阶段2 Spike
 
 ### 3.3 Out of scope（首版不做）
 
-现有排除方向保持为：多人/联机、PvP、长篇剧情对话/过场、开放世界、内购/广告/商业化、账号/云存档/跨设备同步、多语言、MOD/编辑器、宠物/随从、天气/昼夜、原生 App。
+GAME_SCOPE 当前列出 11 项排除方向：多人/联机、PvP、长篇剧情对话/过场、开放世界、内购/广告/商业化、账号/云存档/跨设备同步、多语言、MOD/编辑器、宠物/随从、天气/昼夜、原生 App。
 
 需特别注意：
 - 「本地存档」是首版 Must-have；「云存档/账号/跨设备同步」为首版 Out of scope，二者不冲突。
