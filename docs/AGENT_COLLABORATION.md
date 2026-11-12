@@ -179,7 +179,7 @@ For detailed product decisions and requirements, consult the current authoritati
 
 - 2026-11-12 — Created the shared asynchronous collaboration protocol. The protocol is approved; no Stage 2 task or implementation work is authorized by this entry.
 - 2026-11-12 — WorkBuddy onboarding: read the protocol from `main`, confirmed read/update access via the GitHub REST API, and recorded its understanding, verified capabilities, and permission limits in Section 10. No execution task started; no task ID currently holds `APPROVED_TO_START`.
-- 2026-11-13 — ST2-001 executed by WorkBuddy within the approved scope: Babylon.js 9.36.0 baseline spike (isolated, disposable; source+evidence in `spikes/ST2-001/`). Clean install / dev server / WebGL2 render / production build all verified in the sandbox (Firefox software-GL; sandbox GPU limits recorded honestly). Task set to `READY_FOR_REVIEW`; awaiting ChatGPT review and owner acceptance. No scope expansion; no gameplay or Stage 3 work.
+- 2026-11-13 — ST2-001 initial execution report received from WorkBuddy. ChatGPT reviewed source, logs, manifest, README, harness and evidence file presence; requested corrections for missing lockfile/deterministic install, missing npm audit output, and precise WebGPU probe wording. Status changed to `CHANGES_REQUESTED_BY_REVIEW`; owner acceptance is pending. Sandbox-only WebGL2 result and untested real-GPU/mobile/WebGPU limitations remain explicit.
 
 ## 10. WorkBuddy onboarding feedback
 
@@ -234,7 +234,7 @@ Stage 2 is authorized. The owner explicitly approved ST2-001 on 2026-11-12 with 
 ### 11.2 First approved task
 
 #### ST2-001 — Babylon.js baseline rendering and build compatibility Spike
-- **Status:** `READY_FOR_REVIEW` — WorkBuddy completed execution on 2026-11-13; execution report in Section 6. (Previously `APPROVED_TO_START`, owner approved 2026-11-12.)
+- **Status:** `CHANGES_REQUESTED_BY_REVIEW` — WorkBuddy completed initial execution on 2026-11-13; ChatGPT review on 2026-11-13 found reproducibility/evidence gaps recorded in Section 7. (Owner approval remains valid for corrections within the original scope.)
 - **Plan:** `docs/STAGE2_TECH_SPIKE_PLAN.md`, Section 7.
 - **Scope:** isolated disposable Vite + TypeScript + Babylon.js spike; minimal 3D scene and top-down camera; WebGL2 verification; optional WebGPU capability probe; dev server and production build verification.
 - **Out of scope:** formal game project architecture, gameplay code, full input system, cartoon-rendering decision, spell VFX, save implementation, performance-budget decision, and Stage 3 work.
@@ -252,3 +252,29 @@ Stage 2 is authorized. The owner explicitly approved ST2-001 on 2026-11-12 with 
 - **Source:** Explicit owner message in ChatGPT: “我批准 ST2-001，允许 WorkBuddy 按 GitHub 文档中的准确范围开始执行。”
 - **Conditions / limits:** Isolated disposable Spike only. Do not create the formal game project or implement gameplay. Do not decide cartoon rendering, spell VFX, input architecture, D-207, or D-210 as part of this task. Stop and report if the task cannot be completed within the approved scope.
 - **Record transcription:** This entry transcribes the owner's explicit approval; ChatGPT is not granting approval on the owner's behalf.
+
+
+### ST2-001 Review
+
+- **Review date:** 2026-11-13
+- **Decision:** `CHANGES_REQUESTED`
+- **Evidence inspected:** `spikes/ST2-001/package.json`, `tsconfig.json`, `index.html`, `src/main.ts`, `README.md`, `evidence/dev.log`, `evidence/build.log`, `evidence/preview.log`, `evidence/browser-harness.mjs`, both committed PNG screenshots (files exist), and the Section 6 execution report.
+- **Acceptance criteria results:**
+  - Isolated Vite + TypeScript + Babylon.js spike exists; no formal game project or gameplay code was added: **PASS**.
+  - Minimal 3D scene and top-down camera are implemented: **PASS by source inspection**; reported Firefox screenshot evidence exists.
+  - Development server and production build: **PASS based on submitted logs** (Vite ready; TypeScript/build completed).
+  - WebGL2: **PASS for the reported Firefox 146 software-rendering sandbox only**. This is not real-GPU performance or Mac/mobile compatibility evidence.
+  - Exact versions and reproducibility: **PARTIAL**. README reports resolved versions, but manifest uses semver ranges and no `package-lock.json` is committed. A future install can resolve different dependency versions; `npm install` evidence is not a deterministic clean-install reproduction.
+  - WebGPU: **PARTIAL / not run**. The code checks only whether `navigator.gpu` exists; it does not request an adapter or initialize Babylon `WebGPUEngine`. The report correctly says the engine was not run, but distinguish API-presence probing from adapter availability.
+- **Issues found:**
+  1. Missing lockfile prevents deterministic dependency installation and verification of the exact dependency graph.
+  2. No captured `npm audit` output is included, although the report lists `npm audit` among commands and the README claims zero vulnerabilities from the install output. The install summary alone is not an audit result.
+  3. WebGPU evidence is described too broadly in places: `navigator.gpu` presence is not proof that a usable adapter exists. Current status must remain “not validated / not run.”
+  4. Real-GPU and mobile-browser tests remain unperformed. These are explicitly disclosed and are not a failure of the narrow ST2-001 sandbox scope; they remain prerequisites for broader Stage 2 platform conclusions, not a reason to claim full platform compatibility now.
+- **Required corrections (within existing approved scope):**
+  1. Commit `spikes/ST2-001/package-lock.json`; pin direct dependencies to exact versions in `package.json` (remove floating `^` / `~` ranges for this reproducibility artifact).
+  2. Re-run installation from a clean directory using `npm ci`, then rerun `npm run build`; attach complete logs and report exact Node/npm versions.
+  3. Run `npm audit` and commit its full output; distinguish audit findings from the package-install summary.
+  4. Update README/HUD wording to say exactly what was tested: WebGL2 verified in Firefox software rendering; WebGPU API presence may be probed, but adapter and Babylon WebGPU engine were not validated. Do not imply WebGPU support is established.
+  5. Preserve the sandbox/llvmpipe limitation and the Vite chunk-size warning; do not optimize or expand the spike into formal architecture.
+- **Recommendation to owner:** Hold acceptance pending the above corrections. No new owner approval is required for these corrections because they remain inside ST2-001's already approved scope. After ChatGPT re-review, owner acceptance remains a separate decision. Mac real-GPU confirmation is recommended before treating the engine baseline as established for the owner’s development machine; it is not to be represented as completed by WorkBuddy.
