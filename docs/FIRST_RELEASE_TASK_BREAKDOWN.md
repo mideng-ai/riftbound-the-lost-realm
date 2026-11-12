@@ -1,9 +1,9 @@
 # FIRST_RELEASE_TASK_BREAKDOWN — 首版功能任务树与依赖计划
 
-> **版本：** v1.0  
+> **版本：** v1.1  
 > **日期：** 2026-11-12  
 > **状态：** 阶段1规划工作稿；任务尚未获准执行  
-> **依据：** FIRST_RELEASE_MUST_HAVE_SPEC.md v1.0、STAGE1_EXECUTION_PLAN.md v1.1、DECISIONS_LOG.md v4.0  
+> **依据：** FIRST_RELEASE_MUST_HAVE_SPEC.md v1.0、STAGE1_EXECUTION_PLAN.md v1.2、DECISIONS_LOG.md v4.2  
 > **边界：** 本文件只定义未来工作分解、先后关系与完成证据，不是开工授权；不得据此开始阶段2、正式工程、Babylon.js 安装或游戏代码开发。
 
 ---
@@ -198,4 +198,5 @@ flowchart TD
 
 | 版本 | 日期 | 变更 |
 |---|---|---|
+| v1.1 | 2026-11-12 | 校正依据文件版本号，更新为执行计划 v1.2、决策日志 v4.2；不改变任务范围与阶段门。 |
 | v1.0 | 2026-11-12 | 首次建立首版任务树，包含 38 项规划任务、阶段门、依赖图、关键路径、风险控制与完成定义；所有执行任务未启动。 |
