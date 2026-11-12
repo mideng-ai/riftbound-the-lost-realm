@@ -39,7 +39,7 @@
 | AUD-008 | 低（追溯准确性） | FIRST_RELEASE_TASK_BREAKDOWN.md 文件头 | 依据版本仍写执行计划 v1.0、决策日志 v3.9，与当前仓库 v1.1、v4.0 不一致 | 已更新来源版本号 |
 | AUD-009 | 中（阶段门逻辑） | FIRST_RELEASE_TASK_BREAKDOWN.md 第5节 Mermaid 依赖图 | 图中原先为 G1（阶段1正式验收）指向 A 组（阶段1设计冻结任务），与 G1 放行条件要求 A 组先完成相矛盾，形成阶段门顺序倒置 | 已改为 A 组 → G1 → 阶段2技术验证任务；详细任务表及 G1 条件保持不变 |
 | AUD-011 | 低（文档格式） | GAME_DESIGN_SPEC.md 第4.5节及第15节 | 自动技能延后研究说明和变更记录表中残留字面量 `\\n`，造成段落/表格结构异常；该问题未被早前 AUD-006 覆盖完整 | 已将字面量换行恢复为真实换行；只修复 Markdown 结构，不改变技能规则、状态或范围 |
-| AUD-012 | 低（版本追溯） | FIRST_RELEASE_MUST_HAVE_SPEC.md 文件头 | 依据栏仍引用 DECISIONS_LOG.md v3.9，而当前决策日志为 v4.4，造成来源版本滞后 | 已将 Must-have 规格升至 v1.1 并修正来源引用；同步任务计划、验收清单与审计记录；需求内容及所有待确认状态不变 |
+| AUD-012 | 低（版本追溯） | FIRST_RELEASE_MUST_HAVE_SPEC.md 文件头 | 依据栏仍引用 DECISIONS_LOG.md v3.9，而当前决策日志为 v4.4，造成来源版本滞后 | 已将 Must-have 规格升至 v1.2，最终依据引用为 DECISIONS_LOG.md v4.5；任务树同步引用 Must-have v1.2，执行计划、验收清单与审计记录已同步；需求内容及所有待确认状态不变 |
 
 ## 4. 跨文档一致性结论
 
