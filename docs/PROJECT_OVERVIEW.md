@@ -1,10 +1,10 @@
 # PROJECT_OVERVIEW — 项目总纲
 
 > **项目名称：** Riftbound: The Lost Realm
-> **版本：** v1.2
-> **更新日期：** 2026-11-11
+> **版本：** v1.3
+> **更新日期：** 2026-11-12
 > **状态：** 阶段0（项目准备）
-> **说明：** 本文档为项目最高层级总纲，所有其他文档（路线图、范围、设计原则、决策日志）以本文档为基准。内容基于项目总指令整理；带「待确认」标记的内容尚未经项目最终负责人拍板。v1.1 为五份基础文档统一修订批次；v1.2 为复审后小幅修订（合并第6节重复的技术栈验证说明），变更明细见 DECISIONS_LOG.md 变更记录与 DOCUMENT_REVIEW_REPORT.md。
+> **说明：** 本文档为项目最高层级总纲，所有其他文档（路线图、范围、设计原则、决策日志）以本文档为基准。内容基于项目总指令整理；带「待确认」标记的内容尚未经项目最终负责人拍板。v1.1 为五份基础文档统一修订批次；v1.2 为复审后小幅修订（合并第6节重复的技术栈验证说明）；v1.3 为关联文档列表补全三份阶段0专项文档（AI_TEAM_ROLES / DEVELOPMENT_ENVIRONMENT / ASSET_LICENSE_RESEARCH），正文规则未变。变更明细见 DECISIONS_LOG.md 变更记录与 DOCUMENT_REVIEW_REPORT.md。
 
 ---
 
@@ -121,3 +121,6 @@ M1 达成意味着四大支柱各有一个最小可验证的实现，之后才�
 - [GAME_SCOPE.md](./GAME_SCOPE.md) — 首版范围与红线
 - [GAME_DESIGN_PRINCIPLES.md](./GAME_DESIGN_PRINCIPLES.md) — 游戏设计原则
 - [DECISIONS_LOG.md](./DECISIONS_LOG.md) — 设计决策日志
+- [AI_TEAM_ROLES.md](./AI_TEAM_ROLES.md) — AI 团队岗位说明（阶段0）
+- [DEVELOPMENT_ENVIRONMENT.md](./DEVELOPMENT_ENVIRONMENT.md) — 开发环境说明（阶段0）
+- [ASSET_LICENSE_RESEARCH.md](./ASSET_LICENSE_RESEARCH.md) — 资源与许可证调研清单（阶段0，v0.x 候选清单）
