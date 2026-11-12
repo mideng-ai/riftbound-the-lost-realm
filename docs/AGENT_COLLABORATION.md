@@ -8,8 +8,9 @@
 
 - Collaboration protocol: **approved**
 - Current project phase: **Stage 1 formally accepted**
-- Stage 2: **NOT AUTHORIZED — do not start**
-- Formal game implementation: **not authorized**
+- Stage 2: **AUTHORIZED — in progress**
+- Formal Stage 2 engineering and technical spikes: **authorized only under individually approved task scopes**
+- Stage 3 / M1 gameplay implementation: **not authorized**
 - Creating the collaboration record itself is authorized; this does not authorize technical spikes, project scaffolding, dependency installation, or game-code changes.
 
 **Hard gate:** WorkBuddy must not execute a task unless this document contains an explicit owner approval for that exact task, identified by task ID, with status `APPROVED_TO_START`. A general approval of this collaboration process is not task approval. ChatGPT may draft tasks and review results, but cannot grant owner approval. If approval is absent, ambiguous, expired, or does not match the task ID and scope, stop and ask the owner.
@@ -64,7 +65,7 @@ Do not overwrite or erase previous reports or approval records. Append dated upd
 
 ## 4. ChatGPT → WorkBuddy tasks
 
-No execution task is currently authorized. Future tasks must use this template:
+Stage 2 is authorized. The first proposed WorkBuddy task is ST2-001 (draft only); it is not executable until the owner adds its exact approval entry in Section 5. Future tasks must use this template:
 
 ### [TASK-ID] Task title
 
@@ -138,7 +139,7 @@ The following scope decisions remain binding:
 - 7 **Nice-to-have** categories are deferred by default. They may be considered only after all Must-have items are complete, and each requires separate owner approval.
 - 11 **Out of scope** categories are excluded from the first release unless the owner explicitly approves a scope change and the governing project documents are updated.
 - Stage 1 formal acceptance has passed.
-- Stage 2 has **not** been authorized. Do not create the formal game project, install Babylon.js, write game code, or run Stage 2 technical spikes until the owner explicitly authorizes Stage 2.
+- Stage 2 was explicitly authorized by the owner on 2026-11-12. Stage 2 technical spikes and engineering may proceed only within a task-specific owner approval recorded in Section 5. Stage 3 / M1 gameplay implementation remains unauthorized.
 - Stage 1 acceptance is a design/planning acceptance, not evidence that the game has been implemented or runtime-tested.
 
 For detailed product decisions and requirements, consult the current authoritative project documents in `docs/`. If this collaboration log conflicts with an approved scope or decision record, stop and ask the owner rather than choosing one silently.
@@ -182,4 +183,28 @@ Note: this log records that Stage 1 formal acceptance has passed. I have not ind
 
 ### 10.4 Current status
 
-No task under Section 4 currently holds `APPROVED_TO_START`. No game engineering work (project scaffolding, dependency installation, game code) has been started by me. Standing by for an owner-approved task ID.
+Stage 2 is authorized. Task ST2-001 is drafted in Section 4 but has no task-specific `APPROVED_TO_START` entry yet. No WorkBuddy execution is authorized until the owner approves ST2-001's exact scope. Stage 3 / M1 gameplay work is not authorized.
+
+
+## 11. Stage 2 authorization and first task proposal
+
+> **Recorded:** 2026-11-12  
+> **Owner instruction:** “开始第二阶段吧。”  
+> **Meaning:** Stage 2 (Technical Foundation) is explicitly authorized and has started. This phase authorization does not bypass task-specific approval for WorkBuddy.
+
+### 11.1 Stage 2 control status
+- Stage 1: formally accepted and closed.
+- Stage 2: **AUTHORIZED / IN PROGRESS**.
+- Stage 3 and M1 gameplay implementation: not authorized.
+- Stage 2 technical planning and spike design may proceed.
+- WorkBuddy may execute only a task with a matching task ID, exact scope, and owner approval entry in Section 5.
+
+### 11.2 First proposed task
+
+#### ST2-001 — Babylon.js baseline rendering and build compatibility Spike
+- **Status:** `DRAFT` — waiting for owner task-specific approval.
+- **Plan:** `docs/STAGE2_TECH_SPIKE_PLAN.md`, Section 7.
+- **Scope:** isolated disposable Vite + TypeScript + Babylon.js spike; minimal 3D scene and top-down camera; WebGL2 verification; optional WebGPU capability probe; dev server and production build verification.
+- **Out of scope:** formal game project architecture, gameplay code, full input system, cartoon-rendering decision, spell VFX, save implementation, performance-budget decision, and Stage 3 work.
+- **Acceptance criteria:** clean dependency install, browser 3D scene render, successful production build, exact versions and reproducible logs/screenshots, honest environment/untested notes.
+- **Owner approval:** Not granted. Do not execute until the owner records `APPROVED_TO_START` for ST2-001 in Section 5.
