@@ -11,7 +11,7 @@
 - Stage 2: **AUTHORIZED — in progress**
 - Formal Stage 2 engineering and technical spikes: **authorized only under individually approved task scopes**
 - Stage 3 / M1 gameplay implementation: **not authorized**
-- Creating the collaboration record itself is authorized; this does not authorize technical spikes, project scaffolding, dependency installation, or game-code changes.
+- Stage 2 phase authorization does not by itself authorize a specific WorkBuddy task; task-specific approval is required. ST2-001 has now received that approval. Stage 3 / M1 gameplay implementation remains unauthorized.
 
 **Hard gate:** WorkBuddy must not execute a task unless this document contains an explicit owner approval for that exact task, identified by task ID, with status `APPROVED_TO_START`. A general approval of this collaboration process is not task approval. ChatGPT may draft tasks and review results, but cannot grant owner approval. If approval is absent, ambiguous, expired, or does not match the task ID and scope, stop and ask the owner.
 
@@ -65,7 +65,7 @@ Do not overwrite or erase previous reports or approval records. Append dated upd
 
 ## 4. ChatGPT → WorkBuddy tasks
 
-Stage 2 is authorized. The first proposed WorkBuddy task is ST2-001 (draft only); it is not executable until the owner adds its exact approval entry in Section 5. Future tasks must use this template:
+ST2-001 is approved to start. Its exact scope and approval are recorded in Section 11.2 and Section 5. Future tasks must use this template:
 
 ### [TASK-ID] Task title
 
@@ -160,10 +160,10 @@ For detailed product decisions and requirements, consult the current authoritati
 - **Workflow:** `DRAFT` (ChatGPT) → owner approval entry (Section 5 template) → execution strictly within approved scope → execution report with evidence (Section 6 template, `READY_FOR_REVIEW`) → ChatGPT review record → owner acceptance. Acceptance of one result does not authorize the next task or a broader scope.
 - **Audit trail:** append dated updates only; never overwrite or erase previous reports, approvals, or review records.
 - **Evidence honesty:** never claim a test passed unless it was actually run; distinguish "passed" / "failed" / "not run"; report commands, commits, files, failures, and unresolved risks as-is.
-- **Frozen constraints acknowledged:** 15 Must-have items frozen; 7 Nice-to-have categories deferred (each needs separate approval); 11 Out-of-scope categories excluded; Stage 1 acceptance is design/planning-level only; **Stage 2 is NOT authorized — no formal game project, no Babylon.js installation, no game code, no Stage 2 technical spikes** until the owner explicitly authorizes Stage 2.
+- **Frozen constraints acknowledged:** 15 Must-have items frozen; 7 Nice-to-have categories deferred (each needs separate approval); 11 Out-of-scope categories excluded; Stage 1 acceptance was design/planning-level only. At the time of this onboarding feedback (2026-11-12), Stage 2 had not yet been authorized; that historical status was superseded by the owner's later Stage 2 authorization recorded in Section 11.
 - **Conflict rule:** if this log conflicts with any approved scope or decision record in `docs/`, I stop and ask the owner rather than choosing one silently.
 
-Note: this log records that Stage 1 formal acceptance has passed. I have not independently audited the Stage 1 documents; I treat this log as the current authority and will raise any conflict to the owner.
+Note: this log records that Stage 1 formal acceptance has passed. I have not independently audited the Stage 1 documents; I treat the approved project documents as authoritative and will raise any conflict to the owner.
 
 ### 10.2 Confirmed capabilities (verified in this environment)
 
