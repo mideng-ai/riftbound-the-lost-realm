@@ -63,3 +63,9 @@ PROJECT_OVERVIEW.md、GAME_SCOPE.md、GAME_DESIGN_SPEC.md、DECISIONS_LOG.md、D
 已解决当前发现的 M1 主要设备表述冲突。阶段1仍未完成，因为 D-201 至 D-206、D-208、D-209 尚未全部形成负责人确认的完整规格，GAME_SCOPE 的最终冻结也尚待负责人审查。
 
 下一步按 STAGE1_EXECUTION_PLAN.md 执行 WP-02 至 WP-09，完成设计规格与阶段1验收包。
+
+
+### AUD-004：移动中普通攻击的状态表述不一致
+- 原问题：GAME_DESIGN_SPEC.md 第4.2节曾以确定语气写「允许玩家移动中进行普通攻击」，但 DECISIONS_LOG.md D-201 仍将移动中攻击列为待确认细节。
+- 处理：将 GAME_DESIGN_SPEC.md 第4.2节修正为「提案/待确认」，明确建议方向但不提前冻结规则。
+- 状态：已修正；D-201 仍待负责人确认。
