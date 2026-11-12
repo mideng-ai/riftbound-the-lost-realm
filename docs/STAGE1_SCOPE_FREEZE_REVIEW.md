@@ -4,7 +4,7 @@
 > **日期：** 2026-11-12  
 > **状态：** 负责人最终审查稿；未获明确批准前，GAME_SCOPE 仍为冻结候选  
 > **项目：** Riftbound: The Lost Realm  
-> **依据：** GAME_SCOPE.md、FIRST_RELEASE_MUST_HAVE_SPEC.md、STAGE1_REQUIREMENTS_TRACEABILITY.md、DECISIONS_LOG.md v4.6、D-104_ENEMY_ROSTER_CANDIDATE.md
+> **依据：** GAME_SCOPE.md、FIRST_RELEASE_MUST_HAVE_SPEC.md、STAGE1_REQUIREMENTS_TRACEABILITY.md、DECISIONS_LOG.md v4.7、D-104_ENEMY_ROSTER_CANDIDATE.md
 
 ---
 
@@ -118,8 +118,7 @@ GAME_SCOPE 当前实际列出 11 项排除内容，建议按以下清单冻结�
 
 ## 8. G1 阶段1收尾与负责人决定顺序
 
-1. 明确 D-104 选择：接受 4+2+1、调整数量，或明确延期内容。
-2. 负责人确认 GAME_SCOPE 的 Must-have、Nice-to-have、Out of scope 三类范围冻结。
+1. 负责人确认 GAME_SCOPE 的 Must-have、Nice-to-have、Out of scope 三类范围冻结。
 3. 负责人审查 FR-MH-01～15 验收口径；未决的测试参数按本表留后续验证。
 4. 确认阶段1交付物、风险与延期接受项。
 5. 负责人明确宣布阶段1验收通过。
@@ -133,5 +132,6 @@ GAME_SCOPE 当前实际列出 11 项排除内容，建议按以下清单冻结�
 
 | 版本 | 日期 | 变更 |
 |---|---|---|
+| v1.2 | 2026-11-12 | 更新决策日志依据至 v4.7；移除已完成的 D-104 数量决定步骤，保留三类范围冻结、阶段1验收与阶段2独立授权。 |
 | v1.1 | 2026-11-12 | 记录负责人确认 D-104 为 4 普通 + 2 精英 + 1 Boss；整体范围冻结、阶段1验收与阶段2授权仍独立处理。 |
 | v1.0 | 2026-11-12 | 汇总 15 项 Must-have、可选/排除范围、D-104 阵容选项、验收共通规则与 G1/阶段2授权边界，供负责人最终审查。 |
