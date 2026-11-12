@@ -101,6 +101,37 @@ An approval for one task does not approve another task, a broader scope, or a la
 
 WorkBuddy must append a report under the matching task ID:
 
+### ST2-001 Execution report
+
+- **Execution status:** `READY_FOR_REVIEW`
+- **Started / completed:** 2026-11-13 / 2026-11-13
+- **Approval record checked:** Section 5 "Approval record — ST2-001", `APPROVED_TO_START`, approved by project owner 2026-11-12 ("我批准 ST2-001，允许 WorkBuddy 按 GitHub 文档中的准确范围开始执行。"). Scope verified against Section 11.2 and `STAGE2_TECH_SPIKE_PLAN.md` Section 7 before starting.
+- **Work performed:**
+  1. Researched current stable Babylon.js: **@babylonjs/core 9.36.0** (npm `latest`, published 2026-11-12). Official compat: Apache-2.0; WebGPU supported since 5.0 and maintained side by side with WebGL (doc.babylonjs.com/setup/support/webGPU); GPU particles require WebGL2 (verified during Stage 0 audit). Babylon Lite (WebGPU-only) exists but is NOT adopted — D-007 unchanged.
+  2. Built a minimal isolated Vite + TypeScript + Babylon.js spike in a disposable sandbox directory (no formal game project touched). Committed to `spikes/ST2-001/` in-repo for auditability only; it is disposable and can be deleted after acceptance.
+  3. Minimal 3D scene (ground + box + sphere) with top-down ArcRotateCamera; HUD renders measured engine facts into the DOM for evidence.
+  4. Recorded WebGL2 runtime results; WebGPU probed (unavailable in sandbox; not made a prerequisite, per scope).
+  5. Dev server, production build, and preview verified; exact versions, logs, and screenshots committed as evidence.
+- **Files changed:** `spikes/ST2-001/` (package.json, tsconfig.json, index.html, src/main.ts, README.md, evidence/browser-harness.mjs, evidence/dev.log, evidence/build.log, evidence/preview.log, evidence/shot-dev-firefox.png, evidence/shot-preview-firefox.png) + this document (status update, this report, change log).
+- **Commits:** `23025191e2` (package.json), `ca303c715b` (tsconfig), `983dc2863a` (index.html), `7651812c66` (src/main.ts), `bcc0fec751` (README), `b390bd899f`/`ef446adf26`/`93bed69c00`/`9798c8c92f` (evidence logs/harness), `00f7390080`/`a677b8a501` (screenshots). All on `main`, one file per commit (Contents API; sandbox blocks native git).
+- **Commands run:** `npm install` / `npm run dev` / `npm run build` / `npm run preview -- --port 4173` / `npm audit` / `npm view @babylonjs/core version` / Playwright-driven Firefox harness (see `spikes/ST2-001/evidence/browser-harness.mjs`).
+- **Tests and actual results:**
+  - Clean install: `added 17 packages … found 0 vulnerabilities` ✅
+  - Dev server: `VITE v8.3.8 ready in 129 ms`, `GET / -> 200` ✅
+  - Browser render (sandbox Firefox 146.0.1, software GL via Xvfb + `LIBGL_ALWAYS_SOFTWARE=1`): console `Babylon.js v9.36.0 - WebGL2`; HUD shows `WebGL2 context: YES`, fps ≈ 57.7–59.1 (software rendering), 352 frames, 3 meshes, 1280×800; screenshot visually confirms ground/box/sphere under top-down camera ✅
+  - Production build: `tsc` clean, `✓ built in 231ms`, dist produced; preview server `GET / -> 200` and scene renders (screenshot) ✅
+  - WebGPU probe: `navigator.gpu` unavailable in sandbox browsers (Chrome adapter request returns null); Babylon `WebGPUEngine` NOT run — recorded as untested, not a blocker.
+- **Screenshots / logs / other evidence:** `spikes/ST2-001/evidence/` (2 screenshots, 3 logs, harness script); details in `spikes/ST2-001/README.md`.
+- **Known issues / deviations:**
+  - Sandbox has no GPU (`/dev/dri` missing): Chrome/Chromium GPU process fails EGL init, so **WebGL2 evidence comes from Firefox software rendering (llvmpipe)** — fps numbers are NOT representative of real-GPU performance and are not a performance conclusion.
+  - WebGPU engine untested in sandbox (probe-only, per scope: WebGPU must not be a prerequisite).
+  - One in-spike fix: `Engine.renderingBackend` property does not exist in 9.36.0 typings (TS2339); replaced with static HUD text. Recorded in README.
+  - Vite chunk-size warning (main chunk 1,074 kB / gzip 259 kB) — recorded as an observation for the later S2-G formal skeleton; no optimization done in this spike.
+  - Deviation flagged for review: spike source committed to repo under `spikes/ST2-001/` (evidence/auditability). Judgment call within "提交…可核验结果"; disposable, not the formal game project. If reviewer considers this out of scope, recommend `CANCELLED`-deleting the directory after evidence extraction.
+- **Scope changes:** None. No gameplay code, no formal project, no cartoon-rendering/VFX/input/save/perf-budget decisions made, and D-207 / D-210 statuses untouched.
+- **Next action requested:** ChatGPT review (Section 7). Optional owner-side confirmation: run the same spike on Mac mini (steps in `spikes/ST2-001/README.md` §5) to confirm WebGL2 on real GPU before owner acceptance of the engine baseline.
+
+
 ### [TASK-ID] Execution report
 
 - **Execution status:** `IN_PROGRESS` / `READY_FOR_REVIEW` / `BLOCKED`
@@ -148,6 +179,7 @@ For detailed product decisions and requirements, consult the current authoritati
 
 - 2026-11-12 — Created the shared asynchronous collaboration protocol. The protocol is approved; no Stage 2 task or implementation work is authorized by this entry.
 - 2026-11-12 — WorkBuddy onboarding: read the protocol from `main`, confirmed read/update access via the GitHub REST API, and recorded its understanding, verified capabilities, and permission limits in Section 10. No execution task started; no task ID currently holds `APPROVED_TO_START`.
+- 2026-11-13 — ST2-001 executed by WorkBuddy within the approved scope: Babylon.js 9.36.0 baseline spike (isolated, disposable; source+evidence in `spikes/ST2-001/`). Clean install / dev server / WebGL2 render / production build all verified in the sandbox (Firefox software-GL; sandbox GPU limits recorded honestly). Task set to `READY_FOR_REVIEW`; awaiting ChatGPT review and owner acceptance. No scope expansion; no gameplay or Stage 3 work.
 
 ## 10. WorkBuddy onboarding feedback
 
@@ -202,7 +234,7 @@ Stage 2 is authorized. The owner explicitly approved ST2-001 on 2026-11-12 with 
 ### 11.2 First approved task
 
 #### ST2-001 — Babylon.js baseline rendering and build compatibility Spike
-- **Status:** `APPROVED_TO_START` — owner approved on 2026-11-12; exact scope only.
+- **Status:** `READY_FOR_REVIEW` — WorkBuddy completed execution on 2026-11-13; execution report in Section 6. (Previously `APPROVED_TO_START`, owner approved 2026-11-12.)
 - **Plan:** `docs/STAGE2_TECH_SPIKE_PLAN.md`, Section 7.
 - **Scope:** isolated disposable Vite + TypeScript + Babylon.js spike; minimal 3D scene and top-down camera; WebGL2 verification; optional WebGPU capability probe; dev server and production build verification.
 - **Out of scope:** formal game project architecture, gameplay code, full input system, cartoon-rendering decision, spell VFX, save implementation, performance-budget decision, and Stage 3 work.
