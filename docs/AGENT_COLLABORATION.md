@@ -183,10 +183,10 @@ Note: this log records that Stage 1 formal acceptance has passed. I have not ind
 
 ### 10.4 Current status
 
-Stage 2 is authorized. Task ST2-001 is drafted in Section 4 but has no task-specific `APPROVED_TO_START` entry yet. No WorkBuddy execution is authorized until the owner approves ST2-001's exact scope. Stage 3 / M1 gameplay work is not authorized.
+Stage 2 is authorized. The owner explicitly approved ST2-001 on 2026-11-12 with the message: “我批准 ST2-001，允许 WorkBuddy 按 GitHub 文档中的准确范围开始执行。” The approval is recorded in Section 5. WorkBuddy may execute only the exact ST2-001 scope described in Section 11.2 and `STAGE2_TECH_SPIKE_PLAN.md` Section 7. Stage 3 / M1 gameplay work is not authorized.
 
 
-## 11. Stage 2 authorization and first task proposal
+## 11. Stage 2 authorization and first task
 
 > **Recorded:** 2026-11-12  
 > **Owner instruction:** “开始第二阶段吧。”  
@@ -199,12 +199,24 @@ Stage 2 is authorized. Task ST2-001 is drafted in Section 4 but has no task-spec
 - Stage 2 technical planning and spike design may proceed.
 - WorkBuddy may execute only a task with a matching task ID, exact scope, and owner approval entry in Section 5.
 
-### 11.2 First proposed task
+### 11.2 First approved task
 
 #### ST2-001 — Babylon.js baseline rendering and build compatibility Spike
-- **Status:** `DRAFT` — waiting for owner task-specific approval.
+- **Status:** `APPROVED_TO_START` — owner approved on 2026-11-12; exact scope only.
 - **Plan:** `docs/STAGE2_TECH_SPIKE_PLAN.md`, Section 7.
 - **Scope:** isolated disposable Vite + TypeScript + Babylon.js spike; minimal 3D scene and top-down camera; WebGL2 verification; optional WebGPU capability probe; dev server and production build verification.
 - **Out of scope:** formal game project architecture, gameplay code, full input system, cartoon-rendering decision, spell VFX, save implementation, performance-budget decision, and Stage 3 work.
 - **Acceptance criteria:** clean dependency install, browser 3D scene render, successful production build, exact versions and reproducible logs/screenshots, honest environment/untested notes.
-- **Owner approval:** Not granted. Do not execute until the owner records `APPROVED_TO_START` for ST2-001 in Section 5.
+- **Owner approval:** Granted on 2026-11-12; see the owner approval record in Section 5.
+
+
+### Approval record — ST2-001
+
+- **Task ID:** ST2-001
+- **Decision:** `APPROVED_TO_START`
+- **Approved scope:** The exact scope, exclusions, acceptance criteria, and stop conditions in `docs/STAGE2_TECH_SPIKE_PLAN.md`, Section 7, and the matching task entry in Section 11.2 of this document. No scope expansion.
+- **Approved by:** Project owner
+- **Date:** 2026-11-12
+- **Source:** Explicit owner message in ChatGPT: “我批准 ST2-001，允许 WorkBuddy 按 GitHub 文档中的准确范围开始执行。”
+- **Conditions / limits:** Isolated disposable Spike only. Do not create the formal game project or implement gameplay. Do not decide cartoon rendering, spell VFX, input architecture, D-207, or D-210 as part of this task. Stop and report if the task cannot be completed within the approved scope.
+- **Record transcription:** This entry transcribes the owner's explicit approval; ChatGPT is not granting approval on the owner's behalf.
