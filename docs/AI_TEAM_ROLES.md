@@ -1,16 +1,19 @@
 # AI_TEAM_ROLES — AI 团队岗位说明
 
 > **项目：** Riftbound: The Lost Realm
-> **版本：** v1.1
+> **版本：** v1.2
 > **创建日期：** 2026-11-11
 > **状态：** 阶段0（项目准备）
 > **v1.1 修订：** 修正第四节标准任务流中「岗位不停等时可先做不依赖该决策的部分」的表述，改为「等待用户决定期间，可继续执行不依赖该决策的工作」；六岗职责与权限未变。
+> **v1.2 修订（2026-11-12）：** 配套文档列表补全两份阶段0专项文档（DEVELOPMENT_ENVIRONMENT.md、ASSET_LICENSE_RESEARCH.md），六岗职责与权限未变。
 > **性质：** 本文档定义项目中各 AI 岗位的职责、工作边界、协作方式和统一规则。岗位为职责定义与协作约定，**实际 AI 智能体尚未创建**；本文档是后续组建 AI 团队的依据，须与以下文档配套使用：
 > - [PROJECT_OVERVIEW.md](./PROJECT_OVERVIEW.md)（项目总纲，四大支柱与技术方向）
 > - [DEVELOPMENT_ROADMAP.md](./DEVELOPMENT_ROADMAP.md)（八阶段路线图与阶段边界）
 > - [GAME_SCOPE.md](./GAME_SCOPE.md)（首版范围红线与不开发清单）
 > - [GAME_DESIGN_PRINCIPLES.md](./GAME_DESIGN_PRINCIPLES.md)（设计原则与 Check 的性质）
 > - [DECISIONS_LOG.md](./DECISIONS_LOG.md)（决策状态：已确定 / 暂定 / 待确认）
+> - [DEVELOPMENT_ENVIRONMENT.md](./DEVELOPMENT_ENVIRONMENT.md)（开发环境说明：沙箱与本机验证记录）
+> - [ASSET_LICENSE_RESEARCH.md](./ASSET_LICENSE_RESEARCH.md)（资源与许可证调研清单：v0.x 候选清单，未获准集成）
 
 ---
 
