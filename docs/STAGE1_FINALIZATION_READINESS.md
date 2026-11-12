@@ -1,6 +1,6 @@
 # STAGE1_FINALIZATION_READINESS — 阶段1收尾就绪报告
 
- > **版本：** v1.1  
+ > **版本：** v1.2  
 > **日期：** 2026-11-12  
 > **状态：** 内部收尾审查；不代表负责人验收或阶段2授权  
 > **项目：** Riftbound: The Lost Realm
@@ -15,7 +15,7 @@
 
 | 交付 | 结果 | 证据 |
 |---|---|---|
-| 八项设计方向确认 | 完成 | DECISIONS_LOG.md v4.7、STAGE1_CONFIRMED_DESIGN_BASELINE.md |
+| 八项设计方向确认 | 完成 | DECISIONS_LOG.md v4.8、STAGE1_CONFIRMED_DESIGN_BASELINE.md |
 | 双端输入/战斗/Dash 规格 | 完成 | STAGE1_INPUT_AND_COMBAT_SPEC.md |
 | 地图/撤离/死亡/资产结算规格 | 完成 | STAGE1_MAP_EXTRACTION_DEATH_SPEC.md |
 | 装备/背包/仓库/营地成长规格 | 完成 | STAGE1_EQUIPMENT_CAMP_SPEC.md |
@@ -23,8 +23,8 @@
 | 15 项 Must-have 拆分 | 完成工作稿 | FIRST_RELEASE_MUST_HAVE_SPEC.md |
 | 38 项未来任务与阶段门 | 完成规划稿 | FIRST_RELEASE_TASK_BREAKDOWN.md |
 | FR-MH-01～15 追踪矩阵 | 完成 | STAGE1_REQUIREMENTS_TRACEABILITY.md |
-| 首版范围冻结审查表 | 完成负责人审查稿 | STAGE1_SCOPE_FREEZE_REVIEW.md；STAGE1_OWNER_REVIEW_PACKET.md v0.4 |
-| Must-have 验收口径审查 | 完成工作稿 | STAGE1_ACCEPTANCE_CRITERIA_AUDIT.md
+| 首版范围冻结 | **负责人已正式批准** | GAME_SCOPE.md；DECISIONS_LOG.md v4.8；STAGE1_SCOPE_FREEZE_REVIEW.md v1.3 |
+| Must-have 验收口径审查 | 完成工作稿，待负责人最终审查 | STAGE1_ACCEPTANCE_CRITERIA_AUDIT.md；STAGE1_REQUIREMENTS_TRACEABILITY.md
 | M1 垂直切片边界 | 已定义 | STAGE1_M1_BLUEPRINT.md |
 | 数值验证方式 | 已定义，尚未实测 | STAGE1_NUMERIC_VALIDATION_PLAN.md |
 
@@ -35,18 +35,16 @@
 | 项目 | 当前状态 | G1 前需要的处理 |
 |---|---|---|
 | D-104 首版怪物数量 | 4 普通 + 2 精英 + 1 Boss 已由负责人确认 | 数量决策完成；后续按 T-026 生产与验收七种差异化敌人 |
-| GAME_SCOPE Must-have | 15 项已拆分并追踪 | 负责人最终审查并冻结 |
-| GAME_SCOPE Nice-to-have | 已列候选，默认不做 | 确认候选列表只作为后续批准池，不进入首版默认承诺 |
-| GAME_SCOPE Out of scope | 已列出 11 类排除方向，边界解释已整理 | 负责人最终审查并冻结；尤其商业化、账号/云存档、多语言/ |
-| 首版 Must-have 验收口径 | FR-MH-01～15 已拆分，需最后审查 | 冻结验收条件与依赖 |
+| GAME_SCOPE 三类范围 | 15 Must-have、7 类 Nice-to-have、11 类 Out of scope | **已于 2026-11-12 由负责人正式冻结；该项不再阻塞 G1** | |
+| 首版 Must-have 验收口径 | FR-MH-01～15 已拆分并审查 | 负责人最终审查验收条件、证据类型与阶段归属 |
 | 阶段1验收 | 尚未执行正式验收 | 负责人明确宣布阶段1验收通过 |
 | 阶段2授权 | 尚未批准 | 负责人明确授权进入阶段2 |
 
 D-207 存档技术方案与 D-210 性能预算按既定安排留在阶段2 Spike，不要求阶段1提前决定具体技术。D-010 音频许可证核查在引入具体音频资产前完成，不构成当前设计规格阻塞。
 
-## 3. 首版范围冻结候选口径
+## 3. 已冻结的首版范围基线
 
-本节是对现有 GAME_SCOPE 内容的冻结审查摘要，不擅自修改原范围，也不替负责人做最终批准。
+本节记录负责人于 2026-11-12 正式批准的范围基线，与 GAME_SCOPE.md 保持一致。
 
 ### 3.1 Must-have（15 项，保持当前范围）
 
@@ -114,13 +112,13 @@ GAME_SCOPE 当前列出 11 项排除方向：多人/联机、PvP、长篇剧情�
 
 ## 7. 阶段1正式验收前的执行顺序
 
-1. 负责人审查并冻结 GAME_SCOPE 三类范围。
-3. 审查 FR-MH-01～15 的最终产品行为和验收口径。
+1. **已完成：** 负责人正式冻结 GAME_SCOPE 三类范围（15 Must-have、7 类 Nice-to-have、11 类 Out of scope）。
+2. 负责人最终审查 FR-MH-01～15 的产品行为、验收口径与证据类型。
+3. 负责人审阅 STAGE1_DELIVERY_EVIDENCE_AND_RISK_REGISTER.md，确认阶段1交付物、未产生的运行证据、风险与延期接受项。
 4. 检查任务树阶段门、M1/首版边界与追踪矩阵。
-5. 汇总未解决风险与明确延期接受项。
-6. 负责人宣布阶段1验收通过。
-7. 负责人另行明确批准进入阶段2。
-8. G1 放行后才开展技术 Spike；在此之前不创建正式工程、不安装 Babylon.js、不写游戏代码。
+5. 负责人明确宣布阶段1验收通过。
+6. 负责人另行明确批准进入阶段2。
+7. G1 放行后才开展技术 Spike；在此之前不创建正式工程、不安装 Babylon.js、不写游戏代码。
 
 ---
 
@@ -128,5 +126,11 @@ GAME_SCOPE 当前列出 11 项排除方向：多人/联机、PvP、长篇剧情�
 
 | 版本 | 日期 | 变更 |
 |---|---|---|
+| v1.2 | 2026-11-12 | 同步首版三类范围正式冻结，更新 G1 剩余项；新增交付证据与风险登记册，区分设计交付和后续运行验收。 |
 | v1.1 | 2026-11-12 | 根据 D-104 正式确认更新 G1 阻塞；明确 11 类 Out of scope 边界已整理；修正负责人审查包与决策日志来源状态。 |
 | v1.0 | 2026-11-12 | 汇总阶段1设计交付、G1 实际阻塞、首版范围冻结候选、数值/技术阶段边界与正式验收顺序。 |
+
+
+## 8. 证据与风险登记册
+
+已建立 `STAGE1_DELIVERY_EVIDENCE_AND_RISK_REGISTER.md`，集中记录阶段1文档交付、FR-MH-01～15 后续运行证据、R-01～R-09 风险、可延期与不可豁免事项。该文件是负责人最终验收的审查材料；其建立不代表风险已被负责人接受或阶段1已验收。
