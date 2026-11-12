@@ -3,7 +3,7 @@
 > **版本：** v1.0  
 > **日期：** 2026-11-12  
 > **状态：** 阶段1规划工作稿；任务尚未获准执行  
-> **依据：** FIRST_RELEASE_MUST_HAVE_SPEC.md v1.0、STAGE1_EXECUTION_PLAN.md v1.0、DECISIONS_LOG.md v3.9  
+> **依据：** FIRST_RELEASE_MUST_HAVE_SPEC.md v1.0、STAGE1_EXECUTION_PLAN.md v1.1、DECISIONS_LOG.md v4.0  
 > **边界：** 本文件只定义未来工作分解、先后关系与完成证据，不是开工授权；不得据此开始阶段2、正式工程、Babylon.js 安装或游戏代码开发。
 
 ---
@@ -132,7 +132,7 @@ flowchart TD
   D["T-023～T-029 装备/成长/内容/引导"]
   E["T-030～T-034 音频/存档/PC/性能"]
   F["T-035～T-038 首版回归与验收"]
-  G1 --> A
+  A --> G1
   G1 --> B1
   G1 --> B2
   G1 --> B3
