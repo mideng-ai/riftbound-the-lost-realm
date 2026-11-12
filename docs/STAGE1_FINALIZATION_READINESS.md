@@ -23,6 +23,7 @@
 | 15 项 Must-have 拆分 | 完成工作稿 | FIRST_RELEASE_MUST_HAVE_SPEC.md |
 | 38 项未来任务与阶段门 | 完成规划稿 | FIRST_RELEASE_TASK_BREAKDOWN.md |
 | FR-MH-01～15 追踪矩阵 | 完成 | STAGE1_REQUIREMENTS_TRACEABILITY.md |
+| 首版范围冻结审查表 | 完成负责人审查稿 | STAGE1_SCOPE_FREEZE_REVIEW.md；STAGE1_OWNER_REVIEW_PACKET.md v0.3 |
 | M1 垂直切片边界 | 已定义 | STAGE1_M1_BLUEPRINT.md |
 | 数值验证方式 | 已定义，尚未实测 | STAGE1_NUMERIC_VALIDATION_PLAN.md |
 
