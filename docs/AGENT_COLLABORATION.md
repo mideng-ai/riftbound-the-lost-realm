@@ -146,3 +146,40 @@ For detailed product decisions and requirements, consult the current authoritati
 ## 9. Change log
 
 - 2026-11-12 — Created the shared asynchronous collaboration protocol. The protocol is approved; no Stage 2 task or implementation work is authorized by this entry.
+- 2026-11-12 — WorkBuddy onboarding: read the protocol from `main`, confirmed read/update access via the GitHub REST API, and recorded its understanding, verified capabilities, and permission limits in Section 10. No execution task started; no task ID currently holds `APPROVED_TO_START`.
+
+## 10. WorkBuddy onboarding feedback
+
+> **Recorded:** 2026-11-12
+> **Trigger:** explicit owner instruction (2026-11-12) to read this document and record feedback. This is an onboarding record only — it is not task approval and authorizes no implementation work.
+
+### 10.1 Understanding of the protocol (confirmed read)
+
+- **Hard gate:** I will not execute any task unless this document contains an explicit owner approval entry with status `APPROVED_TO_START` for that exact task ID and scope. Approval of the collaboration process itself is not task approval; ChatGPT cannot grant approvals. If an approval is absent, ambiguous, expired, or mismatched with the task ID/scope, I stop and ask the owner.
+- **Workflow:** `DRAFT` (ChatGPT) → owner approval entry (Section 5 template) → execution strictly within approved scope → execution report with evidence (Section 6 template, `READY_FOR_REVIEW`) → ChatGPT review record → owner acceptance. Acceptance of one result does not authorize the next task or a broader scope.
+- **Audit trail:** append dated updates only; never overwrite or erase previous reports, approvals, or review records.
+- **Evidence honesty:** never claim a test passed unless it was actually run; distinguish "passed" / "failed" / "not run"; report commands, commits, files, failures, and unresolved risks as-is.
+- **Frozen constraints acknowledged:** 15 Must-have items frozen; 7 Nice-to-have categories deferred (each needs separate approval); 11 Out-of-scope categories excluded; Stage 1 acceptance is design/planning-level only; **Stage 2 is NOT authorized — no formal game project, no Babylon.js installation, no game code, no Stage 2 technical spikes** until the owner explicitly authorizes Stage 2.
+- **Conflict rule:** if this log conflicts with any approved scope or decision record in `docs/`, I stop and ask the owner rather than choosing one silently.
+
+Note: this log records that Stage 1 formal acceptance has passed. I have not independently audited the Stage 1 documents; I treat this log as the current authority and will raise any conflict to the owner.
+
+### 10.2 Confirmed capabilities (verified in this environment)
+
+- **Read and update this document and any repo file on `main`** via the GitHub REST API (`api.github.com`). This entry itself is the write confirmation; the commit SHA is reported to the owner in chat.
+- View repository file lists, commit history, and per-commit changed files via the same API.
+- Operate a Linux sandbox (Node.js / npm / Python / Git CLI available) for document diffs, link and license verification (HTTP fetching + content comparison), and general non-game-engineering work.
+- Produce deliverable files visible to the owner (workspace files, self-check reports, etc.).
+
+### 10.3 Current permission and environment limits
+
+- The sandbox blocks direct `github.com` git traffic; only `api.github.com` is reachable. Commits are therefore made **file-by-file via the Contents API** — no native `git push`, no multi-file atomic commit, no branch/PR creation via git. Each file update is its own commit, which suits the one-task-one-file-report audit style of this protocol.
+- The project net-drive (tdrive) sync channel is currently unavailable; **GitHub `main` is the sole baseline**. Historical doc versions are preserved both in Git history and local backups.
+- `itch.io` domains are unreachable from this environment; KayKit page license labels must be verified by the owner locally (as recorded in `docs/STAGE0_SELF_CHECK_REPORT.md`).
+- I cannot run anything on the owner's Mac mini; local machine checks remain owner-side actions.
+- I will never add or modify entries in Section 5 (owner approvals) — that section is owner-only by protocol.
+- Onboarding honesty note: my reports distinguish sandbox-executed results from owner-machine results; I do not present sandbox verification as local-machine verification.
+
+### 10.4 Current status
+
+No task under Section 4 currently holds `APPROVED_TO_START`. No game engineering work (project scaffolding, dependency installation, game code) has been started by me. Standing by for an owner-approved task ID.
