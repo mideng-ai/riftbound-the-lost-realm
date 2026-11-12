@@ -47,6 +47,8 @@
 ### 2.2 首版需求追踪检查
 
 - [x] 已建立 `STAGE1_REQUIREMENTS_TRACEABILITY.md`，覆盖 FR-MH-01～FR-MH-15 的设计规格、任务映射、M1 边界与最终验收证据。
+- [x] 已建立 `STAGE1_ACCEPTANCE_CRITERIA_AUDIT.md`，逐项审查 15 项 Must-have 验收口径与阶段边界。
+- [x] 首版法杖/魔法剑两种武器要求已写入 FR-MH-03、需求追踪矩阵与 T-023；M1 仍只要求最小武器样本。
 - [x] 已区分 M1 最小闭环与首版完整 Must-have，不将 M1 误作完整发布验收。
 - [x] D-104、D-207、D-210、D-010 分别保留为数量决策、存档 Spike、性能实测与音频许可证核查，不被八项设计确认覆盖。
 
