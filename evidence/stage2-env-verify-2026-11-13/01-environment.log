@@ -1,0 +1,45 @@
+=== macOS ===
+ProductName:		macOS
+ProductVersion:		15.0.1
+BuildVersion:		24A348
+=== hardware ===
+      Model Name: Mac mini
+      Model Identifier: Macmini9,1
+      Chip: Apple M1
+      Memory: 8 GB
+      Serial Number (system): C07DV0WTQ6NW
+=== node ===
+v22.22.2
+/Users/guoziqiang/.workbuddy/binaries/node/versions/22.22.2/bin/node
+=== npm ===
+10.9.7
+/Users/guoziqiang/.workbuddy/binaries/node/versions/22.22.2/bin/npm
+=== git ===
+git version 2.39.5 (Apple Git-154)
+=== git fetch ===
+FETCH OK
+=== git status after fetch ===
+## main...origin/main
+=== git log -1 ===
+b7117ee5676117d85958fddc0aeb0541d6e9cc28 Update roadmap for ST2-003 acceptance; Stage 2 remains open (2026-11-13 17:36:19 +0800)
+=== package.json ===
+{
+  "name": "riftbound-the-lost-realm",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview --port 4170 --strictPort",
+    "typecheck": "tsc --noEmit",
+    "test:input": "tsc -p tsconfig.test.json && node tests/prepare.cjs && node tests/input-regression.cjs"
+  },
+  "dependencies": {
+    "@babylonjs/core": "9.36.0"
+  },
+  "devDependencies": {
+    "typescript": "5.9.3",
+    "vite": "8.3.8"
+  }
+}

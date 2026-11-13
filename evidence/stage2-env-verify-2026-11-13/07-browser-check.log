@@ -1,0 +1,23 @@
+[console:debug] [vite] connecting...
+[console:debug] [vite] connected.
+[console:log] BJS - [18:32:09]: Babylon.js v9.36.0 - WebGL2 - Parallel shader compilation
+[console:log] [s2g] formal skeleton started; render pipeline = PROVISIONAL toon (ST2-002 path B)
+[console:log] [save] first run — default save written via mock adapter
+timestamp_utc=2026-11-13T10:32:09.226Z
+chrome=157.0.8103.51 launch={"channel":"chrome","headless":true}
+http_status=200
+title=Riftbound: The Lost Realm — Stage 2 Skeleton
+[console:error] Failed to load resource: the server responded with a status of 404 (Not Found)
+canvas_count=1
+webgl2=true
+gpu_backend=Google Inc. (Apple) | ANGLE (Apple, ANGLE Metal Renderer: Apple M1, Unspecified Version)
+hud=Stage-2 skeleton (NOT gameplay): move + VFX lifecycle demo + mock save
+move x=0.00 y=0.00  suspended=false
+projectiles live=0
+saveAdapter=mock (D-207 pending)
+pageerrors=0
+console_errors=1
+requestfailed=0
+--- console errors ---
+[console:error] Failed to load resource: the server responded with a status of 404 (Not Found)
+--- failed requests ---
