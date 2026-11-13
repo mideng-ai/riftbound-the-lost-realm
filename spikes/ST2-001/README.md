@@ -10,7 +10,7 @@
 | 文件 | 说明 |
 |---|---|
 | `package.json` | 依赖已**固定精确版本**（无 `^` / `~` 浮动范围） |
-| `.npmrc` | **（v3 新增）** 仅一行 `registry=https://registry.npmjs.org/`，使任何环境的 `npm ci` 都使用官方 HTTPS registry，不复现出镜像 URL |
+| `.npmrc` | **（v3 新增）** 固定 `registry=https://registry.npmjs.org/`，并设置 `audit=true`、`fund=false`；安装与审计均使用官方 HTTPS registry |
 | `package-lock.json` | **（v3 重新生成）** lockfileVersion 3，锁定 49 个包；**49/49 个 `resolved` 均为 `https://registry.npmjs.org/…`，明文 `http://` 条目为 0**；49 个 `integrity` 哈希齐全 |
 | `tsconfig.json` / `index.html` / `src/main.ts` | Spike 源码（最小 Vite + TS + Babylon.js 工程） |
 | `README.md` | 本文件 |
