@@ -225,6 +225,27 @@ WorkBuddy must append a report under the matching task ID:
 - **Scope changes:** None. D-207 / D-210 untouched; no gameplay or Stage 3 work.
 - **Next action requested:** ChatGPT re-review of the round 2 corrections; owner acceptance remains a separate decision.
 
+### ST2-002 Execution report
+
+- **Execution status:** `READY_FOR_REVIEW` (task complete; submitted for ChatGPT technical review, then owner acceptance)
+- **Started / completed:** 2026-11-13 / 2026-11-13
+- **Approval record checked:** Section 5 "Approval record — ST2-002" (`APPROVED_TO_START`, 2026-11-13, owner's explicit “批准”). Scope executed: `AGENT_COLLABORATION.md` §11.3 + `STAGE2_TECH_SPIKE_PLAN.md` §9.
+- **Work performed:**
+  1. **Isolated disposable Spike** created under `spikes/ST2-002/` (new files only; ST2-001 and formal sources untouched).
+  2. **Exact pinned dependencies + HTTPS lockfile + `.npmrc`**: `@babylonjs/core 9.36.0`, `typescript 5.9.3`, `vite 8.3.8`; lockfileVersion 3, **49/49 `resolved` URLs `https://registry.npmjs.org/…`, plaintext `http://` = 0, non-HTTPS = 0, `integrity` 49/49** (verified programmatically before install and recorded in the committed log `evidence/npmci.log`).
+  3. **One controlled comparison scene**: identical camera, ground, directional light (same normalized direction vector passed to both approaches), base color `#d94f43`, ambient `#453e56`; three identical object groups (box + sphere + torus knot), one per column. Approaches: **A** = programmatic `NodeMaterial` posterized toon (`DotBlock`→`MaxBlock`→`PosterizeBlock` steps=3); **B** = hand-written GLSL `ShaderMaterial` cel shading (3 stepped bands + hard rim); **C** = B base + outline overlays evaluated separately (inverted-hull silhouette outlines on sphere/knot; `EdgeRenderer` geometric edges on the box). On-screen labels (DynamicTexture billboards) identify each column; `?focus=A|B|C` query param provides per-approach screenshot mode.
+  4. **Clean-directory verification chain**: fresh dir (no `node_modules`) → `npm ci` (`added 19 packages`, exit 0, per-package version check) → `npm audit` 3 modes (**default / `--json` / `--audit-level=moderate` all 0 vulnerabilities, exit 0**, audited tree 49 packages) → `npm run build` twice (**Build A/B main chunk byte-identical**: `index-fYMmSF9j.js`, sha256 `8b737e9b…df1c0a`, 1,222.78 kB / gzip 291.82 kB) → dev (`ready in 99ms`, HTTP 200) and preview (HTTP 200, serves exactly `assets/index-fYMmSF9j.js`). Full logs with environment/exit codes committed: `evidence/npmci.log`, `evidence/npm-audit.log`, `evidence/build.log`, `evidence/run.log`.
+  5. **Browser evidence**: Playwright + Firefox 146 (headful, Xvfb, `LIBGL_ALWAYS_SOFTWARE=1` → llvmpipe software-rendered WebGL2): HUD `WebGL2 context: YES`, `WebGPU probe: api=absent`, `NOTE: WebGPU engine NOT run — probe only, not validated`, fps 34–47 across views. Screenshots: `shot-dev-full.png`, `shot-dev-focus-a/b/c.png`, `shot-preview-full.png`.
+  6. **Comparison report with advisory recommendation** (README): visual differences (A's uniform posterize bands vs B's explicit thresholds — same colors/lighting, difference is parameter placement, not pipeline), implementation complexity, per-technique constraints (PosterizeBlock uniform binning; EdgeRenderer unsuitable for high-curvature meshes — verified during development and rejected; non-uniform-scale normal caveat for ShaderMaterial), and a recommendation (lean toward B as base direction + inverted-hull outlines; NME kept as fallback for editor-driven tuning) explicitly marked **advisory — final decision remains with the owner**.
+- **Files changed:** new files only under `spikes/ST2-002/` (package.json, package-lock.json, .npmrc, tsconfig.json, index.html, src/main.ts, README.md, evidence/ × 10) and this document (execution report, §11.3 status, change log).
+- **Commits (one file per commit via Contents API):** `9d7f87068e` package.json · `e367788b01` package-lock.json · `180b61ce5f` .npmrc · `34e539fd3c` tsconfig.json · `591714c927` index.html · `7d19f72ac0` main.ts · `39c3d4cbe1` npmci.log · `b8de51b3ae` npm-audit.log · `5335ba0d91` build.log · `0b8e5125d3` run.log · `f6b4331fd8` browser-harness.mjs · `f524ff2ac6` shot-dev-full · `2dd0f00d38` shot-focus-a · `8873b7c49d` shot-focus-b · `ac536880a6` shot-focus-c · `f94b48f277` shot-preview-full · `ae9d9d3b62` README · plus this document commit.
+- **Commands run:** lockfile URL/integrity audit (programmatic), `npm install --package-lock-only` against official registry, clean-directory `npm ci`, `npm audit` ×3 modes, `npm run build` ×2 with `cmp`, dev/preview servers + HTTP checks, Playwright Firefox harness screenshots.
+- **Tests and actual results:** all acceptance criteria executed as listed; WebGPU engine, real-GPU (owner Mac) and physical mobile tests NOT run and NOT claimed; performance conclusions explicitly out of scope (fps figures recorded as software-rendering observations only).
+- **Screenshots / logs / other evidence:** `spikes/ST2-002/evidence/` (index in README §5).
+- **Known issues / deviations:** none. Vite chunk-size warning preserved verbatim (no optimization). D-003/D-007/D-207/D-210 untouched. The advisory recommendation does not select a final rendering method.
+- **Scope changes:** None. No gameplay, no formal-project conversion, no new dependencies beyond `@babylonjs/core`, no Stage 3/M1 work.
+- **Next action requested:** ChatGPT technical review of ST2-002; owner acceptance remains a separate decision.
+
 ### [TASK-ID] Execution report
 
 - **Execution status:** `IN_PROGRESS` / `READY_FOR_REVIEW` / `BLOCKED`
@@ -307,6 +328,7 @@ The following scope decisions remain binding:
 For detailed product decisions and requirements, consult the current authoritative project documents in `docs/`. If this collaboration log conflicts with an approved scope or decision record, stop and ask the owner rather than choosing one silently.
 
 ## 9. Change log
+- 2026-11-13 — ST2-002 executed within approved scope: isolated `spikes/ST2-002/` comparison Spike (NME posterized toon vs hand-written GLSL cel+rim, outline overlays evaluated separately), exact pins + HTTPS official-registry lockfile (49/49 https, 0 plaintext http), clean `npm ci` exit 0, `npm audit` 3 modes 0 vulnerabilities, byte-identical double build (sha256-verified), dev/preview HTTP 200, Firefox/llvmpipe screenshots incl. per-approach focus mode. Advisory recommendation recorded; no final rendering decision made. Status `READY_FOR_REVIEW`; awaiting ChatGPT review and owner acceptance.
 - 2026-11-13 — ST2-001 correction round 2 completed (within original approval scope): lockfile regenerated with all 49 resolved URLs on `https://registry.npmjs.org/` (0 plaintext http), directory `.npmrc` added, clean-directory `npm ci` re-run, full `npm audit` output committed (0 vulnerabilities, exit 0), `npm run build` executed twice with byte-identical output (sha256-verified), screenshots retaken. WorkBuddy also self-corrected a round 1 evidence-chain defect: the round 1 build log predated the source rewrite; attribution experiment committed. Status returned to `READY_FOR_REVIEW`; awaiting ChatGPT re-review and owner acceptance.
 - 2026-11-13 — ST2-001 correction round 1 re-reviewed. Exact pins/lockfile, clean `npm ci`, post-install build, `npm audit`, corrected WebGPU wording, and preserved scope limits are supported by committed evidence. Review found all 49 lockfile tarball URLs use plaintext `http://mirrors.tencent.com/...`; requested an HTTPS official/approved registry lockfile and clean-install/audit/build re-verification. Status remains `CHANGES_REQUESTED_BY_REVIEW`; owner acceptance remains pending.
 
@@ -417,7 +439,7 @@ Stage 2 is authorized. ST2-001 was approved to start on 2026-11-12 and formally 
 ### 11.3 Second approved task
 
 #### ST2-002 — Cartoon rendering direction comparison Spike
-- **Status:** `APPROVED_TO_START` — owner explicitly approved this exact scope on 2026-11-13; WorkBuddy may begin.
+- **Status:** `READY_FOR_REVIEW` — executed by WorkBuddy on 2026-11-13 within the approved scope; see execution report in Section 6. Awaiting ChatGPT technical review, then owner acceptance. (History: `APPROVED_TO_START` 2026-11-13 → execution `READY_FOR_REVIEW`.)
 - **Objective:** Compare at least two feasible Babylon.js cartoon-rendering approaches in a controlled, isolated scene and provide reproducible visual/technical evidence for the project owner's later decision.
 - **Plan:** `docs/STAGE2_TECH_SPIKE_PLAN.md`, Section 9.
 - **Scope:** New disposable Spike under `spikes/ST2-002/`; controlled comparison scene; at least two rendering approaches; screenshots; exact dependencies/lockfile; clean install, audit, build and browser verification; report actual environment and limitations.
