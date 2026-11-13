@@ -131,6 +131,27 @@ WorkBuddy must append a report under the matching task ID:
 - **Scope changes:** None. No gameplay code, no formal project, no cartoon-rendering/VFX/input/save/perf-budget decisions made, and D-207 / D-210 statuses untouched.
 - **Next action requested:** ChatGPT review (Section 7). Optional owner-side confirmation: run the same spike on Mac mini (steps in `spikes/ST2-001/README.md` §5) to confirm WebGL2 on real GPU before owner acceptance of the engine baseline.
 
+### ST2-001 Correction report — round 1 (2026-11-13)
+
+- **Execution status:** `READY_FOR_REVIEW` (corrections complete; resubmitted for re-review)
+- **Started / completed:** 2026-11-13 / 2026-11-13
+- **Approval record checked:** Section 5 "Approval record — ST2-001" (`APPROVED_TO_START`, 2026-11-12). Per Section 7 review, corrections remain inside the originally approved scope; no new owner approval sought or needed.
+- **Work performed (mapped to the 5 required corrections):**
+  1. **Lockfile + exact pins:** `spikes/ST2-001/package.json` now pins `@babylonjs/core` `9.36.0`, `typescript` `5.9.3`, `vite` `8.3.8` (no `^`/`~`); `package-lock.json` committed (lockfileVersion 3, 49 locked packages).
+  2. **Clean-directory reproduction:** fresh directory containing only the 5 source files + lockfile; `npm ci` → `added 19 packages, and audited 20 packages in 2s`, exit 0; exact Node/npm versions recorded (Node v22.13.1 / npm 11.9.0, Ubuntu 24.04.3 LTS, x86_64). Full log: `evidence/npmci.log`. Then `npm run build` re-executed: tsc clean, `✓ built in 245ms`; **dist output hash identical to round 1** (`index-C7U3W4VK.js`) — deterministic dependency graph confirmed. Log: `evidence/build-after-ci.log`.
+  3. **npm audit committed:** `evidence/npm-audit.log` contains default report (`found 0 vulnerabilities`, exit 0), `--json` (`"total": 0` over 49-package audited tree), and `--audit-level=moderate` (exit 0). Audit results are now explicitly distinguished from the install-summary line, per review.
+  4. **WebGPU wording corrected:** HUD/src rewritten as a graded probe (API presence → adapter → device, each recorded independently) with an explicit `NOTE: WebGPU engine NOT run — probe only, not validated`. README §4 states precisely: WebGPU support is NOT established in any environment; sandbox Firefox reports `navigator.gpu` absent, so adapter/device levels did not execute; Babylon WebGPUEngine untested.
+  5. **Limitations preserved:** sandbox/llvmpipe limitation and Vite chunk-size warning kept verbatim (README §5); no optimization, no scope expansion. Screenshots retaken with corrected HUD (`evidence/shot-dev-firefox.png`, `evidence/shot-preview-firefox.png`); both show renderer `llvmpipe, or similar` captured via WEBGL_debug_renderer_info.
+- **Files changed:** `spikes/ST2-001/package.json` (pins), `package-lock.json` (new), `src/main.ts` (graded WebGPU probe + HUD wording), `README.md` (v2), `evidence/` (npmci.log, npm-audit.log, build-after-ci.log, dev-after-ci.log, preview-after-ci.log new; both screenshots updated; browser-harness.mjs updated; round-1 logs retained as history), this document (status, correction report, change log).
+- **Commits:** see git log for `spikes/ST2-001/**` after `a677b8a5` and the `docs(AGENT_COLLABORATION)` commit of this report; one file per commit via Contents API.
+- **Commands run:** `npm install --package-lock-only`-equivalent regeneration then verification install, `npm ci`, `npm audit` (3 modes), `npm run build`, dev/preview servers, Playwright Firefox harness.
+- **Tests and actual results:** all pass as listed above; WebGPU adapter/device levels and Babylon WebGPUEngine remain **NOT run / not validated** (honestly recorded).
+- **Screenshots / logs / other evidence:** `spikes/ST2-001/evidence/` (index in README §1).
+- **Known issues / deviations:** none new. Deviation flagged in round 1 (spike committed to repo) stands for reviewer adjudication.
+- **Scope changes:** None. D-207 / D-210 untouched; no gameplay or Stage 3 work.
+- **Next action requested:** ChatGPT re-review of the corrections; owner acceptance remains a separate decision. Mac real-GPU confirmation remains owner-side and is not claimed as completed.
+
+
 
 ### [TASK-ID] Execution report
 
@@ -180,6 +201,7 @@ For detailed product decisions and requirements, consult the current authoritati
 - 2026-11-12 — Created the shared asynchronous collaboration protocol. The protocol is approved; no Stage 2 task or implementation work is authorized by this entry.
 - 2026-11-12 — WorkBuddy onboarding: read the protocol from `main`, confirmed read/update access via the GitHub REST API, and recorded its understanding, verified capabilities, and permission limits in Section 10. No execution task started; no task ID currently holds `APPROVED_TO_START`.
 - 2026-11-13 — ST2-001 initial execution report received from WorkBuddy. ChatGPT reviewed source, logs, manifest, README, harness and evidence file presence; requested corrections for missing lockfile/deterministic install, missing npm audit output, and precise WebGPU probe wording. Status changed to `CHANGES_REQUESTED_BY_REVIEW`; owner acceptance is pending. Sandbox-only WebGL2 result and untested real-GPU/mobile/WebGPU limitations remain explicit.
+- 2026-11-13 — WorkBuddy correction round 1 completed (all 5 required corrections, within original approval scope): exact version pins + committed `package-lock.json`; clean-directory `npm ci` reproduction (build output hash identical to round 1); full `npm audit` output committed (0 vulnerabilities, exit 0, 49-package audited tree); graded WebGPU probe wording (API/adapter/device recorded independently; engine NOT run, not validated). Task returned to `READY_FOR_REVIEW`; awaiting ChatGPT re-review and owner acceptance. Real-GPU/mobile limitations remain owner-side and untested.
 
 ## 10. WorkBuddy onboarding feedback
 
@@ -234,7 +256,7 @@ Stage 2 is authorized. The owner explicitly approved ST2-001 on 2026-11-12 with 
 ### 11.2 First approved task
 
 #### ST2-001 — Babylon.js baseline rendering and build compatibility Spike
-- **Status:** `CHANGES_REQUESTED_BY_REVIEW` — WorkBuddy completed initial execution on 2026-11-13; ChatGPT review on 2026-11-13 found reproducibility/evidence gaps recorded in Section 7. (Owner approval remains valid for corrections within the original scope.)
+- **Status:** `READY_FOR_REVIEW` — correction round 1 completed by WorkBuddy on 2026-11-13; all five required corrections from the Section 7 review executed; see correction report in Section 6. Awaiting ChatGPT re-review, then owner acceptance. (History: `APPROVED_TO_START` 2026-11-12 → initial execution `READY_FOR_REVIEW` → `CHANGES_REQUESTED_BY_REVIEW` → corrections → `READY_FOR_REVIEW`.)
 - **Plan:** `docs/STAGE2_TECH_SPIKE_PLAN.md`, Section 7.
 - **Scope:** isolated disposable Vite + TypeScript + Babylon.js spike; minimal 3D scene and top-down camera; WebGL2 verification; optional WebGPU capability probe; dev server and production build verification.
 - **Out of scope:** formal game project architecture, gameplay code, full input system, cartoon-rendering decision, spell VFX, save implementation, performance-budget decision, and Stage 3 work.
