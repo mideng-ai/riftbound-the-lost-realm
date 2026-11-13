@@ -1,0 +1,60 @@
+# ============================================================
+# ST2-001 — 干净目录 npm ci 完整日志
+# 复审整改 round 2（HTTPS lockfile 版）
+# ============================================================
+
+## 环境
+OS          : Ubuntu 24.04.3 LTS
+Kernel/Arch : Linux 6.6.117-45.14.1.tl4.x86_64 x86_64
+Node        : v22.13.1
+npm         : 11.9.0
+registry    : https://registry.npmjs.org/   (来自本目录 .npmrc)
+时间(UTC)   : 2026-11-13T04:08:00Z
+
+## 干净目录状态（命令执行前）
+$ ls -A
+index.html
+.npmrc
+package.json
+package-lock.json
+src
+tsconfig.json
+$ ls -d node_modules 2>/dev/null || echo 'node_modules: 不存在'
+node_modules: 不存在
+
+## lockfile URL 校验（命令执行前，独立统计）
+$ python3 - <<'PY'
+lockfileVersion = 3
+packages 条目数 = 50
+含 resolved 的条目 = 49
+scheme+host 分布 = {'https://registry.npmjs.org': 49}
+明文 http:// 条目数 = 0
+非 https 条目数 = 0
+含 integrity 的条目 = 49
+
+## 一、npm ci
+$ npm ci
+
+added 19 packages, and audited 20 packages in 2s
+
+found 0 vulnerabilities
+[time] wall=1.68s maxrss=346436KB
+[exit] npmci=0
+
+## 二、安装结果核验
+$ npm ls --depth=0
+spike-st2-001-babylon-baseline@0.0.0 /tmp/st2001-final
+├── @babylonjs/core@9.36.0
+├── typescript@5.9.3
+└── vite@8.3.8
+
+
+$ npm ls --all --parseable | wc -l   # 实际安装的包路径行数
+20
+
+$ node -p "require('./node_modules/@babylonjs/core/package.json').version"
+9.36.0
+$ node -p "require('./node_modules/vite/package.json').version"
+8.3.8
+$ node -p "require('./node_modules/typescript/package.json').version"
+5.9.3
