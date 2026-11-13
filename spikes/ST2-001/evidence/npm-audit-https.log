@@ -1,0 +1,55 @@
+# ============================================================
+# ST2-001 — npm audit 完整输出（HTTPS lockfile 版，复审整改 round 2）
+# ============================================================
+
+环境: Ubuntu 24.04.3 LTS | Node v22.13.1 | npm 11.9.0 | registry=https://registry.npmjs.org/
+前置: 同目录 npm ci 完成（added 19 packages，exit 0）
+时间(UTC): 2026-11-13T04:08:23Z
+说明: 本文件为安全审计结果；npm ci 末尾的 'found 0 vulnerabilities' 仅为安装摘要，不作为审计结论
+
+## 一、npm audit（默认报告格式）
+$ npm audit
+found 0 vulnerabilities
+[exit] audit=0
+
+## 二、npm audit --json（机器可读）
+$ npm audit --json
+{
+  "auditReportVersion": 2,
+  "vulnerabilities": {},
+  "metadata": {
+    "vulnerabilities": {
+      "info": 0,
+      "low": 0,
+      "moderate": 0,
+      "high": 0,
+      "critical": 0,
+      "total": 0
+    },
+    "dependencies": {
+      "prod": 2,
+      "dev": 48,
+      "optional": 34,
+      "peer": 0,
+      "peerOptional": 0,
+      "total": 49
+    }
+  }
+}
+[exit] audit-json=0
+
+## 三、npm audit --audit-level=moderate
+$ npm audit --audit-level=moderate
+found 0 vulnerabilities
+[exit] audit-level=0
+
+## 四、被审计的依赖树
+$ npm ls --depth=0
+spike-st2-001-babylon-baseline@0.0.0 /tmp/st2001-final
+├── @babylonjs/core@9.36.0
+├── typescript@5.9.3
+└── vite@8.3.8
+
+
+$ npm ls --all --parseable | wc -l
+20
