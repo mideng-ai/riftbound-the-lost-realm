@@ -405,6 +405,74 @@ WorkBuddy must append a report under the matching task ID:
 - **Scope changes:** None. No Stage-3/M1 work; D-207 / D-210 / final-rendering direction untouched; no Stage-2 acceptance claimed.
 - **Next action requested:** owner runs A1–A10. Commands verified copy-pasteable against the real directories; notes for the owner: A7 uses `spikes/ST2-002` whose preview script does **not** lock a port (relies on Vite default 4173) and conflicts with A8 (stop A8 first — already noted in the checklist); the dev server for the skeleton listens on **5173** by default, `preview` on 4170.
 
+### Stage 2 environment verification — Correction report round 1 (2026-11-13)
+
+- **Execution status:** `READY_FOR_REVIEW` (correction of the owner-directed environment-verification report above)
+- **Trigger:** ChatGPT review of that report: `CHANGES_REQUESTED` (7 items). All corrections stay inside the original verify-only scope; **zero source/config/dependency changes** (`git diff` for this commit touches only `docs/` and `evidence/`).
+- **Environment separation used throughout this report:**
+  | Label | Node | npm | Binary | Notes |
+  |---|---|---|---|---|
+  | **WorkBuddy (agent) env** | v22.22.2 | 10.9.7 | `~/.workbuddy/binaries/node/versions/22.22.2/` | Sandbox injects `NODE_TLS_REJECT_UNAUTHORIZED=0` and `NODE_OPTIONS` (WorkBuddy shim); **not** from shell profiles, **not** from the project |
+  | **Owner terminal env** | v24.16.0 | 11.13.0 | `/usr/local/bin/` | Run with `NODE_TLS_REJECT_UNAUTHORIZED` and `NODE_OPTIONS` unset and `PATH=/usr/local/bin` first, replicating the owner's terminal |
+
+#### Fix 1 — TLS verification restored (review item 1)
+
+`NODE_TLS_REJECT_UNAUTHORIZED=0` was confirmed present **only** in the WorkBuddy agent sandbox environment (`env | grep` — absent from `~/.zshrc`/`~/.zprofile`/`~/.zshenv` and from any project file; npm config `strict-ssl=true` was never changed). Because the sandbox injects it into every process, it cannot be permanently removed from the host app environment from inside the session; it was **unset per-command** (`env -u NODE_TLS_REJECT_UNAUTHORIZED`) for all re-runs. Post-unset TLS sanity check: `fetch('https://registry.npmjs.org/-/ping')` → **status 200 with full certificate verification**. Registry stayed `https://registry.npmjs.org/` throughout.
+
+#### Fix 2 — npm ci / npm audit re-run under normal TLS (review item 2)
+
+WorkBuddy env (Node 22.22.2/npm 10.9.7), `NODE_TLS_REJECT_UNAUTHORIZED` unset:
+
+| Command | Result | Log |
+|---|---|---|
+| `npm ci` | **PASS, exit 0**, 0 vulnerabilities, full TLS verification | `evidence/stage2-env-verify-2026-11-13/08-npm-ci-tls-normal.log` |
+| `npm audit` | **PASS, exit 0**, 0 vulnerabilities | `…/08b-npm-audit-tls-normal.log` |
+
+#### Fix 3 — checks re-run in the owner's actual Node/npm environment (review item 3)
+
+Owner terminal env (Node v24.16.0 / npm 11.13.0, `NODE_TLS_REJECT_UNAUTHORIZED`/`NODE_OPTIONS` unset, `PATH=/usr/local/bin` first):
+
+| Check | Result | Log |
+|---|---|---|
+| `npm run typecheck` | **PASS, exit 0** (clean) | `…/09-owner24-typecheck.log` |
+| `npm run test:input` | **PASS, exit 0, 18 passed / 0 failed (18 checks)** | `…/09-owner24-test-input.log` |
+| `npm run build` | **PASS, exit 0**, built in 1.18 s; only the pre-existing chunk-size warning | `…/09-owner24-build.log` |
+
+The earlier WorkBuddy-env results (round 0: typecheck clean, 18/18, build 1.19 s, logs `03/04/05`) remain valid for that environment and are kept **separately labelled**; no numbers are merged across environments. Browser evidence (07) remains a WorkBuddy-env Node + system-Chrome run.
+
+#### Fix 4 — 404 identified (review item 4)
+
+The non-blocking 404 seen in round 0 is: **`GET http://localhost:5173/favicon.ico` → HTTP 404 `text/plain`** (Vite dev server default response).
+
+- Cause: the browser auto-requests `/favicon.ico`; the project's `index.html` contains **no** `<link rel="icon">` and the repo has **no `public/` directory**, so the request falls through to a 404.
+- Impact: **none** — no project code references the resource (grep evidence), page load, canvas, Babylon startup, HUD and mock-save all unaffected, and 0 `pageerror`. It is a cosmetic, browser-initiated request.
+- Evidence: `…/10-find404-full.log` (CDP network capture of a fresh load: exactly one non-2xx response, the favicon 404, out of 234 responses; console errors contain only the corresponding "Failed to load resource" line) and `…/10-find404.log`; direct `curl -I http://localhost:5173/favicon.ico` → `HTTP/1.1 404 Not Found`; harness `…/10-find404-harness.mjs`.
+- The proper fix would be adding a favicon (`public/favicon.ico` + `<link>`), which is a **source change** — out of the verify-only scope, left as an owner decision (cosmetic, can ride along with any future approved change).
+
+#### Fix 5 — serial number redacted (review item 5)
+
+`evidence/stage2-env-verify-2026-11-13/01-environment.log` contained the device serial captured by a `system_profiler` grep in round 0 (string not reproduced here to avoid re-spreading it). It is now replaced with `[REDACTED-PER-REVIEW-R5]`. Repo-wide grep confirms no other occurrence in `evidence/` or docs. **Honest note:** the redaction is a forward-fix commit; the string remains in the earlier commit's git history. Permanent purge would require history rewrite + force-push (destructive) — **not done without owner approval**. No other hardware identifiers (the model identifier `Macmini9,1` and chip name) are considered secret and were kept, as they are needed for the GPU-backend evidence chain.
+
+#### Fix 6 — scope (review item 6)
+
+`git status` before this commit: only `docs/AGENT_COLLABORATION.md`, `evidence/stage2-env-verify-2026-11-13/*` modified/added. No source, config, lockfile or dependency change; no performance work; no Stage 3/M1.
+
+#### Fix 7 — environment-to-result map (review item 7)
+
+| Check | Owner env (Node 24.16.0 / npm 11.13.0) | WorkBuddy env (Node 22.22.2 / npm 10.9.7) |
+|---|---|---|
+| `npm ci` (TLS normal) | — | **PASS** exit 0, 0 vuln (`08`) |
+| `npm audit` (TLS normal) | — | **PASS** exit 0, 0 vuln (`08b`) |
+| `typecheck` | **PASS** exit 0 (`09-owner24-typecheck`) | **PASS** exit 0 (round 0, `03`) |
+| `test:input` | **PASS** 18/18 exit 0 (`09-owner24-test-input`) | **PASS** 18/18 exit 0 (round 0, `04`) |
+| `build` | **PASS** exit 0, 1.18 s (`09-owner24-build`) | **PASS** exit 0, 1.19 s (round 0, `05`) |
+| dev server load + WebGL2 check (Chrome 157, ANGLE Metal / Apple M1) | — | **PASS** (round 0, `07`; 404 root-caused in `10-*`) |
+
+**Not run / not verified:** `npm ci` in the owner env (node_modules were installed by the WorkBuddy npm in round 0 and re-verified TLS-normal in Fix 2; the owner-env runs reused the same dependency tree — reinstalling it with npm 11 was not requested and would churn `node_modules` without changing the lockfile); `npm run preview` (:4170) remains unrun (out of instructed scope); A1–A10 / B1–B6 remain `OWNER_DEVICE_TEST_REQUIRED`.
+
+- **Scope changes:** None. No Stage-3/M1 work; D-207 / D-210 / render direction untouched; no Stage-2 acceptance claimed.
+- **Next action requested:** ChatGPT re-review of this correction; owner decision on (a) favicon addition in some future approved change, (b) whether to purge the serial from git history.
+
 ### [TASK-ID] Execution report
 
 - **Execution status:** `IN_PROGRESS` / `READY_FOR_REVIEW` / `BLOCKED`
@@ -527,6 +595,7 @@ The following scope decisions remain binding:
 For detailed product decisions and requirements, consult the current authoritative project documents in `docs/`. If this collaboration log conflicts with an approved scope or decision record, stop and ask the owner rather than choosing one silently.
 
 ## 9. Change log
+- 2026-11-13 — **Stage-2 environment verification correction round 1 completed** (verify-only scope kept): (1) `NODE_TLS_REJECT_UNAUTHORIZED=0` traced to the WorkBuddy sandbox injection (not shell profiles, not project), unset per-command, registry TLS verified (status 200); (2) `npm ci`/`npm audit` re-run TLS-normal — both exit 0, 0 vulnerabilities; (3) `typecheck`/`test:input` 18/18/`build` 1.18 s re-run in the **owner's** Node v24.16.0/npm 11.13.0 environment and kept separate from the WorkBuddy Node 22.22.2 results; (4) round-0 404 root-caused to the browser-initiated `GET /favicon.ico` (no `<link rel=icon>`, no `public/` dir; zero functional impact, evidence via CDP capture + curl); (5) device serial redacted to `[REDACTED-PER-REVIEW-R5]` in `01-environment.log` (git history not purged — needs owner-approved rewrite); (6) no source/config/dependency change. Supplementary logs: `evidence/stage2-env-verify-2026-11-13/08–10-*`.
 - 2026-11-13 — **Owner-directed Stage-2 environment verification completed** (no TASK-ID; verify-only): on the owner's local clone `~/riftbound-the-lost-realm` (HEAD `b7117ee`, clean tree before/after). Results: `npm ci` PASS (0 vulnerabilities, versions match pins: babylon 9.36.0 / ts 5.9.3 / vite 8.3.8), `typecheck` PASS, `test:input` **18/18 PASS**, `build` PASS (1.19 s, pre-existing chunk warning only); dev server confirmed on **:5173** (HTTP 200); headless Chrome 157 loaded the page on **ANGLE Metal / Apple M1** WebGL2 with HUD live, mock-save first write ok, **0 pageerror** (1 non-blocking 404, targeted re-probe clean). No source/config/dependency change; `npm run preview` not run (out of scope). Raw logs: `evidence/stage2-env-verify-2026-11-13/`. This run is agent-automated and does **not** substitute any A1–A10 item; report in Section 6.
 - 2026-11-13 — **ST2-003 correction round 2 completed** (R5 only, within the existing approval): the unsupported “real GPU Chrome/macOS” wording was replaced with measured evidence — `ANGLE (Apple, ANGLE Metal Renderer: Apple M1)` via `WEBGL_debug_renderer_info`, host `Macmini9,1` / Apple M1 / 8 GB, launch `playwright-core 1.49.1 chromium.launch({channel:'chrome',headless:true})`, recorded inside the evidence files (`gpu-backend-probe.txt`, `results-chrome-macos.txt`, `preview-smoke.log`). Evidence re-run: S2-E 11/11 PASS, npm ci/audit 0 vulnerabilities, typecheck clean, input 18/18, build ✓, smoke 0 pageerror. The run is explicitly agent-automated headless, **not** the owner's Mac mini checklist; A1–A10 / B1–B6 remain `OWNER_DEVICE_TEST_REQUIRED`. Status `READY_FOR_REVIEW`; `docs/STAGE2_FINAL_REPORT.md` §12 holds the details.
 - 2026-11-13 — **ST2-003 correction round 1 completed** (within the existing approval), addressing review findings R1–R4: paths/ports corrected and verified by starting every preview server; action-button listeners retained and removed on dispose (hold-release timer cancelled); `suspended` now changes only via blur/focus/visibility, `touchcancel` releases input only; D-207 failure path added (L6/L6b/L6c) with Chrome/macOS 11/11 PASS and honest `NOT VERIFIED` for Firefox. New regression suite `npm run test:input` (18/18). npm ci/audit 0 vulnerabilities, typecheck clean, build ✓, preview smoke 0 pageerror. Status `READY_FOR_REVIEW`; `docs/STAGE2_FINAL_REPORT.md` §11 has the full evidence map.

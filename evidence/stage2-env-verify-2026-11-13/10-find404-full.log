@@ -1,0 +1,5 @@
+=== all non-2xx responses (CDP) ===
+HTTP 404 text/plain http://localhost:5173/favicon.ico
+=== total network responses seen: 234 ===
+=== console errors ===
+Failed to load resource: the server responded with a status of 404 (Not Found)
