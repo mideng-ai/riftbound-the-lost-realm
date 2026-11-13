@@ -1,0 +1,11 @@
+=== TOUCH SIM RESULTS (desktop emulation; NOT a physical device) ===
+T1 left-zone touchstart: joy=block | move x=0.00 y=0.00 | #1 move(touch) x=0.00 y=0.00
+T2 joystick drag (+x,+y): joy=block | move x=0.71 y=0.71 | #2 move(touch) x=0.71 y=0.71 ; #1 move(touch) x=0.00 y=0.00
+PASS T3 right-zone canvas touch ignored (no intent fired)
+PASS T4 second left-zone finger does not create a second joystick
+PASS T5 cross-zone drag keeps finger in move zone (joystick still visible)
+T6 touchcancel release: joy=none | move x=0.00 y=0.00 | #5 SUSPEND touchcancel → false ; #4 move(touch) x=0.00 y=0.00 ; #3 move(touch) x=0.95 y=-0.32 ; #2 move(touch) x=0.71 y=0.71 ; #1 move(touch) x=0.00 y=0.00
+PASS T6 touchcancel → move reset 0,0
+PASS T7 DOM button touchstart → skill1 intent (touch)
+
+TOTAL: 5/8 PASS
