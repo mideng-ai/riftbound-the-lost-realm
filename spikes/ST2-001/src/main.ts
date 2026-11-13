@@ -14,10 +14,36 @@ const canvas = document.getElementById("renderCanvas") as HTMLCanvasElement;
 const hud = document.getElementById("hud") as HTMLDivElement;
 
 // —— 环境探测（在引擎创建前）——
+// 注意：本段只做能力探测，不代表 WebGPU 可用性已被验证。
+// 「navigator.gpu 存在」≠「能取到 adapter」≠「能创建 device」≠「Babylon WebGPUEngine 可运行」。
 const probe = document.createElement("canvas");
 const webgl2OK = !!probe.getContext("webgl2");
 const webgl1Only = !webgl2OK && !!probe.getContext("webgl");
-const webgpuAvailable = typeof navigator !== "undefined" && !!(navigator as any).gpu;
+const webgpuApiPresent = typeof navigator !== "undefined" && !!(navigator as any).gpu;
+// 分级探测：api → adapter → device（三者逐级独立记录）
+let webgpuAdapter: "yes" | "no" | "n/a" | "pending" = webgpuApiPresent ? "pending" : "n/a";
+let webgpuDevice: "yes" | "no" | "n/a" | "pending" = webgpuApiPresent ? "pending" : "n/a";
+if (webgpuApiPresent) {
+  (async () => {
+    try {
+      const adapter = await (navigator as any).gpu.requestAdapter();
+      webgpuAdapter = adapter ? "yes" : "no";
+      if (adapter) {
+        try {
+          const device = await adapter.requestDevice();
+          webgpuDevice = device ? "yes" : "no";
+        } catch {
+          webgpuDevice = "no";
+        }
+      } else {
+        webgpuDevice = "no";
+      }
+    } catch {
+      webgpuAdapter = "no";
+      webgpuDevice = "no";
+    }
+  })();
+}
 
 // —— 引擎与场景 ——
 const engine = new Engine(canvas, true, { stencil: true }); // 默认走 WebGL2（不可用则回退 WebGL1）
@@ -56,11 +82,15 @@ engine.runRenderLoop(() => { scene.render(); });
 
 // —— HUD：把实测信息渲染进 DOM，供无头浏览器截图取证 ——
 const update = () => {
+  const wgpuLine = webgpuApiPresent
+    ? `WebGPU probe: api=present | adapter=${webgpuAdapter} | device=${webgpuDevice}`
+    : `WebGPU probe: api=absent (navigator.gpu undefined)`;
   hud.textContent =
     `ST2-001 spike | Babylon.js ${Engine.Version}\n` +
-    `engine: WebGL (Engine 默认后端，实际版本见下行探测)\n` +
+    `engine: WebGL (Engine 默认后端)\n` +
     `WebGL2 context: ${webgl2OK ? "YES" : "NO"}${webgl1Only ? " (WebGL1 only)" : ""}\n` +
-    `WebGPU (navigator.gpu): ${webgpuAvailable ? "available (NOT used as requirement)" : "not available"}\n` +
+    `${wgpuLine}\n` +
+    `NOTE: WebGPU engine NOT run — probe only, not validated\n` +
     `fps: ${engine.getFps().toFixed(1)} | frames rendered: ${frame}\n` +
     `meshes: ${scene.meshes.length} | viewport: ${engine.getRenderWidth()}x${engine.getRenderHeight()}`;
 };
