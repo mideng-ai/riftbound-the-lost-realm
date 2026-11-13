@@ -147,3 +147,12 @@ ChatGPT 负责技术复审，负责人负责最终验收。阶段2验收通过�
 ## 13. 变更记录
 
 2026-11-13 v1.0：建立阶段2剩余工作总执行计划；整合 S2-C～S2-G 与真实设备验证。负责人明确回复“批准 ST2-003”，总任务状态更新为 APPROVED_TO_START；ST2-001/ST2-002 保持已验收。
+
+
+## 14. Owner acceptance record — ST2-003 (2026-11-13)
+
+- **Task status:** `OWNER_ACCEPTED`
+- **Accepted by:** Project owner
+- **Source:** Explicit owner response “验收通过” after ChatGPT recorded `REVIEW_PASSED`.
+- **Accepted scope:** ST2-003 execution deliverables as reviewed in `docs/ST2-003_TECHNICAL_REVIEW.md`.
+- **Not included in this acceptance:** Closure of the entire Stage 2 phase; completion of owner-run Mac mini A1–A10 or physical-phone B1–B6 tests; final decisions for D-207, D-210, or rendering direction; authorization of Stage 3/M1.
