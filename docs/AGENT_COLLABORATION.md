@@ -85,7 +85,7 @@ ST2-001 is owner-accepted. ST2-002 is the current draft proposal and must not st
 
 ### ST2-002 — Cartoon rendering direction comparison Spike
 
-- **Status:** `DRAFT` — not approved; WorkBuddy must not start.
+- **Status:** `APPROVED_TO_START` — owner explicitly approved this exact task on 2026-11-13; WorkBuddy may begin within the recorded scope.
 - **Created:** 2026-11-13
 - **Objective:** Compare a small number of technically viable cartoon/toon rendering approaches in Babylon.js and produce evidence-based recommendations for a later owner decision. This is a rendering-technique evaluation, not a final art-direction or performance-budget decision.
 - **Background / references:** `docs/STAGE2_TECH_SPIKE_PLAN.md` Section 3 (S2-B), Sections 2 and 5; D-003 and D-007; ST2-001 accepted baseline and `spikes/ST2-001/` dependency/version evidence.
@@ -103,7 +103,7 @@ ST2-001 is owner-accepted. ST2-002 is the current draft proposal and must not st
 - **Acceptance criteria:** At least two approaches are implemented in the same controlled scene; comparison screenshots and source are committed; exact dependency graph is reproducible with clean `npm ci`; `npm audit` output and production build logs are committed; test environments and limitations are explicit; conclusions distinguish visual feasibility from performance evidence; no out-of-scope work is present.
 - **Required verification / tests:** Lockfile URL/integrity checks; clean-directory `npm ci`; `npm audit`; `npm run build`; dev/preview HTTP checks; browser rendering checks for each approach; capture screenshots; record browser, OS, rendering backend, GPU/software-rendering status, and any emulation mode.
 - **Risks and stop conditions:** Stop and report if Babylon.js 9.36.0 cannot support a candidate approach without changing the approved stack, if a material/shader approach requires a substantial dependency or architecture change, if license/security concerns arise, or if scope expansion is needed. Do not switch engines or frameworks.
-- **Owner approval:** Not granted. Awaiting explicit approval for ST2-002 only.
+- **Owner approval:** Granted on 2026-11-13; see Section 5 approval record for ST2-002.
 
 ## 5. Owner approvals
 
@@ -120,6 +120,17 @@ Only the project owner may add an approval entry. Approval must be explicit and 
 
 An approval for one task does not approve another task, a broader scope, or a later project phase.
 
+
+### Approval record — ST2-002
+
+- **Task ID:** ST2-002
+- **Decision:** `APPROVED_TO_START`
+- **Approved scope (must match the task):** The exact scope in Section 11.3 and `docs/STAGE2_TECH_SPIKE_PLAN.md` Section 9: isolated disposable Babylon.js cartoon-rendering comparison Spike under `spikes/ST2-002/`; at least two feasible approaches in a controlled scene; exact pinned dependencies and HTTPS lockfile; screenshots, source, clean-install, audit, build, dev/preview and desktop-browser evidence; explicit environment limitations and recommendation. All listed out-of-scope items and stop conditions remain binding.
+- **Approved by:** Project owner
+- **Date:** 2026-11-13
+- **Source:** Owner's explicit reply “批准” to ChatGPT's direct question: “你是否也批准 WorkBuddy 现在开始执行 ST2-002？”
+- **Conditions / limits:** Approval is for ST2-002 only. No final rendering decision, production pipeline, formal game architecture, gameplay, S2-C/S2-D, D-207/D-210 decision, Stage 3/M1, or unsupported physical-device performance claim is authorized. Stop and report if the task cannot be completed within this scope.
+- **Record transcription:** This entry transcribes the owner's explicit approval in its conversational context; ChatGPT is not independently granting approval.
 
 ### Owner acceptance record — ST2-001
 
@@ -403,14 +414,16 @@ Stage 2 is authorized. ST2-001 was approved to start on 2026-11-12 and formally 
 - **Recommendation to owner:** Hold acceptance pending the above corrections. No new owner approval is required for these corrections because they remain inside ST2-001's already approved scope. After ChatGPT re-review, owner acceptance remains a separate decision. Mac real-GPU confirmation is recommended before treating the engine baseline as established for the owner’s development machine; it is not to be represented as completed by WorkBuddy.
 
 
-### 11.3 Next task — draft only
+### 11.3 Second approved task
 
 #### ST2-002 — Cartoon rendering direction comparison Spike
-- **Status:** `DRAFT` — not approved; WorkBuddy must not start.
+- **Status:** `APPROVED_TO_START` — owner explicitly approved this exact scope on 2026-11-13; WorkBuddy may begin.
 - **Objective:** Compare at least two feasible Babylon.js cartoon-rendering approaches in a controlled, isolated scene and provide reproducible visual/technical evidence for the project owner's later decision.
 - **Plan:** `docs/STAGE2_TECH_SPIKE_PLAN.md`, Section 9.
 - **Scope:** New disposable Spike under `spikes/ST2-002/`; controlled comparison scene; at least two rendering approaches; screenshots; exact dependencies/lockfile; clean install, audit, build and browser verification; report actual environment and limitations.
 - **Out of scope:** final rendering decision, production pipeline, formal game architecture, gameplay, spell VFX, input system, save implementation, D-207/D-210 decisions, Stage 3/M1, and physical mobile performance claims without real-device evidence.
-- **Owner approval:** Not granted. The owner's ST2-001 acceptance does not authorize ST2-002.
+- **Owner approval:** Granted on 2026-11-13; exact approval recorded in Section 5.
 
 - 2026-11-13 — Project owner formally accepted ST2-001 after ChatGPT's round 2 technical re-review. Status changed to `OWNER_ACCEPTED`; acceptance is limited to ST2-001 and its disclosed sandbox-only WebGL2 evidence. ST2-002 drafted as a separate task; no execution approval granted.
+
+- 2026-11-13 — Project owner explicitly approved ST2-002 with “批准” in response to a direct question asking permission to start this exact task. Status changed from `DRAFT` to `APPROVED_TO_START`; WorkBuddy may execute only the approved scope. No Stage 3/M1 authorization.
