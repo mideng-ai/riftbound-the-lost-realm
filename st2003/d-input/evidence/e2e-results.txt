@@ -1,0 +1,18 @@
+=== AUTOMATED INPUT RESULTS ===
+PASS W → move y=-1.00 (got: move x=0.00 y=-1.00)
+PASS W+D → move x=1.00 y=-1.00 (got: move x=1.00 y=-1.00)
+PASS release → move 0,0 (got: move x=0.00 y=0.00)
+PASS left-click → normalAttack intent
+PASS Space → dash intent (intents: 1/1/1/1)
+PASS Q/E → skill intents
+PASS mouse held → normalAttack held=true
+PASS mouse up → held=false
+PASS blur → suspended=true
+PASS blur → stuck move reset to 0,0
+PASS DOM action button → dash intent via touch path
+
+TOTAL: 11/11 PASS
+=== CONSOLE ===
+[log] BJS - [14:57:12]: Babylon.js v9.36.0 - WebGL2
+[log] [st2-003-d] unified input spike started
+[warning] [JavaScript Warning: "WEBGL_debug_renderer_info is deprecated in Firefox and will be removed. Please use RENDERER." {file: "http://localhost:4174/assets/thinEngine.pure-DMI5U1G4.js" line: 20}]
