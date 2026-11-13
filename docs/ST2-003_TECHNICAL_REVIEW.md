@@ -57,3 +57,22 @@ The raw storage logs show eight PASS assertions, but quota observations are reco
 **ST2-003 remains `CHANGES_REQUESTED`.** These corrections are within the already approved ST2-003 scope; no new owner start approval is required. WorkBuddy should correct the four findings, add raw logs/tests, update the final report and device instructions, then resubmit as `READY_FOR_REVIEW`.
 
 This review is not owner acceptance, does not close Stage 2, does not decide D-207/D-210/rendering direction, and does not authorize Stage 3/M1. The owner must still execute the Mac mini and physical-phone checklist before any real-device compatibility/performance conclusion can be made.
+
+
+## Re-review — correction round 1 (2026-11-13)
+
+- **R1:** PASS. Device checklist and master plan now use the actual `st2003/*` paths. Preview-port evidence records HTTP 200 and the server's confirmed ports 4173–4176.
+- **R2:** PASS. Bound action-button handlers are retained and removed on dispose; touch hold-release timer is cleared. Regression log records R2-1…R2-8 passing.
+- **R3:** PASS. `InputSystem.route()` changes suspension only for blur/focus/visibility. Regression log records blur→touchcancel and hidden→touchcancel remaining suspended, plus valid focus/visibility recovery.
+- **R4:** PASS for the tested Chrome profile. L6 records an actual `QuotaExceededError`, absence of `save_next`, and intact `save_main` readback; L6b/L6c recovery assertions pass. Firefox/private and physical-mobile L6 remain unverified and are disclosed as such.
+- **Build/regression evidence:** clean `npm ci` (0 vulnerabilities), `npm audit` (0 vulnerabilities), typecheck, input tests (18/18), production build, and preview smoke (0 pageerrors) are recorded. A favicon 404 and chunk-size warning remain disclosed.
+
+### Remaining correction R5 — unsupported real-GPU claim
+
+The correction report §11.6 says the new Chrome/macOS evidence is **“real GPU Chrome/macOS”**. The committed browser log identifies the user agent as `HeadlessChrome/157` and records WebGL behavior, but the evidence reviewed does not include a WebGL renderer/vendor string, `chrome://gpu` report, or another artifact establishing that the browser used the Mac's physical GPU rather than a software/virtualized renderer. The device checklist also continues to mark the Mac mini's A1–A10 real-device run as `OWNER_DEVICE_TEST_REQUIRED`.
+
+**Required:** either add reproducible GPU-backend evidence (renderer/vendor plus the host/device identity and launch configuration), or change the report wording to “macOS HeadlessChrome/WebGL2; GPU backend not independently verified.” Do not describe this as the owner's Mac mini validation unless that exact device is evidenced. This is a reporting/evidence correction; no new implementation or owner start approval is needed.
+
+**Current review status: `CHANGES_REQUESTED` (R5 only).** R1–R4 are accepted. Once R5 is corrected, resubmit the report as `READY_FOR_REVIEW` for final technical sign-off. Real Mac mini and physical-phone tests remain owner-required; they are not a blocker to closing the ST2-003 agent execution task if the report keeps them explicitly pending, but they remain a blocker to claiming complete real-device validation or setting device-dependent Stage 2 acceptance criteria as passed.
+
+This re-review does not constitute owner acceptance or authorize Stage 3/M1.
