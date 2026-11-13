@@ -47,6 +47,26 @@ function lsRead(key = 'save_main'): SaveV2 | null {
   }
 }
 
+/**
+ * Startup recovery for the recommended temp-key protocol:
+ * write `save_next` → verify → promote to `save_main` → delete `save_next`.
+ * If `save_next` still exists at startup the previous write was interrupted:
+ * prefer it when valid, otherwise fall back to the last known-good `save_main`.
+ */
+function recoverSave(): SaveV2 | null {
+  const next = localStorage.getItem('save_next');
+  if (next !== null) {
+    try {
+      const parsed = JSON.parse(next) as SaveV1 | SaveV2;
+      if (parsed && parsed.schemaVersion === 2) return parsed;
+      if (parsed && parsed.schemaVersion === 1) return migrateV1toV2(parsed);
+    } catch {
+      // invalid temp → fall through to the main save
+    }
+  }
+  return lsRead('save_main');
+}
+
 function testLocalStorage() {
   // L1 versioned read/write
   try {
@@ -96,6 +116,66 @@ function testLocalStorage() {
     record('L5', 'ls sync write cost (300×10KB)', ok === 300, `${ms.toFixed(1)}ms total, ${(ms / ok).toFixed(3)}ms/op, ${ok} writes — all on main thread (note: 1000×10KB would exceed the ~5MB quota)`);
     localStorage.clear();
   } catch (e) { record('L5', 'ls sync write cost', false, String(e)); }
+
+  // L6 quota write-failure path (correction round R4): a failed save must leave the
+  // previous valid save intact and readable. Fills storage in decreasing chunk sizes
+  // so the remaining headroom is smaller than a realistic save payload, then attempts
+  // the temp-key write (nothing is ever half-written over `save_main`).
+  try {
+    localStorage.clear();
+    const previous: SaveV2 = { schemaVersion: 2, gold: 777, items: ['relic'], settings: { sfx: true } };
+    localStorage.setItem('save_main', JSON.stringify(previous));
+    let filled = 0;
+    let quotaHit = false;
+    // keep going with smaller chunks after a failure so headroom ends up < 512B
+    for (const size of [1 << 20, 64 << 10, 4 << 10, 512]) {
+      const chunk = 'x'.repeat(size);
+      for (let k = 0; k < 4096; k++) {
+        try {
+          localStorage.setItem(`qfill${size}_${k}`, chunk);
+          filled += size;
+        } catch { quotaHit = true; break; }
+      }
+    }
+
+    if (!quotaHit) {
+      record('L6', 'ls quota write-failure path', null,
+        `NOT VERIFIED — quota not reached after ${(filled / 1048576).toFixed(1)}MB of filler in this browser; failure path cannot be asserted automatically`);
+      localStorage.clear();
+    } else {
+      // realistic save payload (~2 KB, well under the ~5 MB quota by itself)
+      const bigger: SaveV2 = { schemaVersion: 2, gold: 888, items: ['relic', 'huge'], settings: { sfx: true } };
+      const payload = JSON.stringify(bigger).padEnd(2048, 'x');
+      let threw = '';
+      try {
+        localStorage.setItem('save_next', payload); // temp write must fail, main untouched
+      } catch (e) { threw = (e as Error).name || String(e); }
+      const kept = lsRead('save_main');
+      const tempPresent = localStorage.getItem('save_next') !== null;
+      const pass = threw === 'QuotaExceededError' && !!kept && kept.gold === 777 && kept.items[0] === 'relic';
+      record('L6', 'ls quota write-failure path', pass,
+        `filler=${(filled / 1048576).toFixed(1)}MB → temp write threw ${threw || '(none)'}; save_next=${tempPresent ? 'present' : 'absent'}; save_main intact readback gold=${kept?.gold} (expected 777)`);
+      localStorage.clear();
+    }
+  } catch (e) { record('L6', 'ls quota write-failure path', null, 'NOT VERIFIED — ' + String(e)); }
+
+  // L6b/L6c interrupted-write recovery protocol (deterministic, no quota needed)
+  try {
+    localStorage.clear();
+    localStorage.setItem('save_main', JSON.stringify({ schemaVersion: 2, gold: 777, items: ['relic'], settings: { sfx: true } }));
+    localStorage.setItem('save_next', JSON.stringify({ schemaVersion: 2, gold: 888, items: ['relic', 'gem'], settings: { sfx: true } }));
+    const rec = recoverSave();
+    record('L6b', 'ls interrupted-write recovery prefers valid temp', !!rec && rec.gold === 888,
+      `save_next present + valid → recovered gold=${rec?.gold} (expected 888)`);
+  } catch (e) { record('L6b', 'ls interrupted-write recovery (valid temp)', false, String(e)); }
+
+  try {
+    localStorage.setItem('save_next', '{broken json!!');
+    const rec = recoverSave();
+    record('L6c', 'ls recovery falls back to main on invalid temp', !!rec && rec.gold === 777,
+      `save_next corrupt → fell back to save_main gold=${rec?.gold} (expected 777)`);
+    localStorage.clear();
+  } catch (e) { record('L6c', 'ls recovery fallback (invalid temp)', false, String(e)); }
 }
 
 // ---------- IndexedDB suite ----------
