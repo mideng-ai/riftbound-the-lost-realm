@@ -11,7 +11,7 @@
 - Stage 2: **AUTHORIZED — in progress**
 - Formal Stage 2 engineering and technical spikes: **authorized only under individually approved task scopes**
 - Stage 3 / M1 gameplay implementation: **not authorized**
-- Stage 2 phase authorization does not by itself authorize a specific WorkBuddy task; task-specific approval is required. ST2-001 has been technically reviewed and formally owner-accepted on 2026-11-13. ST2-002 has been approved to start and WorkBuddy submitted it as `READY_FOR_REVIEW`; ChatGPT review has requested corrections, and owner acceptance is pending. Stage 3 / M1 gameplay implementation remains unauthorized.
+- Stage 2 phase authorization does not by itself authorize a specific WorkBuddy task; task-specific approval is required. ST2-001 has been technically reviewed and formally owner-accepted on 2026-11-13. ST2-002 has completed its correction round and passed ChatGPT technical re-review on 2026-11-13; owner acceptance is pending. Stage 3 / M1 gameplay implementation remains unauthorized. Stage 3 / M1 gameplay implementation remains unauthorized.
 
 **Hard gate:** WorkBuddy must not execute a task unless this document contains an explicit owner approval for that exact task, identified by task ID, with status `APPROVED_TO_START`. A general approval of this collaboration process is not task approval. ChatGPT may draft tasks and review results, but cannot grant owner approval. If approval is absent, ambiguous, expired, or does not match the task ID and scope, stop and ask the owner.
 
@@ -307,6 +307,24 @@ Never claim a test passed unless it was actually run. Distinguish “not run”,
   4. Correct stale status text in this collaboration log so ST2-002 is not simultaneously described as draft-only and ready for review.
 - **Recommendation to owner:** Do not accept ST2-002 yet. The engineering/reproducibility evidence is substantially complete, but the central comparison is not controlled enough to support its visual recommendation. The above corrections remain within the original approved scope and do not require a new owner approval. No final rendering decision or Stage 3/M1 work is authorized.
 
+### ST2-002 Review — correction round 1 re-review
+
+- **Review date:** 2026-11-13
+- **Decision:** `REVIEW_PASSED`
+- **Evidence inspected:** latest `spikes/ST2-002/src/main.ts` (SHA `a8c4a73b9830c9d1b24616308afa71650f803eb7`), `README.md` (SHA `af2ee8bd6e6761155808e2164a8e7d68d23ef0c5`), `evidence/npmci.log`, `npm-audit.log`, `build.log`, `run.log`, `browser-harness.mjs`, and screenshots `shot-dev-focus-a/b/c/d.png` fetched and visually inspected.
+- **Acceptance criteria results:**
+  - A/B base shading: **PASS** — both source paths implement `baseColor * (ambientColor + lightColor * band)`; same normalized light vector, base/ambient/light colors, and explicit thresholds 0.08/0.44/0.78 with weights 0.30/0.32/0.38. A uses a NodeMaterial StepBlock graph because PosterizeBlock cannot express those explicit thresholds; B uses GLSL `step()`. Screenshot A/B captures show matching band placement and overall color response in the inspected llvmpipe browser output.
+  - Optional treatments isolated: **PASS** — C adds rim lighting to B as a separate column; D evaluates outline overlays separately (inverted hull on sphere/knot and EdgeRenderer on box).
+  - Updated report: **PASS** — README retracts the prior unsupported visual-difference claim and correctly identifies the pipeline difference as authoring/workflow rather than output, given the controlled equation.
+  - Clean install and lockfile: **PASS based on committed log** — clean directory, no `node_modules`; npm ci exit 0; 49/49 resolved URLs HTTPS official registry, 49/49 integrity values; direct dependencies match exact pins.
+  - Security audit: **PASS based on committed full output** — default, JSON and moderate-threshold audit all exit 0, 0 vulnerabilities.
+  - Build repeatability: **PASS based on committed log** — corrected source built twice; main chunk SHA-256 `1b1df5766782c2b7f73cf986cda2f40fcc0e6f53d53aab3d6ce9c66094ccd28b` identical; Vite >500 kB warning retained.
+  - Dev/preview/browser: **PASS within disclosed sandbox scope based on logs** — HTTP 200, six capture sessions with zero console errors; Firefox 146, WebGL2 on llvmpipe software rendering. FPS is observational only and not a performance conclusion.
+  - WebGPU, real GPU/Mac, and physical mobile: **not run / not validated**, correctly disclosed; no unsupported compatibility or performance claim.
+  - Scope: **PASS** — isolated Spike only; no formal game source, decisions, gameplay, D-207/D-210, or Stage 3/M1 work.
+- **Remaining limitations (not blockers for this task):** screenshots and browser evidence are software-rendered only; ShaderMaterial's world-matrix normal transform is safe for this uniform-scale test scene but requires a normal matrix for future non-uniformly scaled meshes; one dev-only EdgeRenderer dynamic-import timing issue was observed in an informal first capture, while formal captures report zero console errors and preview/build succeed. Chunk-size warning remains intentionally unoptimized.
+- **Recommendation to owner:** ST2-002 meets its approved technical-spike acceptance criteria. **Recommend owner acceptance.** This review does not choose the final rendering direction, approve a production pipeline, complete Stage 2, or authorize ST2-003 / Stage 3 / M1. Those require separate owner decisions.
+
 ### [TASK-ID] Review
 
 - **Review date:**
@@ -370,6 +388,7 @@ The following scope decisions remain binding:
 For detailed product decisions and requirements, consult the current authoritative project documents in `docs/`. If this collaboration log conflicts with an approved scope or decision record, stop and ask the owner rather than choosing one silently.
 
 ## 9. Change log
+- 2026-11-13 — ST2-002 correction round 1 re-review: `REVIEW_PASSED`. Verified equivalent NME/GLSL base-shading equations and inspected A/B/C/D screenshots; clean install, audit, repeatable build, browser evidence, and scope boundaries meet the approved Spike criteria. Recommend owner acceptance; final rendering choice and next task remain unapproved.
 - 2026-11-13 — ST2-002 correction round 1 completed (within original approval scope): A and B base-shading equations unified exactly (`baseColor*(ambientColor+lightColor*band)`, thresholds 0.08/0.44/0.78) with the NME approach rebuilt as an explicit StepBlock threshold graph (PosterizeBlock limitation documented); rim light removed from the B baseline and isolated as an optional-effect column; outlines remain a separate column; layout now 4 columns. Clean npm ci / 3-mode npm audit re-run (0 vulnerabilities), double build byte-identical (sha256-verified), dev/preview HTTP 200, 6 fresh screenshots (focus A–D added). README conclusions corrected: A and B render identically when equations match; earlier A/B color-difference claim retracted. Status `READY_FOR_REVIEW`; awaiting ChatGPT re-review and owner acceptance.
 - 2026-11-13 — ST2-002 initial technical review: `CHANGES_REQUESTED`. Dependency, clean-install, audit, build-repeatability, dev/preview and disclosed sandbox WebGL2 evidence pass within scope. The central A/B comparison is confounded by different ambient/base-color equations and an extra rim term in B. Requested equivalent base-shading equations, isolated rim treatment, corrected captures/report, and removal of stale contradictory status text. Corrections are within the existing owner-approved ST2-002 scope; no new approval required.
 - 2026-11-13 — ST2-002 executed within approved scope: isolated `spikes/ST2-002/` comparison Spike (NME posterized toon vs hand-written GLSL cel+rim, outline overlays evaluated separately), exact pins + HTTPS official-registry lockfile (49/49 https, 0 plaintext http), clean `npm ci` exit 0, `npm audit` 3 modes 0 vulnerabilities, byte-identical double build (sha256-verified), dev/preview HTTP 200, Firefox/llvmpipe screenshots incl. per-approach focus mode. Advisory recommendation recorded; no final rendering decision made. Status `READY_FOR_REVIEW`; awaiting ChatGPT review and owner acceptance.
@@ -483,7 +502,7 @@ Stage 2 is authorized. ST2-001 was approved to start on 2026-11-12 and formally 
 ### 11.3 Second approved task
 
 #### ST2-002 — Cartoon rendering direction comparison Spike
-- **Status:** `READY_FOR_REVIEW` — correction round 1 completed by WorkBuddy on 2026-11-13 (A/B unified shading equation via NME threshold graph, rim isolated to its own column, re-verified build/evidence, README v2); see correction report in Section 6. Awaiting ChatGPT re-review, then owner acceptance. (History: `APPROVED_TO_START` 2026-11-13 → execution `READY_FOR_REVIEW` → `CHANGES_REQUESTED_BY_REVIEW` → round 1 corrections `READY_FOR_REVIEW`.)
+- **Status:** `REVIEW_PASSED` — correction round 1 passed ChatGPT technical re-review on 2026-11-13. Awaiting the project owner's separate acceptance decision. (History: `APPROVED_TO_START` → `READY_FOR_REVIEW` → `CHANGES_REQUESTED_BY_REVIEW` → correction round 1 `READY_FOR_REVIEW` → `REVIEW_PASSED`.)
 - **Objective:** Compare at least two feasible Babylon.js cartoon-rendering approaches in a controlled, isolated scene and provide reproducible visual/technical evidence for the project owner's later decision.
 - **Plan:** `docs/STAGE2_TECH_SPIKE_PLAN.md`, Section 9.
 - **Scope:** New disposable Spike under `spikes/ST2-002/`; controlled comparison scene; at least two rendering approaches; screenshots; exact dependencies/lockfile; clean install, audit, build and browser verification; report actual environment and limitations.
