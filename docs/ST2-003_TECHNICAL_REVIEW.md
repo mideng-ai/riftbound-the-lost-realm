@@ -76,3 +76,19 @@ The correction report §11.6 says the new Chrome/macOS evidence is **“real GPU
 **Current review status: `CHANGES_REQUESTED` (R5 only).** R1–R4 are accepted. Once R5 is corrected, resubmit the report as `READY_FOR_REVIEW` for final technical sign-off. Real Mac mini and physical-phone tests remain owner-required; they are not a blocker to closing the ST2-003 agent execution task if the report keeps them explicitly pending, but they remain a blocker to claiming complete real-device validation or setting device-dependent Stage 2 acceptance criteria as passed.
 
 This re-review does not constitute owner acceptance or authorize Stage 3/M1.
+
+
+## Final technical sign-off — correction round 2 (2026-11-13)
+
+- **R5:** PASS. The committed probe and same-session test artifacts record `UNMASKED_RENDERER_WEBGL=ANGLE (Apple, ANGLE Metal Renderer: Apple M1, Unspecified Version)`, host identity `Macmini9,1 / Apple M1 / 8 GB`, macOS display-profiler output showing Apple M1 and Metal 3, and the Playwright Chrome headless launch configuration. The storage-suite and preview-smoke logs carry the renderer identity in the same sessions as their results.
+- The report now accurately describes these as **agent-automated headless Chrome runs on a Mac mini host using ANGLE/Metal (Apple M1)**, not as the project owner's interactive A1–A10 device validation.
+- **R1–R4:** remain PASS from correction round 1.
+- **Build/regression evidence:** reviewed round-2 clean install, audit, typecheck, 18/18 input regression, production build, preview smoke, and S2-E 11/11 storage suite. Known non-blocking favicon 404 and chunk-size warning remain disclosed.
+- **Technical review result: `REVIEW_PASSED` for ST2-003 execution deliverables.**
+
+### Boundaries after technical sign-off
+
+1. This is ChatGPT technical sign-off only. **The project owner has not yet formally accepted ST2-003 or Stage 2.**
+2. Mac mini interactive checklist A1–A10 and physical-phone checklist B1–B6 remain `OWNER_DEVICE_TEST_REQUIRED`; the automated headless run does not replace them.
+3. D-207 storage backend, D-210 performance budget, and final rendering direction remain OPEN and require explicit owner decisions. The current localStorage recommendation, performance numbers, and GLSL toon path remain recommendations/provisional.
+4. Stage 2 is not yet owner-accepted or closed. Stage 3/M1 remains unauthorized and must not begin without separate explicit owner authorization.
