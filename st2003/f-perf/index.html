@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ST2-003-F — Performance Baseline Scenario</title>
+    <style>
+      html, body { margin: 0; padding: 0; overflow: hidden; background: #0b0d12; }
+      #renderCanvas { width: 100vw; height: 100vh; display: block; touch-action: none; outline: none; }
+      #hud {
+        position: fixed; top: 8px; left: 8px; z-index: 10;
+        font: 12px/1.5 monospace; color: #d8e6ff; background: rgba(5, 8, 16, 0.8);
+        padding: 8px 10px; border-radius: 6px; white-space: pre; pointer-events: none;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="renderCanvas"></canvas>
+    <div id="hud">initializing…</div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
