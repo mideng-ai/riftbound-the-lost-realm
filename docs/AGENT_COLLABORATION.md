@@ -8,10 +8,10 @@
 
 - Collaboration protocol: **approved**
 - Current project phase: **Stage 2 authorized and in progress; Stage 1 formally accepted**
-- Stage 2: **AUTHORIZED — in progress**
+- Stage 2: **AUTHORIZED — in progress; ST2-001 and ST2-002 owner-accepted**
 - Formal Stage 2 engineering and technical spikes: **authorized only under individually approved task scopes**
 - Stage 3 / M1 gameplay implementation: **not authorized**
-- Stage 2 phase authorization does not by itself authorize a specific WorkBuddy task; task-specific approval is required. ST2-001 has been technically reviewed and formally owner-accepted on 2026-11-13. ST2-002 has completed its correction round and passed ChatGPT technical re-review on 2026-11-13; owner acceptance is pending. Stage 3 / M1 gameplay implementation remains unauthorized. Stage 3 / M1 gameplay implementation remains unauthorized.
+- Stage 2 phase authorization does not by itself authorize a specific WorkBuddy task; task-specific approval is required. ST2-001 has been technically reviewed and formally owner-accepted on 2026-11-13. ST2-002 passed ChatGPT technical re-review and was formally owner-accepted on 2026-11-13. Stage 3 / M1 gameplay implementation remains unauthorized.
 
 **Hard gate:** WorkBuddy must not execute a task unless this document contains an explicit owner approval for that exact task, identified by task ID, with status `APPROVED_TO_START`. A general approval of this collaboration process is not task approval. ChatGPT may draft tasks and review results, but cannot grant owner approval. If approval is absent, ambiguous, expired, or does not match the task ID and scope, stop and ask the owner.
 
@@ -65,7 +65,7 @@ Do not overwrite or erase previous reports or approval records. Append dated upd
 
 ## 4. ChatGPT → WorkBuddy tasks
 
-ST2-001 is owner-accepted. ST2-002 is the current task under technical review after execution; its approval is recorded in Section 5. Do not treat that approval as acceptance of its result or authorization for another task. Future tasks must use this template:
+ST2-001 and ST2-002 are owner-accepted. Neither acceptance authorizes another task or the next project phase. Future tasks must use this template:
 
 ### [TASK-ID] Task title
 
@@ -85,7 +85,7 @@ ST2-001 is owner-accepted. ST2-002 is the current task under technical review af
 
 ### ST2-002 — Cartoon rendering direction comparison Spike
 
-- **Status:** `APPROVED_TO_START` — owner explicitly approved this exact task on 2026-11-13; WorkBuddy may begin within the recorded scope.
+- **Status:** `OWNER_ACCEPTED` — owner formally accepted on 2026-11-13 after ChatGPT technical re-review; see Section 5 acceptance record and Section 7 review.
 - **Created:** 2026-11-13
 - **Objective:** Compare a small number of technically viable cartoon/toon rendering approaches in Babylon.js and produce evidence-based recommendations for a later owner decision. This is a rendering-technique evaluation, not a final art-direction or performance-budget decision.
 - **Background / references:** `docs/STAGE2_TECH_SPIKE_PLAN.md` Section 3 (S2-B), Sections 2 and 5; D-003 and D-007; ST2-001 accepted baseline and `spikes/ST2-001/` dependency/version evidence.
@@ -142,6 +142,19 @@ An approval for one task does not approve another task, a broader scope, or a la
 - **Accepted result:** The ST2-001 result as technically reviewed in Section 7, including the disclosed limitation that WebGL2 was demonstrated only in Firefox software rendering (llvmpipe) in WorkBuddy's Linux sandbox.
 - **Boundary:** This acceptance closes ST2-001 only. It does not establish real-GPU or mobile compatibility, does not complete Stage 2, does not approve ST2-002, and does not authorize Stage 3 / M1.
 - **Record transcription:** This entry records the owner's response in its conversational context; ChatGPT is not granting owner acceptance on the owner's behalf.
+
+
+
+### Owner acceptance record — ST2-002
+
+- **Task ID:** ST2-002
+- **Decision:** `OWNER_ACCEPTED`
+- **Accepted by:** Project owner
+- **Date:** 2026-11-13
+- **Source:** Owner's explicit response: “验收通过”.
+- **Accepted result:** The corrected ST2-002 cartoon-rendering comparison Spike, after ChatGPT's correction-round-1 technical re-review recorded in Section 7.
+- **Boundary:** This accepts the technical comparison Spike only. It does not select a final rendering direction, approve a production rendering pipeline, complete Stage 2, approve ST2-003 or any other WorkBuddy task, or authorize Stage 3/M1. Real Mac GPU, physical mobile, and WebGPU-engine validation remain outstanding as disclosed.
+- **Record transcription:** This entry records the owner's explicit acceptance in its conversational context; ChatGPT is not granting acceptance on the owner's behalf.
 
 ## 6. WorkBuddy → ChatGPT execution reports
 
@@ -388,6 +401,7 @@ The following scope decisions remain binding:
 For detailed product decisions and requirements, consult the current authoritative project documents in `docs/`. If this collaboration log conflicts with an approved scope or decision record, stop and ask the owner rather than choosing one silently.
 
 ## 9. Change log
+- 2026-11-13 — Owner formally accepted ST2-002 after ChatGPT technical re-review (`OWNER_ACCEPTED`). Acceptance is limited to the corrected cartoon-rendering comparison Spike; no final rendering choice, further task, Stage 2 completion, or Stage 3/M1 authorization is implied.
 - 2026-11-13 — ST2-002 correction round 1 re-review: `REVIEW_PASSED`. Verified equivalent NME/GLSL base-shading equations and inspected A/B/C/D screenshots; clean install, audit, repeatable build, browser evidence, and scope boundaries meet the approved Spike criteria. Recommend owner acceptance; final rendering choice and next task remain unapproved.
 - 2026-11-13 — ST2-002 correction round 1 completed (within original approval scope): A and B base-shading equations unified exactly (`baseColor*(ambientColor+lightColor*band)`, thresholds 0.08/0.44/0.78) with the NME approach rebuilt as an explicit StepBlock threshold graph (PosterizeBlock limitation documented); rim light removed from the B baseline and isolated as an optional-effect column; outlines remain a separate column; layout now 4 columns. Clean npm ci / 3-mode npm audit re-run (0 vulnerabilities), double build byte-identical (sha256-verified), dev/preview HTTP 200, 6 fresh screenshots (focus A–D added). README conclusions corrected: A and B render identically when equations match; earlier A/B color-difference claim retracted. Status `READY_FOR_REVIEW`; awaiting ChatGPT re-review and owner acceptance.
 - 2026-11-13 — ST2-002 initial technical review: `CHANGES_REQUESTED`. Dependency, clean-install, audit, build-repeatability, dev/preview and disclosed sandbox WebGL2 evidence pass within scope. The central A/B comparison is confounded by different ambient/base-color equations and an extra rim term in B. Requested equivalent base-shading equations, isolated rim treatment, corrected captures/report, and removal of stale contradictory status text. Corrections are within the existing owner-approved ST2-002 scope; no new approval required.
