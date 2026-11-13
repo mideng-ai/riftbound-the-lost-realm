@@ -1,0 +1,56 @@
+# ============================================================
+# ST2-002 — 干净目录 npm ci 完整日志
+# ============================================================
+
+## 环境
+OS          : Ubuntu 24.04.3 LTS
+Kernel/Arch : Linux 6.6.117-45.14.1.tl4.x86_64 x86_64
+Node        : v22.13.1
+npm         : 11.9.0
+registry    : https://registry.npmjs.org/   (来自本目录 .npmrc)
+时间(UTC)   : 2026-11-13T04:46:10Z
+
+## 干净目录状态（命令执行前）
+$ ls -A
+index.html
+.npmrc
+package.json
+package-lock.json
+src
+tsconfig.json
+$ ls -d node_modules 2>/dev/null || echo 'node_modules: 不存在'
+node_modules: 不存在
+
+## lockfile URL 校验（命令执行前，独立统计）
+lockfileVersion = 3
+packages 条目数 = 50
+含 resolved 的条目 = 49
+scheme+host 分布 = {'https://registry.npmjs.org': 49}
+明文 http:// 条目数 = 0
+非 https 条目数 = 0
+含 integrity 的条目 = 49
+
+## 一、npm ci
+$ npm ci
+
+added 19 packages, and audited 20 packages in 2s
+
+found 0 vulnerabilities
+[time] wall=1.63s maxrss=345032KB
+[exit] npmci=0
+
+## 二、安装结果核验
+$ npm ls --depth=0
+spike-st2-002-cartoon-comparison@0.0.0 /tmp/st2002-final
+├── @babylonjs/core@9.36.0
+├── typescript@5.9.3
+└── vite@8.3.8
+
+
+$ npm ls --all --parseable | wc -l
+20
+
+$ 逐包版本核验
+@babylonjs/core: 9.36.0
+vite: 8.3.8
+typescript: 5.9.3
