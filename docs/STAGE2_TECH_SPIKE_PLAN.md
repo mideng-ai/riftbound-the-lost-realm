@@ -95,9 +95,9 @@ Linux 沙箱或桌面模拟结果不能冒充手机真机结果；负责人 Mac 
 - **负责人批准：** 已于 2026-11-12 明确授予；审批记录见 `docs/AGENT_COLLABORATION.md` Section 5。
 
 
-## 9. ST2-002 — Cartoon rendering direction comparison Spike (task draft)
+## 9. ST2-002 — Cartoon rendering direction comparison Spike
 
-- **Status:** `DRAFT` — proposed by ChatGPT on 2026-11-13; not approved to start.
+- **Status:** `APPROVED_TO_START` — the project owner explicitly approved this exact task scope on 2026-11-13; WorkBuddy may begin.
 - **Prerequisite:** ST2-001 has been technically reviewed and owner-accepted. Its sandbox-only WebGL2 result does not establish real-GPU or mobile compatibility.
 - **Objective:** Compare a minimum of two practical cartoon-rendering approaches in Babylon.js using a controlled scene, then provide reproducible evidence and a recommendation for the project owner. The recommendation is advisory; final selection remains with the owner.
 - **Scope:**
