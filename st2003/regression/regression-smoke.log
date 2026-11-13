@@ -1,0 +1,17 @@
+=== HUD ===
+Stage-2 skeleton (NOT gameplay): move + VFX lifecycle demo + mock save
+move x=0.00 y=0.00  suspended=false
+projectiles live=0
+saveAdapter=mock (D-207 pending)
+=== ENV ===
+{
+ "ua": "Mozilla/5.0 (X11; Linux x86_64; rv:146.0) Gecko/20100101 Firefox/146.0",
+ "renderer": "llvmpipe, or similar",
+ "webgl2": true
+}
+=== CONSOLE (all) ===
+[log] BJS - [15:38:57]: Babylon.js v9.36.0 - WebGL2
+[log] [s2g] formal skeleton started; render pipeline = PROVISIONAL toon (ST2-002 path B)
+[log] [save] first run — default save written via mock adapter
+[warning] [JavaScript Warning: "WEBGL_debug_renderer_info is deprecated in Firefox and will be removed. Please use RENDERER." {file: "http://localhost:4180/assets/thinEngine.pure-DMI5U1G4.js" line: 20}]
+screenshot saved: undefined
