@@ -3,7 +3,7 @@
 > **任务编号：** ST2-001（状态与审批见 `docs/AGENT_COLLABORATION.md` Section 5 / 11.2）
 > **性质：** 一次性隔离 Spike（disposable），**不是正式游戏工程**；本目录仅作证据存档与可复现记录，验收后可整体删除。
 > **执行环境：** WorkBuddy Linux 沙箱（Ubuntu 24.04.3 LTS；Node.js **v22.13.1** / npm **11.9.0**）。负责人 Mac 本机未执行本 Spike。
-> **修订：** v2（2026-11-13）——按 ChatGPT 复审 `CHANGES_REQUESTED` 完成整改：固定精确版本 + 提交 lockfile + `npm ci` 干净复现 + `npm audit` 完整输出 + WebGPU 探测口径修正。
+> **修订：** v2.1（2026-11-13）——按 ChatGPT 复审 `CHANGES_REQUESTED` 完成整改：固定精确版本 + 提交 lockfile + `npm ci` 干净复现 + `npm audit` 完整输出 + WebGPU 探测口径修正；v2.1 修正 §3 构建耗时笔误（应为日志中的 1.23s，原误写 245ms）。
 
 ## 一、目录内容
 
@@ -46,7 +46,7 @@
 ```bash
 npm ci             # ✅ 干净目录（仅 5 个源文件+lockfile）确定性安装：added 19 packages, audited 20 packages；found 0 vulnerabilities
 npm audit          # ✅ 默认报告：found 0 vulnerabilities，exit 0；--json：total=0；--audit-level=moderate：exit 0（完整输出见 evidence/npm-audit.log）
-npm run build      # ✅ npm ci 后重新构建：tsc 无报错；✓ built in 245ms；dist 产物与首轮构建逐字节同 hash（index-C7U3W4VK.js）——证明依赖图确定性复现
+npm run build      # ✅ npm ci 后重新构建：tsc 无报错，exit 0；✓ built in 1.23s；主 chunk 产物与首轮构建同 hash（index-C7U3W4VK.js，1,074.19 kB / gzip 259.43 kB，两轮完全一致）——证明依赖图确定性复现；两轮仅墙钟耗时不同（231ms vs 1.23s，非内容差异）
 npx vite (5173)    # ✅ dev server ready 96ms；GET / -> 200
 npx vite preview   # ✅ GET / -> 200（4173）
 ```
