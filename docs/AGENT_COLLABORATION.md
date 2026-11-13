@@ -9,7 +9,7 @@
 - Collaboration protocol: **approved**
 - Current project phase: **Stage 2 authorized and in progress; Stage 1 formally accepted**
 - Stage 2: **AUTHORIZED — in progress; ST2-001 and ST2-002 owner-accepted**
-- Formal Stage 2 remaining work: **ST2-003 technical review passed on 2026-11-13; awaiting project-owner acceptance and outstanding owner decisions/device validation**
+- Formal Stage 2 remaining work: **ST2-003 owner-accepted on 2026-11-13; Stage 2 still in progress pending owner device validation and D-207/D-210/final-rendering decisions**
 - Stage 3 / M1 gameplay implementation: **not authorized**
 - Stage 2 phase authorization does not by itself authorize a WorkBuddy task; an exact task approval is required. ST2-003 is now approved as one master task covering its listed sub-work packages. ST2-001 has been technically reviewed and formally owner-accepted on 2026-11-13. ST2-002 passed ChatGPT technical re-review and was formally owner-accepted on 2026-11-13. Stage 3 / M1 gameplay implementation remains unauthorized.
 
@@ -107,7 +107,7 @@ ST2-001 and ST2-002 are owner-accepted. Neither acceptance authorizes another ta
 
 ### ST2-003 — Stage 2 Remaining Work Master Execution
 
-- **Status:** `REVIEW_PASSED` — R1–R4 accepted in correction round 1; R5 accepted in correction round 2 after verifying same-session ANGLE/Metal Apple M1 renderer evidence. Awaiting project-owner acceptance. Review: `docs/ST2-003_TECHNICAL_REVIEW.md`.
+- **Status:** `OWNER_ACCEPTED` — project owner formally accepted on 2026-11-13 after ChatGPT technical review `REVIEW_PASSED`. Review: `docs/ST2-003_TECHNICAL_REVIEW.md`.
 - **Created:** 2026-11-13
 - **Objective:** Complete all remaining Stage 2 work under one owner-approved master task, avoiding separate start approvals for each sub-work package.
 - **Background / references:** `docs/STAGE2_MASTER_EXECUTION_PLAN.md` v1.0; `docs/STAGE2_TECH_SPIKE_PLAN.md`; D-007/D-207/D-210; accepted ST2-001 and ST2-002.
@@ -639,5 +639,17 @@ Stage 2 is authorized. ST2-001 was approved to start on 2026-11-12 and formally 
 - **Findings:** R1–R4 accepted in correction round 1; R5 accepted in correction round 2 after checking the raw renderer/vendor probe and same-session browser logs.
 - **Evidence boundary:** automated headless Chrome on a Mac mini host using ANGLE/Metal (Apple M1) is not the owner's interactive Mac mini A1–A10 validation. Physical phone B1–B6 also remains `OWNER_DEVICE_TEST_REQUIRED`.
 - **Owner decision gates still OPEN:** D-207, D-210, final rendering direction. ST2-003 technical sign-off does not decide these.
-- **Owner acceptance:** pending. Stage 2 remains in progress until the owner accepts the task/phase and handles the remaining owner decisions and device-validation requirements.
+- **Owner acceptance:** `OWNER_ACCEPTED` on 2026-11-13; source: owner's explicit response “验收通过” following the ST2-003 technical sign-off. This accepts the ST2-003 execution deliverables, not the entire Stage 2 phase.
 - **Stage 3/M1:** not authorized.
+
+
+### Owner acceptance record — ST2-003
+
+- **Task ID:** ST2-003
+- **Decision:** `OWNER_ACCEPTED`
+- **Accepted by:** Project owner
+- **Date:** 2026-11-13
+- **Source:** Owner's explicit response: “验收通过” following ChatGPT's final `REVIEW_PASSED` technical sign-off for ST2-003.
+- **Accepted result:** ST2-003 execution deliverables and their reviewed evidence, including S2-C through S2-G work, correction rounds R1–R5, and the disclosed test limitations.
+- **Boundary:** This accepts ST2-003 only. Stage 2 remains in progress; owner-run Mac mini interactive checklist A1–A10 and physical-phone checklist B1–B6 remain outstanding, as do owner decisions D-207, D-210, and final rendering direction. This acceptance does not close Stage 2, decide those items, authorize additional scope, or authorize Stage 3/M1.
+- **Record transcription:** This entry records the owner's explicit acceptance in its conversational context; ChatGPT is not granting acceptance on the owner's behalf.
