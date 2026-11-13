@@ -186,6 +186,24 @@ Never claim a test passed unless it was actually run. Distinguish “not run”,
 
 ChatGPT review is a technical recommendation, not owner acceptance.
 
+
+### ST2-001 Review — correction round 1 re-review
+
+- **Review date:** 2026-11-13
+- **Decision:** `CHANGES_REQUESTED`
+- **Evidence inspected:** latest `package.json`, `package-lock.json`, `README.md`, `src/main.ts`, `evidence/npmci.log`, `evidence/npm-audit.log`, `evidence/build-after-ci.log`, `evidence/dev-after-ci.log`, `evidence/preview-after-ci.log`, `evidence/browser-harness.mjs`, and the correction report in Section 6.
+- **Acceptance criteria results:**
+  - Exact direct dependency pins and committed lockfile: **PASS**.
+  - Clean-directory `npm ci`: **PASS based on submitted log** (Node v22.13.1 / npm 11.9.0; exit 0).
+  - Post-install TypeScript/production build: **PASS based on submitted log** (exit 0; chunk hash reported identical to prior build).
+  - `npm audit`: **PASS based on committed full output** (0 reported vulnerabilities; exit 0).
+  - WebGPU wording and status: **PASS** — API/adapter/device distinctions are explicit and Babylon `WebGPUEngine` remains accurately marked not run / not validated.
+  - Sandbox limitations and chunk-size warning: **PASS** — retained without scope-expanding optimization.
+  - Scope control: **PASS by inspected source and report** — no gameplay, formal project architecture, or Stage 3 implementation added.
+- **Issue found:** all 49 `resolved` package URLs in `spikes/ST2-001/package-lock.json` use plaintext `http://mirrors.tencent.com/npm/...`; none use HTTPS. This makes the committed lockfile dependent on a specific mirror and does not provide transport encryption. Integrity hashes are present, which help detect altered package contents, but they do not make plaintext transport or a mirror-specific dependency baseline desirable for a reusable project.
+- **Required correction (within existing ST2-001 approval):** regenerate or normalize the lockfile so every package tarball URL uses HTTPS from the official npm registry (`https://registry.npmjs.org/`) or another explicitly approved HTTPS registry. Do not merely claim success: verify there are no remaining plaintext `http://` resolved URLs; then run `npm ci` from a clean directory, `npm audit`, and `npm run build` against that exact committed lockfile. Commit the resulting lockfile and complete logs, including environment and exit codes. Do not change the task scope or perform chunk optimization.
+- **Recommendation to owner:** Continue to hold ST2-001 acceptance. The previous four correction groups are now supported by repository evidence; only the lockfile registry transport/source issue remains for this review. This correction is within the existing approved task scope and requires no new owner approval. ChatGPT must re-review the updated lockfile and logs; owner acceptance remains a separate decision.
+
 ## 8. Frozen project constraints
 
 The following scope decisions remain binding:
@@ -199,6 +217,7 @@ The following scope decisions remain binding:
 For detailed product decisions and requirements, consult the current authoritative project documents in `docs/`. If this collaboration log conflicts with an approved scope or decision record, stop and ask the owner rather than choosing one silently.
 
 ## 9. Change log
+- 2026-11-13 — ST2-001 correction round 1 re-reviewed. Exact pins/lockfile, clean `npm ci`, post-install build, `npm audit`, corrected WebGPU wording, and preserved scope limits are supported by committed evidence. Review found all 49 lockfile tarball URLs use plaintext `http://mirrors.tencent.com/...`; requested an HTTPS official/approved registry lockfile and clean-install/audit/build re-verification. Status remains `CHANGES_REQUESTED_BY_REVIEW`; owner acceptance remains pending.
 
 - 2026-11-12 — Created the shared asynchronous collaboration protocol. The protocol is approved; no Stage 2 task or implementation work is authorized by this entry.
 - 2026-11-12 — WorkBuddy onboarding: read the protocol from `main`, confirmed read/update access via the GitHub REST API, and recorded its understanding, verified capabilities, and permission limits in Section 10. No execution task started; no task ID currently holds `APPROVED_TO_START`.
