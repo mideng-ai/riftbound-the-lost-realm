@@ -1,0 +1,13 @@
+# ST2-001 npm ci 干净安装日志
+# 环境: Ubuntu 24.04.3 LTS | Kernel 6.6.117-45.14.1.tl4.x86_64 | x86_64 | Node v22.13.1 | npm 11.9.0
+# 目录: 全新空目录，仅含 package.json / package-lock.json / tsconfig.json / index.html / src/main.ts（无 node_modules）
+# 执行时间: 2026-11-13T02:03:19Z
+# 命令: npm ci
+--- 输出 ---
+
+added 19 packages, and audited 20 packages in 2s
+
+9 packages are looking for funding
+  run `npm fund` for details
+
+found 0 vulnerabilities
