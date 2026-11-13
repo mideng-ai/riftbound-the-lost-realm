@@ -1,7 +1,7 @@
 # STAGE2_TECH_SPIKE_PLAN — 阶段2技术验证计划
 
 > **项目：** Riftbound: The Lost Realm  
-> **版本：** v1.1  
+> **版本：** v1.2  
 > **日期：** 2026-11-12  
 > **状态：** 阶段2已获负责人授权并启动；各 WorkBuddy 执行任务仍须按任务编号单独审批。  
 > **依据：** DEVELOPMENT_ROADMAP.md 阶段2、DECISIONS_LOG.md D-007/D-207/D-210、GAME_SCOPE.md、DEVELOPMENT_ENVIRONMENT.md。
@@ -110,7 +110,7 @@ Linux 沙箱或桌面模拟结果不能冒充手机真机结果；负责人 Mac 
 - **Out of scope:** final rendering decision; formal project architecture; production pipeline; gameplay; spell VFX (S2-C); input abstraction (S2-D); save system/D-207; performance budget/D-210; mobile hardware claims without real-device evidence; Stage 3/M1.
 - **Acceptance criteria:** two or more approaches run in the same controlled scene; source and screenshots are committed; reproducible clean install/build and audit evidence are present; browser/environment limitations are explicit; report distinguishes visual feasibility from performance conclusions; no scope expansion.
 - **Stop conditions:** no engine/framework substitution; stop and report if an approach requires changing D-007, a major unapproved dependency/architecture change, or work beyond the approved task.
-- **Owner approval:** Not granted. WorkBuddy may not execute until an explicit `APPROVED_TO_START` record for ST2-002 is added to `AGENT_COLLABORATION.md` Section 5.
+- **Owner approval:** Granted on 2026-11-13. The exact owner approval and boundaries are recorded in `AGENT_COLLABORATION.md` Section 5; no other task or phase is thereby authorized.
 
 ## 10. Change log
 
@@ -119,4 +119,5 @@ Linux 沙箱或桌面模拟结果不能冒充手机真机结果；负责人 Mac 
 ## 10. 变更记录
 
 - 2026-11-12 v1.0：负责人授权开始阶段2；建立技术 Spike 工作包、证据规则与阶段验收门槛；ST2-001 建立为待单独批准的首个 WorkBuddy 执行任务。
-- 2026-11-13 v1.1：ST2-001 经 ChatGPT 技术复审通过并由负责人正式验收；新增 ST2-002 卡通渲染方向比较 Spike 草案，尚未获准开始。
+- 2026-11-13 v1.1：ST2-001 经 ChatGPT 技术复审通过并由负责人正式验收；新增 ST2-002 卡通渲染方向比较 Spike 草案。
+- 2026-11-13 v1.2：负责人明确批准 ST2-002 准确范围开始执行；阶段2继续进行，未授权阶段3/M1。
