@@ -1,5 +1,5 @@
 /**
- * S2-G formal project — migrated from spikes/ST2-003-D-INPUT — Touch adapter (mobile).
+ * S2-G formal project — migrated from st2003/d-input — Touch adapter (mobile).
  * Multi-touch zone policy (anti-cross-talk):
  *   - A touch is assigned a zone ONCE at touchstart and keeps it until
  *     touchend/touchcancel — dragging across zones never migrates it.
@@ -25,6 +25,8 @@ export class TouchAdapter {
   private attached = false;
   private zone: HTMLElement | null = null;
   private ui: TouchUiHooks | null = null;
+  /** outstanding hold-release timeout from buttonIntent — cleared on dispose (R2). */
+  private releaseTimer: ReturnType<typeof setTimeout> | null = null;
 
   /** Visual joystick callbacks (HUD rendering), optional. */
   setUi(hooks: TouchUiHooks) {
@@ -120,16 +122,26 @@ export class TouchAdapter {
     if (action === 'normalAttack') {
       // mobile normal attack is auto-triggered per design; button also acts as hold
       this.emit({ kind: 'held', action: 'normalAttack', pressed: true, source: 'touch' });
-      setTimeout(() => this.emit({ kind: 'held', action: 'normalAttack', pressed: false, source: 'touch' }), 120);
+      if (this.releaseTimer !== null) clearTimeout(this.releaseTimer);
+      this.releaseTimer = setTimeout(() => {
+        this.releaseTimer = null;
+        this.emit({ kind: 'held', action: 'normalAttack', pressed: false, source: 'touch' });
+      }, 120);
     }
   }
 
   dispose() {
+    if (this.releaseTimer !== null) {
+      clearTimeout(this.releaseTimer);
+      this.releaseTimer = null;
+    }
     this.zone?.removeEventListener('touchstart', this.onTouchStart);
     this.zone?.removeEventListener('touchmove', this.onTouchMove);
     this.zone?.removeEventListener('touchend', this.onTouchEnd);
     this.zone?.removeEventListener('touchcancel', this.onTouchCancel);
     this.attached = false;
+    this.moveFinger = null;
+    this.zone = null;
     this.listeners = [];
   }
 }
