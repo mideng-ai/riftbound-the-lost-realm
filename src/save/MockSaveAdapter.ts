@@ -2,7 +2,7 @@
  * MockSaveAdapter — in-memory SavePort. D-207 decision gate: no real
  * persistence backend is wired until the owner confirms the storage choice.
  * Swap via a future LocalStorageSaveAdapter / IndexedDbSaveAdapter.
- * (Comparison evidence: spikes/ST2-003-E-SAVE/)
+ * (Comparison evidence: st2003/e-save/)
  */
 import type { SavePort, SaveDataV2 } from './SavePort';
 import { defaultSave } from './SavePort';
