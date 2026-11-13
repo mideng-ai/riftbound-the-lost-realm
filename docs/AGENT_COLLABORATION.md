@@ -9,9 +9,9 @@
 - Collaboration protocol: **approved**
 - Current project phase: **Stage 2 authorized and in progress; Stage 1 formally accepted**
 - Stage 2: **AUTHORIZED — in progress; ST2-001 and ST2-002 owner-accepted**
-- Formal Stage 2 engineering and technical spikes: **authorized only under individually approved task scopes**
+- Formal Stage 2 remaining work: **ST2-003 master scope approved; sub-work packages may proceed under this single approval**
 - Stage 3 / M1 gameplay implementation: **not authorized**
-- Stage 2 phase authorization does not by itself authorize a specific WorkBuddy task; task-specific approval is required. ST2-001 has been technically reviewed and formally owner-accepted on 2026-11-13. ST2-002 passed ChatGPT technical re-review and was formally owner-accepted on 2026-11-13. Stage 3 / M1 gameplay implementation remains unauthorized.
+- Stage 2 phase authorization does not by itself authorize a WorkBuddy task; an exact task approval is required. ST2-003 is now approved as one master task covering its listed sub-work packages. ST2-001 has been technically reviewed and formally owner-accepted on 2026-11-13. ST2-002 passed ChatGPT technical re-review and was formally owner-accepted on 2026-11-13. Stage 3 / M1 gameplay implementation remains unauthorized.
 
 **Hard gate:** WorkBuddy must not execute a task unless this document contains an explicit owner approval for that exact task, identified by task ID, with status `APPROVED_TO_START`. A general approval of this collaboration process is not task approval. ChatGPT may draft tasks and review results, but cannot grant owner approval. If approval is absent, ambiguous, expired, or does not match the task ID and scope, stop and ask the owner.
 
@@ -107,7 +107,7 @@ ST2-001 and ST2-002 are owner-accepted. Neither acceptance authorizes another ta
 
 ### ST2-003 — Stage 2 Remaining Work Master Execution
 
-- **Status:** `DRAFT` — not approved; WorkBuddy must not start.
+- **Status:** `APPROVED_TO_START` — owner approved on 2026-11-13; WorkBuddy may begin the exact master scope.
 - **Created:** 2026-11-13
 - **Objective:** Complete all remaining Stage 2 work under one owner-approved master task, avoiding separate start approvals for each sub-work package.
 - **Background / references:** `docs/STAGE2_MASTER_EXECUTION_PLAN.md` v1.0; `docs/STAGE2_TECH_SPIKE_PLAN.md`; D-007/D-207/D-210; accepted ST2-001 and ST2-002.
@@ -118,9 +118,21 @@ ST2-001 and ST2-002 are owner-accepted. Neither acceptance authorizes another ta
 - **Acceptance criteria:** All Stage 2 work packages S2-C through S2-G have reproducible source/evidence; clean install, audit, typecheck, build and preview pass; PC/mobile input architecture is documented and honestly tested; D-207/D-210 reports include comparisons and explicit owner decision status; real-device tests are complete or clearly flagged OWNER_DEVICE_TEST_REQUIRED with an owner-run checklist; formal project skeleton and documentation are reproducible; risks, limitations and untested items are explicit; no out-of-scope work.
 - **Required verification / tests:** Exact dependency pins and HTTPS lockfile; clean `npm ci`; `npm audit`; typecheck; production build; preview smoke test; desktop browser rendering/input; physical mobile tests where owner hardware is available; Mac M1 real-GPU test; frame-time/memory/load measurements with device/browser/backend metadata; storage read/write/migration/corruption-recovery tests; screenshots and raw logs.
 - **Risks and stop conditions:** Stop affected work if D-007 must change, if an unapproved dependency/architecture or scope expansion is required, if historical evidence may be overwritten, or if a material security/license issue appears. Do not claim software-rendering or emulation results as physical-device results. D-207, D-210 and final rendering choice remain owner decisions. Stage 3/M1 is not authorized.
-- **Owner approval:** Not granted. Awaiting explicit approval for this exact ST2-003 scope.
+- **Owner approval:** Granted on 2026-11-13; see Section 5 approval record — ST2-003.
 
 ## 5. Owner approvals
+
+### Approval record — ST2-003
+
+- **Task ID:** ST2-003
+- **Decision:** `APPROVED_TO_START`
+- **Approved scope:** The complete exact scope in `docs/STAGE2_MASTER_EXECUTION_PLAN.md` v1.0 (Sections 3–9), including S2-C spell VFX validation; S2-D PC/mobile unified input abstraction; S2-E D-207 local-storage technology comparison and minimum validation; S2-F D-210 performance measurement and budget recommendation; owner-run Mac/physical-mobile validation preparation and support; S2-G formal Vite + TypeScript + Babylon.js project skeleton and architecture documentation; and Stage 2 integration regression/evidence package.
+- **Approved by:** Project owner
+- **Date:** 2026-11-13
+- **Source:** Owner's explicit message in ChatGPT: “批准 ST2-003”, approving the exact master task scope presented immediately before the response.
+- **Conditions / limits:** This is one approval for the complete ST2-003 scope; WorkBuddy does not need separate start approvals for its listed sub-work packages. D-207, D-210, and final rendering-direction decisions remain reserved to the owner. Physical-device tests must be actual device tests or explicitly marked pending. Stage 3/M1, gameplay implementation, scope expansion, and unapproved technology-stack changes are not authorized. Preserve accepted ST2-001/ST2-002 evidence. Final Stage 2 acceptance and Stage 3 authorization remain separate owner decisions.
+- **Record transcription:** This entry records the owner's explicit approval in its conversational context; ChatGPT is not independently granting approval.
+
 
 Only the project owner may add an approval entry. Approval must be explicit and tied to a task ID and the exact task scope.
 
