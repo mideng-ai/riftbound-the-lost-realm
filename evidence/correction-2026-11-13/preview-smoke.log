@@ -1,4 +1,4 @@
-[log] BJS - [16:40:27]: Babylon.js v9.36.0 - WebGL2 - Parallel shader compilation
+[log] BJS - [17:01:37]: Babylon.js v9.36.0 - WebGL2 - Parallel shader compilation
 [log] [s2g] formal skeleton started; render pipeline = PROVISIONAL toon (ST2-002 path B)
 [log] [save] first run — default save written via mock adapter
 [error] Failed to load resource: the server responded with a status of 404 (Not Found)
@@ -14,3 +14,8 @@ projectiles_logged=true
 save_first_run=true
 ua=Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/157.0.0.0 Safari/537.36
 webgl2=true
+webgl_version=WebGL 2.0 (OpenGL ES 3.0 Chromium)
+webgl_vendor=Google Inc. (Apple)
+webgl_renderer=ANGLE (Apple, ANGLE Metal Renderer: Apple M1, Unspecified Version)
+chrome=157.0.8103.51
+launch={"channel":"chrome","headless":true}
