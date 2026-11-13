@@ -1,0 +1,39 @@
+# S2-E storage suite — real Chrome (macOS), 2026-11-13T08:38:06.834Z
+UA: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/157.0.0.0 Safari/537.36
+URL: http://localhost:4175/
+
+[log] [PASS] L1 ls versioned write/read — roundtrip ok, bytes=72
+[log] [PASS] L2 ls v1→v2 migration — migrated: {"schemaVersion":2,"gold":50,"items":["shield"],"settings":{"sfx":true}}
+[log] [PASS] L3 ls corruption recovery — parse failure quarantined to _corrupt_backup, default returned
+[log] [INFO] L4 ls quota behavior — QuotaExceededError thrown after ~4 MB synchronous throws, prior keys unaffected
+[log] [PASS] L5 ls sync write cost (300×10KB) — 2.6ms total, 0.009ms/op, 300 writes — all on main thread (note: 1000×10KB would exceed the ~5MB quota)
+[log] [PASS] L6 ls quota write-failure path — filler=5.0MB → temp write threw QuotaExceededError; save_next=absent; save_main intact readback gold=777 (expected 777)
+[log] [PASS] L6b ls interrupted-write recovery prefers valid temp — save_next present + valid → recovered gold=888 (expected 888)
+[log] [PASS] L6c ls recovery falls back to main on invalid temp — save_next corrupt → fell back to save_main gold=777 (expected 777)
+[log] [PASS] I1 idb versioned write/read — structured clone roundtrip ok
+[log] [PASS] I2 idb v1→v2 onupgradeneeded migration — in-upgrade-transaction migration ok: {"schemaVersion":2,"gold":75,"items":["ring"],"settings":{"sfx":true}}
+[log] [PASS] I3 idb transaction atomicity (abort) — sync-aborted tx with 3 puts left 0 rows — all-or-nothing confirmed (engine-independent)
+[log] [PASS] I3b idb invalid data rejected (DataCloneError) — write rejected upfront: DataCloneError
+[log] [INFO] I4 idb storage estimate() — usage=0MB quota=10240MB (browser-managed eviction policy applies)
+[log] [INFO] I5 idb async write cost (1000×10KB, batched) — 37.0ms total, 0.037ms/op — off main-thread commit, batched tx
+[log] [INFO] P1 private-mode probe — see README browser matrix — separate -private browser run required
+
+--- rendered table ---
+completed 11 | PASS 11 | FAIL 0
+
+#	test	result	detail
+L1	ls versioned write/read	PASS	roundtrip ok, bytes=72
+L2	ls v1→v2 migration	PASS	migrated: {"schemaVersion":2,"gold":50,"items":["shield"],"settings":{"sfx":true}}
+L3	ls corruption recovery	PASS	parse failure quarantined to _corrupt_backup, default returned
+L4	ls quota behavior	INFO	QuotaExceededError thrown after ~4 MB synchronous throws, prior keys unaffected
+L5	ls sync write cost (300×10KB)	PASS	2.6ms total, 0.009ms/op, 300 writes — all on main thread (note: 1000×10KB would exceed the ~5MB quota)
+L6	ls quota write-failure path	PASS	filler=5.0MB → temp write threw QuotaExceededError; save_next=absent; save_main intact readback gold=777 (expected 777)
+L6b	ls interrupted-write recovery prefers valid temp	PASS	save_next present + valid → recovered gold=888 (expected 888)
+L6c	ls recovery falls back to main on invalid temp	PASS	save_next corrupt → fell back to save_main gold=777 (expected 777)
+I1	idb versioned write/read	PASS	structured clone roundtrip ok
+I2	idb v1→v2 onupgradeneeded migration	PASS	in-upgrade-transaction migration ok: {"schemaVersion":2,"gold":75,"items":["ring"],"settings":{"sfx":true}}
+I3	idb transaction atomicity (abort)	PASS	sync-aborted tx with 3 puts left 0 rows — all-or-nothing confirmed (engine-independent)
+I3b	idb invalid data rejected (DataCloneError)	PASS	write rejected upfront: DataCloneError
+I4	idb storage estimate()	INFO	usage=0MB quota=10240MB (browser-managed eviction policy applies)
+I5	idb async write cost (1000×10KB, batched)	INFO	37.0ms total, 0.037ms/op — off main-thread commit, batched tx
+P1	private-mode probe	INFO	see README browser matrix — separate -private browser run required
