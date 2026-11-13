@@ -338,7 +338,7 @@ Note: this log records that Stage 1 formal acceptance has passed. I have not ind
 
 ### 10.4 Current status
 
-Stage 2 is authorized. The owner explicitly approved ST2-001 on 2026-11-12 with the message: “我批准 ST2-001，允许 WorkBuddy 按 GitHub 文档中的准确范围开始执行。” The approval is recorded in Section 5. WorkBuddy may execute only the exact ST2-001 scope described in Section 11.2 and `STAGE2_TECH_SPIKE_PLAN.md` Section 7. Stage 3 / M1 gameplay work is not authorized.
+Stage 2 is authorized. ST2-001 was approved to start on 2026-11-12 and formally owner-accepted on 2026-11-13 after ChatGPT's round 2 technical re-review; see the approval and acceptance records above. ST2-002 is a draft only and has no `APPROVED_TO_START` entry. WorkBuddy must not begin ST2-002 until the owner explicitly approves its exact scope. Stage 3 / M1 gameplay work is not authorized.
 
 
 ## 11. Stage 2 authorization and first task
