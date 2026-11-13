@@ -1,5 +1,5 @@
 /**
- * S2-G formal project — migrated from spikes/ST2-003-D-INPUT — InputSystem facade. The ONLY object game logic consumes.
+ * S2-G formal project — migrated from st2003/d-input — InputSystem facade. The ONLY object game logic consumes.
  * Merges adapter streams; buffers instant intents for one poll.
  */
 import { KeyboardMouseAdapter } from './KeyboardMouseAdapter';
@@ -15,6 +15,8 @@ export class InputSystem {
   private listeners: InputListener[] = [];
   private kbm = new KeyboardMouseAdapter();
   private touch = new TouchAdapter();
+  /** DOM action buttons wired by bindActionButton — retained so dispose() can unbind them (R2). */
+  private boundButtons: Array<{ el: HTMLElement; onDown: (e: Event) => void }> = [];
 
   attachKeyboardMouse(canvas: HTMLElement) {
     this.kbm.addListener({ onEvent: (ev: InputEvent) => this.route(ev) });
@@ -31,14 +33,15 @@ export class InputSystem {
   bindActionButton(id: string, action: 'normalAttack' | 'skill1' | 'skill2' | 'dash') {
     const el = document.getElementById(id);
     if (!el) return;
-    el.addEventListener('touchstart', (e) => {
+    // One shared handler for touch + mouse preview; the reference is retained so
+    // dispose() can remove it from both event types (previously anonymous → leak).
+    const onDown = (e: Event) => {
       e.preventDefault();
       this.touch.buttonIntent(action);
-    }, { passive: false });
-    el.addEventListener('mousedown', (e) => {
-      e.preventDefault();
-      this.touch.buttonIntent(action); // desktop preview of the same path
-    });
+    };
+    el.addEventListener('touchstart', onDown, { passive: false });
+    el.addEventListener('mousedown', onDown);
+    this.boundButtons.push({ el, onDown });
   }
 
   private route(ev: InputEvent) {
@@ -54,8 +57,11 @@ export class InputSystem {
         this.held.set(ev.action, ev.pressed);
         break;
       case 'suspend':
-        this.system.suspended = ev.suspended || ev.reason === 'blur';
-        if (ev.reason === 'visibility' && !ev.suspended) this.system.suspended = false;
+        // Only real focus/visibility transitions may change the suspended state.
+        // touchcancel is an input-release (gesture interruption), never a resume.
+        if (ev.reason === 'blur') this.system.suspended = true;
+        else if (ev.reason === 'focus') this.system.suspended = false;
+        else if (ev.reason === 'visibility') this.system.suspended = ev.suspended;
         break;
       case 'pointerLockLost':
         this.system.pointerLockLost = true;
@@ -100,6 +106,11 @@ export class InputSystem {
   }
 
   dispose() {
+    for (const { el, onDown } of this.boundButtons) {
+      el.removeEventListener('touchstart', onDown);
+      el.removeEventListener('mousedown', onDown);
+    }
+    this.boundButtons = [];
     this.kbm.dispose();
     this.touch.dispose();
     this.listeners = [];
