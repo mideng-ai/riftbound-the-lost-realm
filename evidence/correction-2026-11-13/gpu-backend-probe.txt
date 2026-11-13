@@ -1,0 +1,24 @@
+=== ST2-003 R5 GPU backend probe ===
+timestamp_utc=2026-11-13T09:00:28.520Z
+hostname=Mac-mini.local
+chrome_version=157.0.8103.51
+playwright_launch={"channel":"chrome","headless":true}
+playwright_version=1.49.1
+ua=Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/157.0.0.0 Safari/537.36
+webgl2_available=true
+gl_version=WebGL 2.0 (OpenGL ES 3.0 Chromium)
+gl_vendor=WebKit
+gl_renderer=WebKit WebGL
+unmasked_vendor=Google Inc. (Apple)
+unmasked_renderer=ANGLE (Apple, ANGLE Metal Renderer: Apple M1, Unspecified Version)
+max_texture_size=16384
+host_Model_Name:_Mac_mini
+host_Model_Identifier:_Macmini9,1
+host_Chip:_Apple_M1
+host_Total_Number_of_Cores:_8_(4_performance_and_4_efficiency)
+host_Memory:_8_GB
+--- SPDisplaysDataType (GPU) ---
+display_Chipset Model: Apple M1
+display_Vendor: Apple (0x106b)
+display_Metal Support: Metal 3
+display_Resolution: 1920 x 1080 (1080p FHD - Full High Definition)
