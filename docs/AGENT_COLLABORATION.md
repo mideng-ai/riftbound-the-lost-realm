@@ -9,7 +9,7 @@
 - Collaboration protocol: **approved**
 - Current project phase: **Stage 2 authorized and in progress; Stage 1 formally accepted**
 - Stage 2: **AUTHORIZED — in progress; ST2-001 and ST2-002 owner-accepted**
-- Formal Stage 2 remaining work: **ST2-003 executed end-to-end (S2-C…S2-G + integration regression); status `READY_FOR_REVIEW`, awaiting ChatGPT review and owner acceptance**
+- Formal Stage 2 remaining work: **ST2-003 submitted; ChatGPT review status `CHANGES_REQUESTED`; correction round required before owner acceptance**
 - Stage 3 / M1 gameplay implementation: **not authorized**
 - Stage 2 phase authorization does not by itself authorize a WorkBuddy task; an exact task approval is required. ST2-003 is now approved as one master task covering its listed sub-work packages. ST2-001 has been technically reviewed and formally owner-accepted on 2026-11-13. ST2-002 passed ChatGPT technical re-review and was formally owner-accepted on 2026-11-13. Stage 3 / M1 gameplay implementation remains unauthorized.
 
@@ -107,7 +107,7 @@ ST2-001 and ST2-002 are owner-accepted. Neither acceptance authorizes another ta
 
 ### ST2-003 — Stage 2 Remaining Work Master Execution
 
-- **Status:** `READY_FOR_REVIEW` — executed within the approved master scope on 2026-11-13; awaiting ChatGPT technical review, then owner acceptance. (History: `APPROVED_TO_START` → execution complete → `READY_FOR_REVIEW`.) See Section 6 "ST2-003 Execution report" and `docs/STAGE2_FINAL_REPORT.md`.
+- **Status:** `CHANGES_REQUESTED` — ChatGPT technical review on 2026-11-13 found four blocking corrections within the approved scope. WorkBuddy must correct and resubmit as `READY_FOR_REVIEW`; owner acceptance remains pending. Review: `docs/ST2-003_TECHNICAL_REVIEW.md`.
 - **Created:** 2026-11-13
 - **Objective:** Complete all remaining Stage 2 work under one owner-approved master task, avoiding separate start approvals for each sub-work package.
 - **Background / references:** `docs/STAGE2_MASTER_EXECUTION_PLAN.md` v1.0; `docs/STAGE2_TECH_SPIKE_PLAN.md`; D-007/D-207/D-210; accepted ST2-001 and ST2-002.
@@ -328,6 +328,17 @@ WorkBuddy must append a report under the matching task ID:
 - **Known issues / deviations:** (1) all browser evidence is software-rendered (llvmpipe/SwiftShader) — directional only, no real-GPU claims; (2) touch tests are Chromium synthetic TouchEvents, not real hardware; (3) bundle unoptimized (chunk-size warning) — deliberate Stage-2 boundary; (4) sandbox lacks direct github.com git access → one-file-per-Contents-API commits; (5) `performance.memory` Chromium-only. No evidence was overwritten; ST2-001/002 artifacts preserved.
 - **Scope changes:** None. No gameplay code, no Stage 3/M1 work, no engine substitution, no unapproved dependencies, D-007 untouched. D-207 / D-210 / final rendering direction remain owner decisions (recommendations only, clearly marked).
 - **Next action requested:** ChatGPT technical review of ST2-003 as a whole; owner device-test execution and the three decision gates (D-207, D-210, render direction); Stage 3 authorization remains a separate owner decision not requested here.
+
+### ST2-003 ChatGPT technical review — CHANGES_REQUESTED
+
+- **Review date:** 2026-11-13
+- **Decision:** `CHANGES_REQUESTED`
+- **Review report:** `docs/ST2-003_TECHNICAL_REVIEW.md`
+- **Findings:** (R1) device checklist/master-plan paths refer to nonexistent `spikes/ST2-003-*` directories instead of actual `st2003/*` paths; (R2) `InputSystem.bindActionButton()` registers anonymous DOM listeners that `dispose()` cannot remove; (R3) `touchcancel` emits `suspended:false` and can incorrectly clear focus/visibility suspension; (R4) D-207 quota/write-failure handling is logged as INFO/observation and the recommended interrupted-write recovery protocol is not tested.
+- **Required correction:** fix paths and provide verified copy-pasteable device commands; remove button listeners on dispose with regression coverage; ensure only actual focus/visibility recovery clears suspension with regression coverage; add a reproducible quota-failure test proving the previous valid save remains recoverable, or mark the specific behavior NOT VERIFIED.
+- **Evidence reviewed:** `docs/STAGE2_FINAL_REPORT.md`, `docs/STAGE2_DEVICE_TEST_CHECKLIST.md`, `docs/STAGE2_MASTER_EXECUTION_PLAN.md`, S2-C/D/E/F README and raw storage logs, S2-G input/save/render/engine/bootstrap source, package manifest, integration regression log, and latest execution report commit.
+- **Accepted disclosures:** software rendering is not represented as real GPU performance; synthetic touch is not physical mobile evidence; D-207/D-210/rendering direction remain owner-reserved; no Stage 3/M1 implementation was identified.
+- **Boundary:** corrections are within existing ST2-003 approval; no new start approval is required. No owner acceptance, Stage 2 closure, decision-gate resolution, or Stage 3/M1 authorization is implied.
 
 ### [TASK-ID] Execution report
 
