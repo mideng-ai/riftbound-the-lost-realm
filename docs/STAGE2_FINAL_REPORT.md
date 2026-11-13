@@ -1,7 +1,7 @@
 # Stage 2 Final Report — Remaining Work Execution (ST2-003)
 
-> **Status: READY_FOR_REVIEW (resubmitted after correction round)** — awaiting ChatGPT re-review and project-owner acceptance.
-> **Correction round:** 2026-11-13, addresses `docs/ST2-003_TECHNICAL_REVIEW.md` findings R1–R4 within the existing ST2-003 approval (see §11).
+> **Status: READY_FOR_REVIEW (resubmitted after correction rounds 1–2)** — awaiting ChatGPT final technical sign-off and project-owner acceptance.
+> **Correction round:** 2026-11-13, addresses `docs/ST2-003_TECHNICAL_REVIEW.md` findings R1–R4 within the existing ST2-003 approval (see §11) and R5 GPU-backend evidence in round 2 (see §12).
 > **Executed by:** WorkBuddy, under the single owner approval `ST2-003 APPROVED_TO_START` (2026-11-13).
 > **Scope document:** `docs/STAGE2_MASTER_EXECUTION_PLAN.md` v1.0 (Sections 3–9).
 > **Not included by design:** Stage 3 / M1 gameplay; final D-207 / D-210 / rendering-direction decisions (owner-reserved); real-device test execution (owner hardware).
@@ -156,10 +156,12 @@ Trigger: `docs/ST2-003_TECHNICAL_REVIEW.md` (`CHANGES_REQUESTED`). All four find
 ### 11.4 R4 — D-207 quota / write-failure path (blocking for S2-E) → fixed and measured
 
 - `st2003/e-save/src/main.ts` gained three assertions: **L6** fills storage down to <512 bytes of headroom, then attempts the temp-key write of a realistic ~2 KB save; **L6b** validates interrupted-write recovery preferring a valid `save_next`; **L6c** validates fallback to `save_main` when `save_next` is corrupt.
-- Result (Chrome 157, macOS, real GPU): **11/11 PASS** — L6 observed `QuotaExceededError`, `save_next` absent, `save_main` read back intact (`gold=777`). Evidence: `st2003/e-save/evidence/results-chrome-macos.txt` + `shot-chrome-macos.png`.
+- Result (macOS HeadlessChrome 157.0.8103.51, WebGL2; GPU backend identified as `ANGLE Metal Renderer: Apple M1` — see §12): **11/11 PASS** — L6 observed `QuotaExceededError`, `save_next` absent, `save_main` read back intact (`gold=777`). Evidence: `st2003/e-save/evidence/results-chrome-macos.txt` + `shot-chrome-macos.png`.
 - **Firefox / Firefox private: L6 NOT VERIFIED** — no Firefox on this machine; the historical 3-profile 8/8 results were produced with the earlier suite (no L6) and are left untouched. The UI prints `NOT VERIFIED` rather than PASS when quota cannot be triggered.
 
-### 11.5 Regression re-run (this machine: macOS, Node 22.22.2, Chrome 157)
+### 11.5 Regression re-run (macOS 15, Node 22.22.2, HeadlessChrome 157.0.8103.51, WebGL2 — see §12 for GPU backend)
+
+> Scope note: these are **agent-automated headless runs**. They are not the project owner's A1–A10 device-checklist run and must not be read as one; the GPU backend is identified in §12, the device validation is not.
 
 | Check | Result | Evidence |
 |---|---|---|
@@ -174,9 +176,70 @@ Trigger: `docs/ST2-003_TECHNICAL_REVIEW.md` (`CHANGES_REQUESTED`). All four find
 
 1. L6 initially **failed twice** in this environment: the first version wrote a tiny temp payload into remaining headroom (no exception); the second stopped filling at the first oversized chunk. Both were test-design defects, fixed by decreasing chunk sizes until headroom < 512 B; the final run is a real `QuotaExceededError` observation, not a simulated one.
 2. The smoke log contains one non-blocking `404` resource error (favicon); no `[pageerror]`.
-3. This round's browser evidence is **real GPU Chrome/macOS**, not the sandbox software rasterizer — but it is still desktop-only; Mac-mini checklist items A1–A10 and phone items B1–B6 remain **OWNER_DEVICE_TEST_REQUIRED**.
+3. The phrase “real GPU Chrome/macOS” as written in round 1 was **not backed by any committed artifact** — the browser log carried only the UA string. The claim is now substantiated with renderer/vendor evidence recorded inside the evidence files themselves (§12, correction R5), and the wording is restated precisely. The run is still desktop-only and headless: Mac-mini checklist items A1–A10 and phone items B1–B6 remain **OWNER_DEVICE_TEST_REQUIRED**.
 4. Bundle remains unoptimized (chunk-size warning) — deliberate Stage-2 boundary.
 
 ### 11.7 Files changed in this round
 
 Modified: `src/input/{InputSystem,KeyboardMouseAdapter,TouchAdapter,types}.ts`, `package.json`, `tsconfig.test.json` (new), `.gitignore` (new), `tests/input-regression.cjs` (new), `tests/prepare.cjs` (new), `st2003/{c-vfx,d-input,e-save,f-perf}/package.json` (preview ports), `st2003/e-save/src/main.ts`, `st2003/e-save/README.md`, `docs/STAGE2_DEVICE_TEST_CHECKLIST.md`, `docs/STAGE2_MASTER_EXECUTION_PLAN.md`, `docs/TECH_ARCHITECTURE.md`, `README.md`, this report, `docs/AGENT_COLLABORATION.md`. New evidence: `evidence/correction-2026-11-13/*`, `st2003/e-save/evidence/results-chrome-macos.txt`, `st2003/e-save/evidence/shot-chrome-macos.png`.
+
+## 12. Correction round 2 — R5 GPU-backend evidence (2026-11-13, post-re-review)
+
+Trigger: `docs/ST2-003_TECHNICAL_REVIEW.md` → “Remaining correction R5 — unsupported real-GPU claim”. R1–R4 were accepted in that re-review; R5 is the only open finding. No implementation change, no scope change, no decision gate touched, no Stage 3/M1 work.
+
+### 12.1 Which option was taken
+
+The review allowed either (a) reproducible GPU-backend evidence or (b) rewording to “macOS HeadlessChrome/WebGL2; GPU backend not independently verified.” A probe was run before editing anything, because (b) is only the honest wording when the backend genuinely cannot be identified. The probe identified the backend, so (a) is used — with (b) kept as the rule for any run that lacks the renderer string.
+
+### 12.2 Measured backend
+
+Recorded via `WEBGL_debug_renderer_info` **in the same browser session as the evidence runs** (not in a separate later probe):
+
+| Field | Value |
+|---|---|
+| User agent | `HeadlessChrome/157.0.0.0` on macOS |
+| Chrome build | `157.0.8103.51` |
+| Launch configuration | `playwright-core 1.49.1` → `chromium.launch({ channel: 'chrome', headless: true })`; viewport 1280×1000 (S2-E suite) / 1280×800 (smoke) |
+| WebGL version | `WebGL 2.0 (OpenGL ES 3.0 Chromium)` |
+| `UNMASKED_VENDOR_WEBGL` | `Google Inc. (Apple)` |
+| `UNMASKED_RENDERER_WEBGL` | `ANGLE (Apple, ANGLE Metal Renderer: Apple M1, Unspecified Version)` |
+| `MAX_TEXTURE_SIZE` | `16384` |
+| Host identity (probe) | `Model Name: Mac mini` · `Model Identifier: Macmini9,1` · `Chip: Apple M1` · `Memory: 8 GB` · `macOS 15` |
+| Host GPU (independent of the browser) | `system_profiler SPDisplaysDataType` → `Chipset Model: Apple M1` · `Vendor: Apple (0x106b)` · `Metal Support: Metal 3` |
+
+`ANGLE Metal Renderer: Apple M1` is ANGLE's Metal backend on the integrated Apple GPU. A fallback renderer reports differently (`ANGLE (Google, … SwiftShader …)` for Chromium's software path, `llvmpipe` in the Linux sandbox), so these strings do distinguish hardware from software rasterization.
+
+Artifacts:
+- `evidence/correction-2026-11-13/gpu-backend-probe.txt` — standalone probe: Chrome build, launch config, renderer/vendor, host identity, display profiler output.
+- `st2003/e-save/evidence/results-chrome-macos.txt` — suite log; header now carries UA, Chrome build, launch config, WebGL version, vendor, renderer, `MAX_TEXTURE_SIZE` and host identity, so the GPU path is inside the evidence file itself.
+- `evidence/correction-2026-11-13/preview-smoke.log` — smoke log with `webgl_renderer=` line.
+
+### 12.3 What this establishes, and what it does not
+
+- **Establishes:** the automated Chrome sessions that produced the 11/11 storage results and the smoke log rendered through the Apple M1 GPU (ANGLE/Metal), not a software rasterizer.
+- **Does not establish:** the project owner's Mac mini device validation. These are **agent-automated headless runs**; the relationship between the run host and the owner's checklist machine is not established by these artifacts. Nothing here substitutes for `docs/STAGE2_DEVICE_TEST_CHECKLIST.md` A1–A10 (interactive window, on-screen output, frame pacing, input latency) or B1–B6 (physical phones). Both remain `OWNER_DEVICE_TEST_REQUIRED`. The test is described as “automated headless Chrome on a Mac mini host”, never as the owner's device run.
+- **Does not establish:** any performance conclusion. GPU identity is recorded for the storage/smoke evidence only; D-210 numbers remain PROVISIONAL and were measured under software rendering (SwiftShader / llvmpipe) in the sandbox.
+
+### 12.4 Wording changes
+
+- Every unqualified “real GPU Chrome/macOS” / “真机 GPU” phrase removed from `docs/STAGE2_FINAL_REPORT.md` (§11.4, §11.6), `docs/AGENT_COLLABORATION.md` (Section 6 round-1 report, Section 9 change log), `st2003/e-save/README.md` (results table, L6 row, conclusions, limits) and the regenerated evidence headers.
+- Replacement is the measured form: “macOS HeadlessChrome 157 / WebGL2 — ANGLE Metal (Apple M1), agent-automated; not owner device validation”.
+- Runs that never recorded a renderer string (historical Firefox/llvmpipe 8/8, sandbox Chromium/SwiftShader) keep their software-rendering disclosure; any future run without the renderer string must use the review's fallback wording verbatim: **“macOS HeadlessChrome/WebGL2; GPU backend not independently verified.”**
+
+### 12.5 Re-run of the evidence chain after the artifact change
+
+| Check | Result | Evidence |
+|---|---|---|
+| `st2003/e-save` `npm ci` | ✅ 0 vulnerabilities | `evidence/correction-2026-11-13/round2/e-save-npmci.log` |
+| `st2003/e-save` `npm run build` | ✅ built in 324 ms | `…/round2/e-save-build.log` |
+| S2-E suite (HeadlessChrome 157, ANGLE Metal/Apple M1) | ✅ **11/11 PASS**; L6 `QuotaExceededError`, `save_next` absent, `save_main` intact `gold=777` | `st2003/e-save/evidence/results-chrome-macos.txt` |
+| root `npm ci` / `npm audit` | ✅ 0 vulnerabilities | `…/round2/root-npmci.log`, `…/round2/npm-audit.log` |
+| `npm run typecheck` / `npm run test:input` | ✅ clean / **18/18 PASS** | `…/round2/typecheck.log`, `…/round2/input-regression.log` |
+| root `npm run build` | ✅ built in 1.16 s | `…/round2/root-build.log` |
+| preview smoke on :4170 | ✅ HUD live, `projectiles live=1`, mock-save first-run, **0 pageerror** (one non-blocking favicon 404) | `evidence/correction-2026-11-13/preview-smoke.log` |
+
+No source code changed in this round, so round-1 logs (same code) remain valid and are kept alongside the round-2 logs. The round-1 storage artifact is preserved unchanged as `st2003/e-save/evidence/results-chrome-macos-r4.txt`.
+
+### 12.6 Files changed in round 2
+
+`docs/STAGE2_FINAL_REPORT.md`, `docs/AGENT_COLLABORATION.md`, `st2003/e-save/README.md`; regenerated `st2003/e-save/evidence/results-chrome-macos.txt` + `shot-chrome-macos.png`; new `st2003/e-save/evidence/results-chrome-macos-r4.txt`, `evidence/correction-2026-11-13/gpu-backend-probe.txt`, `evidence/correction-2026-11-13/round2/*.log`; regenerated `evidence/correction-2026-11-13/preview-smoke.log` + `.png`. **No source-code change.**
