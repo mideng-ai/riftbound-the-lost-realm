@@ -22,7 +22,7 @@ coherent codebase:
   touch e2e checks).
 - **SavePort + MockSaveAdapter** — D-207 left open: only an in-memory mock is
   wired. The real backend (localStorage vs IndexedDB) is decided by the owner;
-  see `spikes/ST2-003-E-SAVE/README.md` for the comparison evidence.
+  see `st2003/e-save/README.md` for the comparison evidence.
 - **AssetLoader** — programmatic placeholders now; Stage-3 GLTF interface stub.
 - **PerfMonitor** — dev HUD (fps, p50, p95). Observations only, **not** a budget.
 - **ProjectileSystem** — lightweight lifecycle path from ST2-003-C
@@ -45,8 +45,9 @@ npm ci        # uses package-lock.json — all 49 URLs pinned to https://registr
 |---|---|
 | `npm run dev` | Vite dev server |
 | `npm run build` | `tsc` type-check + production build (`dist/`) |
-| `npm run preview` | Serve the production build |
+| `npm run preview` | Serve the production build on port **4170** (`--strictPort`) |
 | `npm run typecheck` | `tsc --noEmit` |
+| `npm run test:input` | Input regression suite (18 checks: listener lifecycle + focus/visibility/touchcancel) |
 
 ## What you should see on first run
 
