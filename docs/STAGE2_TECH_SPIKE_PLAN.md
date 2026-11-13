@@ -97,7 +97,7 @@ Linux 沙箱或桌面模拟结果不能冒充手机真机结果；负责人 Mac 
 
 ## 9. ST2-002 — Cartoon rendering direction comparison Spike
 
-- **Status:** `REVIEW_PASSED` — correction round 1 passed ChatGPT technical re-review on 2026-11-13; owner acceptance is pending. This is a technical comparison Spike only and does not select the final rendering direction.
+- **Status:** `OWNER_ACCEPTED` — owner formally accepted on 2026-11-13 after ChatGPT technical re-review. This is a technical comparison Spike only and does not select the final rendering direction.
 - **Prerequisite:** ST2-001 has been technically reviewed and owner-accepted. Its sandbox-only WebGL2 result does not establish real-GPU or mobile compatibility.
 - **Objective:** Compare a minimum of two practical cartoon-rendering approaches in Babylon.js using a controlled scene, then provide reproducible evidence and a recommendation for the project owner. The recommendation is advisory; final selection remains with the owner.
 - **Scope:**
@@ -117,6 +117,7 @@ Linux 沙箱或桌面模拟结果不能冒充手机真机结果；负责人 Mac 
 - 2026-11-13 v1.1 — ST2-001 owner acceptance recorded; ST2-002 cartoon-rendering comparison added as a draft only. No ST2-002 execution approval and no rendering decision made.
 
 ## 10. 变更记录
+- 2026-11-13 v1.5：负责人正式验收 ST2-002（`OWNER_ACCEPTED`）；仅关闭该技术对比 Spike，不代表最终渲染方向定案、阶段2完成或阶段3/M1获批。
 
 - 2026-11-12 v1.0：负责人授权开始阶段2；建立技术 Spike 工作包、证据规则与阶段验收门槛；ST2-001 建立为待单独批准的首个 WorkBuddy 执行任务。
 - 2026-11-13 v1.1：ST2-001 经 ChatGPT 技术复审通过并由负责人正式验收；新增 ST2-002 卡通渲染方向比较 Spike 草案。
