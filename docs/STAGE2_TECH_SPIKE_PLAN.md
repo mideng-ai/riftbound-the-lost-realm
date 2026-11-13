@@ -1,7 +1,7 @@
 # STAGE2_TECH_SPIKE_PLAN — 阶段2技术验证计划
 
 > **项目：** Riftbound: The Lost Realm  
-> **版本：** v1.0  
+> **版本：** v1.1  
 > **日期：** 2026-11-12  
 > **状态：** 阶段2已获负责人授权并启动；各 WorkBuddy 执行任务仍须按任务编号单独审批。  
 > **依据：** DEVELOPMENT_ROADMAP.md 阶段2、DECISIONS_LOG.md D-007/D-207/D-210、GAME_SCOPE.md、DEVELOPMENT_ENVIRONMENT.md。
@@ -93,6 +93,28 @@ Linux 沙箱或桌面模拟结果不能冒充手机真机结果；负责人 Mac 
 - **验收标准：** 干净安装成功；开发服务器可运行；3D 场景可渲染；生产构建成功；版本、浏览器/环境和未测事项完整记录。
 - **停止条件：** Babylon.js 与既定技术方向存在阻断问题、依赖漏洞/许可异常、环境限制导致无法验证，或需要扩大任务范围时，停止并报告，不得自行换引擎。
 - **负责人批准：** 已于 2026-11-12 明确授予；审批记录见 `docs/AGENT_COLLABORATION.md` Section 5。
+
+
+## 9. ST2-002 — Cartoon rendering direction comparison Spike (task draft)
+
+- **Status:** `DRAFT` — proposed by ChatGPT on 2026-11-13; not approved to start.
+- **Prerequisite:** ST2-001 has been technically reviewed and owner-accepted. Its sandbox-only WebGL2 result does not establish real-GPU or mobile compatibility.
+- **Objective:** Compare a minimum of two practical cartoon-rendering approaches in Babylon.js using a controlled scene, then provide reproducible evidence and a recommendation for the project owner. The recommendation is advisory; final selection remains with the owner.
+- **Scope:**
+  1. Build a new isolated, disposable Spike in `spikes/ST2-002/`.
+  2. Use the existing Babylon.js + TypeScript + Vite direction; pin exact versions, commit a lockfile, and use HTTPS package registry URLs.
+  3. Use identical camera, geometry, lighting, and scene conditions to compare at least two distinct approaches (for example, stepped/toon lighting and a NodeMaterial/custom-shader approach). Evaluate outline techniques separately where feasible.
+  4. Capture screenshots and describe visual quality, implementation complexity, shader/material constraints, and observed runtime behavior.
+  5. Run clean install, audit, production build, dev/preview and desktop-browser rendering checks; include full logs and exact environment.
+  6. If mobile emulation is available, label it strictly as emulation. Physical mobile and owner Mac tests must be marked not run unless actually performed.
+- **Out of scope:** final rendering decision; formal project architecture; production pipeline; gameplay; spell VFX (S2-C); input abstraction (S2-D); save system/D-207; performance budget/D-210; mobile hardware claims without real-device evidence; Stage 3/M1.
+- **Acceptance criteria:** two or more approaches run in the same controlled scene; source and screenshots are committed; reproducible clean install/build and audit evidence are present; browser/environment limitations are explicit; report distinguishes visual feasibility from performance conclusions; no scope expansion.
+- **Stop conditions:** no engine/framework substitution; stop and report if an approach requires changing D-007, a major unapproved dependency/architecture change, or work beyond the approved task.
+- **Owner approval:** Not granted. WorkBuddy may not execute until an explicit `APPROVED_TO_START` record for ST2-002 is added to `AGENT_COLLABORATION.md` Section 5.
+
+## 10. Change log
+
+- 2026-11-13 v1.1 — ST2-001 owner acceptance recorded; ST2-002 cartoon-rendering comparison added as a draft only. No ST2-002 execution approval and no rendering decision made.
 
 ## 8. 变更记录
 
