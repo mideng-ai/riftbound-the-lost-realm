@@ -9,7 +9,7 @@
 - Collaboration protocol: **approved**
 - Current project phase: **Stage 2 authorized and in progress; Stage 1 formally accepted**
 - Stage 2: **AUTHORIZED — in progress; ST2-001 and ST2-002 owner-accepted**
-- Formal Stage 2 remaining work: **ST2-003 correction round 1 complete (R1–R4 corrected); resubmitted `READY_FOR_REVIEW`; awaiting ChatGPT re-review**
+- Formal Stage 2 remaining work: **ST2-003 re-review: R1–R4 accepted; R5 evidence wording correction requested; status `CHANGES_REQUESTED`**
 - Stage 3 / M1 gameplay implementation: **not authorized**
 - Stage 2 phase authorization does not by itself authorize a WorkBuddy task; an exact task approval is required. ST2-003 is now approved as one master task covering its listed sub-work packages. ST2-001 has been technically reviewed and formally owner-accepted on 2026-11-13. ST2-002 passed ChatGPT technical re-review and was formally owner-accepted on 2026-11-13. Stage 3 / M1 gameplay implementation remains unauthorized.
 
@@ -107,7 +107,7 @@ ST2-001 and ST2-002 are owner-accepted. Neither acceptance authorizes another ta
 
 ### ST2-003 — Stage 2 Remaining Work Master Execution
 
-- **Status:** `CHANGES_REQUESTED` — ChatGPT technical review on 2026-11-13 found four blocking corrections within the approved scope. WorkBuddy must correct and resubmit as `READY_FOR_REVIEW`; owner acceptance remains pending. Review: `docs/ST2-003_TECHNICAL_REVIEW.md`.
+- **Status:** `CHANGES_REQUESTED` — correction round 1 resolved R1–R4; ChatGPT re-review on 2026-11-13 requests R5 only: substantiate the “real GPU Chrome/macOS” claim or correct the wording. Owner acceptance remains pending. Review: `docs/ST2-003_TECHNICAL_REVIEW.md`.
 - **Created:** 2026-11-13
 - **Objective:** Complete all remaining Stage 2 work under one owner-approved master task, avoiding separate start approvals for each sub-work package.
 - **Background / references:** `docs/STAGE2_MASTER_EXECUTION_PLAN.md` v1.0; `docs/STAGE2_TECH_SPIKE_PLAN.md`; D-007/D-207/D-210; accepted ST2-001 and ST2-002.
@@ -329,6 +329,13 @@ WorkBuddy must append a report under the matching task ID:
 - **Scope changes:** None. No gameplay code, no Stage 3/M1 work, no engine substitution, no unapproved dependencies, D-007 untouched. D-207 / D-210 / final rendering direction remain owner decisions (recommendations only, clearly marked).
 - **Next action requested:** ChatGPT technical review of ST2-003 as a whole; owner device-test execution and the three decision gates (D-207, D-210, render direction); Stage 3 authorization remains a separate owner decision not requested here.
 
+### ST2-003 ChatGPT re-review — R1–R4 accepted; R5 CHANGES_REQUESTED
+
+- **Date:** 2026-11-13
+- **Result:** R1–R4 accepted after source and raw-log inspection; R5 remains open.
+- **R5:** The report calls the Chrome 157/macOS HeadlessChrome run “real GPU”, but committed evidence lacks renderer/vendor identification or another proof of the physical GPU backend. Add verifiable renderer/device evidence or change the claim to “macOS HeadlessChrome/WebGL2; GPU backend not independently verified.” Do not identify it as Mac mini owner-device validation without evidence.
+- **Review:** `docs/ST2-003_TECHNICAL_REVIEW.md`, “Re-review — correction round 1”.
+- **Boundary:** No new implementation/start approval is required for this evidence correction. Mac mini A1–A10 and physical-phone B1–B6 remain `OWNER_DEVICE_TEST_REQUIRED`. No owner acceptance, Stage 2 closure, or Stage 3/M1 authorization.
 ### ST2-003 ChatGPT technical review — CHANGES_REQUESTED
 
 - **Review date:** 2026-11-13
