@@ -1,0 +1,14 @@
+
+> spike-st2-003-e-save@0.0.0 build
+> tsc && vite build
+
+vite v8.3.8 building client environment for production...
+transforming...
+✓ 5 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                0.73 kB │ gzip: 0.50 kB
+dist/assets/index-DS9lmSaP.js  9.06 kB │ gzip: 3.21 kB
+
+✓ built in 324ms
+EXIT:0
