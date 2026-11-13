@@ -1,0 +1,49 @@
+# ST2-001 npm audit 完整输出
+# 环境: Ubuntu 24.04.3 LTS | Node v22.13.1 | npm 11.9.0
+# 安装方式: npm ci（依据已提交的 package-lock.json）
+# 执行时间: 2026-11-13T02:03:27Z
+# 说明: 本文件是安全审计结果，与 npm install 末尾的 'found 0 vulnerabilities' 汇总行不同，后者仅为安装摘要
+
+## 一、npm audit（默认报告格式，退出码反映结果）
+$ npm audit
+found 0 vulnerabilities
+audit exit=0
+
+## 二、npm audit --json（机器可读，供复审逐项核验）
+$ npm audit --json
+{
+  "auditReportVersion": 2,
+  "vulnerabilities": {},
+  "metadata": {
+    "vulnerabilities": {
+      "info": 0,
+      "low": 0,
+      "moderate": 0,
+      "high": 0,
+      "critical": 0,
+      "total": 0
+    },
+    "dependencies": {
+      "prod": 2,
+      "dev": 48,
+      "optional": 34,
+      "peer": 0,
+      "peerOptional": 0,
+      "total": 49
+    }
+  }
+}
+audit-json exit=0
+
+## 三、npm audit --audit-level=moderate
+$ npm audit --audit-level=moderate
+found 0 vulnerabilities
+audit-level exit=0
+
+## 四、被审计的依赖树（npm ls --all 顶层与 Babylon 依赖计数）
+$ npm ls --depth=0
+spike-st2-001-babylon-baseline@0.0.0 /root/.codebuddy/artifact/***/spike-ci-verify
+├── @babylonjs/core@9.36.0
+├── typescript@5.9.3
+└── vite@8.3.8
+
