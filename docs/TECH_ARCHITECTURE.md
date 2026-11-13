@@ -58,18 +58,27 @@ Lifecycle: `construct → start() → (auto) → dispose()`.
 
 ### input/ (S2-D contract)
 - `types.ts` — the typed contract: `MoveVector {x,y}`, `InstantAction`
-  (`'dash'|'confirm'|'cancel'`), `HeldAction`, `SystemState`
-  (`'blur'|'visibilityHidden'|'touchCancel'`), plus `InputListener` /
-  `InputSystemFacade`.
+  (`'normalAttack'|'skill1'|'skill2'|'dash'`), `HeldAction`
+  (`'normalAttack'`), `SystemState {suspended, pointerLockLost}`, and the
+  `suspend` event reasons `'blur'|'focus'|'visibility'|'touchcancel'`, plus
+  `InputListener` / `InputSystemFacade`.
 - `KeyboardMouseAdapter` — **pointer** events (`pointerdown/pointerup` with
   `pointerType === 'mouse'`), not mouse events; Babylon's canvas
   `preventDefault` on `pointerdown` suppresses synthesized mousedown.
+  Emits `blur` (suspend) and `focus` (resume) plus `visibilitychange`
+  (`suspended = document.hidden`).
 - `TouchAdapter` — left-half single-finger dynamic joystick, fixed zone
   assignment (a touch never migrates zones), right-half action buttons;
-  `touchcancel` clears state.
+  `touchcancel` releases the joystick and moves only — it is an input-release
+  event and **never** changes suspension state (correction round R3).
 - `InputSystem` — collects adapter events into a per-frame `pending` set,
-  consumed exactly once by the game, then cleared; `SystemState` events
-  (blur/visibility/touchcancel) flush held state immediately.
+  consumed exactly once by the game, then cleared. Only `blur` (→suspended),
+  `focus` (→resumed) and `visibility` (→`document.hidden`) may change
+  `SystemState.suspended`; `touchcancel` never does.
+- Lifecycle: `bindActionButton()` retains its handler references and
+  `dispose()` removes every DOM listener (buttons, keyboard/mouse, touch) and
+  cancels the pending hold-release timer (correction round R2). Regression
+  coverage: `npm run test:input` (18 checks, Node + DOM stubs).
 
 ### render/CameraRig
 Orthographic-style top-down camera; `follow(target, dt)` applies exponential
@@ -88,7 +97,7 @@ reset(): Promise<void> }`, `CURRENT_SCHEMA_VERSION = 2`, `defaultSave()`
 factory. Only `MockSaveAdapter` (in-memory) is wired. The localStorage-vs-
 IndexedDB decision is the owner's; the S2-E evidence (Firefox real quota
 ~4–5 MB, IDB sync-abort atomicity, 8/8 PASS ×3 browser profiles) lives in
-`spikes/ST2-003-E-SAVE/`.
+`st2003/e-save/`.
 
 ### resources/AssetLoader
 Programmatic placeholder geometry/materials today; exposes an async
@@ -105,7 +114,7 @@ one light per hit (each new light triggers a shader recompilation stall).
 ### debug/PerfMonitor
 HUD-only (fps, p50, p95). Values are **observations, not budget**; the D-210
 budget decision belongs to the owner (S2-F ladder data is in
-`spikes/ST2-003-F-PERF/`).
+`st2003/f-perf/`).
 
 ### scenes/BootstrapScene
 Single assembly point: ground + player (toon material) + camera follow +
@@ -143,8 +152,8 @@ scene never touches DOM events directly.
 
 | Gate | Topic | Status | Evidence |
 |---|---|---|---|
-| D-207 | Save backend (localStorage vs IndexedDB) | **OPEN** — recommendation only | `spikes/ST2-003-E-SAVE/README.md` |
-| D-210 | Performance budget | **OPEN** — all numbers provisional | `spikes/ST2-003-F-PERF/` |
+| D-207 | Save backend (localStorage vs IndexedDB) | **OPEN** — recommendation only | `st2003/e-save/README.md` |
+| D-210 | Performance budget | **OPEN** — all numbers provisional | `st2003/f-perf/` |
 | Render direction | Toon pipeline (path B) | **OPEN** — ToonMaterial marked PROVISIONAL | `spikes/ST2-002-*` + this doc §3 |
 | Real devices | Mac mini / phone matrix | **NOT EXECUTED by agent** | `docs/STAGE2_DEVICE_TEST_CHECKLIST.md` |
 
