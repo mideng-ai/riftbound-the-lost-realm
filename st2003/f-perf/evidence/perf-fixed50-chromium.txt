@@ -1,0 +1,19 @@
+=== HUD ===
+ST2-003-F perf baseline | run=fixed level n=50 | t=15s
+fps(now,120f)=20.0  activeMeshes=52  tris=1386  emitRate=160
+frame p50=37.2ms p95=85.1ms
+heap=21MB used / 4096MB limit  firstRender=5ms
+
+
+=== CONSOLE ===
+[level] start n=50 emitRate=160 entities=50
+[st2-003-f] perf baseline started {run: fixed, fixedN: 50}
+[load] first-render 5ms after scene script start
+
+=== ENV ===
+{
+ "ua": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36",
+ "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+ "dpr": 1,
+ "mem": "available"
+}
