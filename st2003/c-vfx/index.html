@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ST2-003-C — Spell VFX Spike (Babylon.js)</title>
+    <style>
+      html, body { margin: 0; padding: 0; overflow: hidden; background: #0b0d12; }
+      #renderCanvas { width: 100vw; height: 100vh; display: block; touch-action: none; outline: none; }
+      #hud {
+        position: fixed; top: 8px; left: 8px; z-index: 10;
+        font: 12px/1.5 monospace; color: #d8e6ff; background: rgba(5, 8, 16, 0.75);
+        padding: 8px 10px; border-radius: 6px; white-space: pre; pointer-events: none;
+      }
+      #legend {
+        position: fixed; bottom: 8px; left: 8px; z-index: 10;
+        font: 11px/1.6 monospace; color: #9fb4d8; background: rgba(5, 8, 16, 0.7);
+        padding: 8px 10px; border-radius: 6px; white-space: pre; pointer-events: none;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="renderCanvas"></canvas>
+    <div id="hud">initializing…</div>
+    <div id="legend">L = lightweight path | R = richer path | auto-fire loop; query: ?mode=L|R|both&amp;stress=N&amp;bench=1</div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
