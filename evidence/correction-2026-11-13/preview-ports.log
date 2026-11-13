@@ -1,0 +1,20 @@
+=== st2003/c-vfx (port 4173) ===
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 1.10s
+=== st2003/d-input (port 4174) ===
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 1.07s
+=== st2003/e-save (port 4175) ===
+
+✓ built in 344ms
+=== st2003/f-perf (port 4176) ===
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 1.10s
+st2003/c-vfx → port 4173 HTTP:200 <title>ST2-003-C — Spell VFX Spike (Babylon.js)</title>
+  server log confirms port 4173
+st2003/d-input → port 4174 HTTP:200 <title>ST2-003-D — Unified Input Spike (Babylon.js)</title>
+  server log confirms port 4174
+st2003/e-save → port 4175 HTTP:200 <title>ST2-003-E — Local Save Storage Spike</title>
+  server log confirms port 4175
+st2003/f-perf → port 4176 HTTP:200 <title>ST2-003-F — Performance Baseline Scenario</title>
+  server log confirms port 4176
