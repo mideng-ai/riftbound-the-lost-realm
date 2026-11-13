@@ -1,0 +1,33 @@
+=== HUD ===
+ST2-003-F perf baseline | run=ladder level n=200 | t=62s
+fps(now,120f)=14.4  activeMeshes=156  tris=2634  emitRate=460
+frame p50=88.0ms p95=93.8ms
+heap=23MB used / 4096MB limit  firstRender=3ms
+
+[result] n=0 frames=191 fps=24.0 p50=18.2ms p95=81.8ms activeMeshes=2 tris=786 heap=23MB used / 4096MB limit
+[result] n=25 frames=186 fps=21.9 p50=20.8ms p95=83.0ms activeMeshes=27 tris=1086 heap=24MB used / 4096MB limit
+[result] n=50 frames=170 fps=20.0 p50=31.5ms p95=89.0ms activeMeshes=52 tris=1386 heap=22MB used / 4096MB limit
+[result] n=100 frames=147 fps=17.1 p50=82.6ms p95=90.9ms activeMeshes=102 tris=1986 heap=22MB used / 4096MB limit
+[result] n=200 frames=124 fps=14.7 p50=87.6ms p95=93.5ms activeMeshes=156 tris=2634 heap=22MB used / 4096MB limit
+
+=== CONSOLE ===
+[level] start n=0 emitRate=60 entities=0
+[st2-003-f] perf baseline started {run: ladder, fixedN: 50}
+[load] first-render 3ms after scene script start
+[result] n=0 frames=191 fps=24.0 p50=18.2ms p95=81.8ms activeMeshes=2 tris=786 heap=23MB used / 4096MB limit
+[level] start n=25 emitRate=110 entities=25
+[result] n=25 frames=186 fps=21.9 p50=20.8ms p95=83.0ms activeMeshes=27 tris=1086 heap=24MB used / 4096MB limit
+[level] start n=50 emitRate=160 entities=50
+[result] n=50 frames=170 fps=20.0 p50=31.5ms p95=89.0ms activeMeshes=52 tris=1386 heap=22MB used / 4096MB limit
+[level] start n=100 emitRate=260 entities=100
+[result] n=100 frames=147 fps=17.1 p50=82.6ms p95=90.9ms activeMeshes=102 tris=1986 heap=22MB used / 4096MB limit
+[level] start n=200 emitRate=460 entities=200
+[result] n=200 frames=124 fps=14.7 p50=87.6ms p95=93.5ms activeMeshes=156 tris=2634 heap=22MB used / 4096MB limit
+
+=== ENV ===
+{
+ "ua": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36",
+ "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+ "dpr": 1,
+ "mem": "available"
+}
