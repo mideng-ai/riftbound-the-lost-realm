@@ -1,6 +1,6 @@
 /**
  * Projectile — minimal VFX lifecycle (launch → flight → hit → release).
- * Migrated from spikes/ST2-003-C-VFX (lightweight path). Demonstration only —
+ * Migrated from st2003/c-vfx (lightweight path). Demonstration only —
  * this is NOT skill/gameplay implementation (no damage/cooldowns).
  * S2-C conclusions applied: dispose-on-hit; pooling optional (<50 concurrent).
  */
