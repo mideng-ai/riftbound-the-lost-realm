@@ -1,0 +1,72 @@
+# ============================================================
+# ST2-001 — 运行验证（HTTPS lockfile 干净树，复审整改 round 2）
+# ============================================================
+环境: Ubuntu 24.04.3 LTS | Node v22.13.1 | npm 11.9.0
+前置: 本目录 npm ci（added 19 packages, exit 0）+ npm run build（Build A/B 一致）
+时间(UTC): 2026-11-13T04:09:59Z
+
+## 一、开发服务器 dev
+$ node ./node_modules/.bin/vite --port 5173 --strictPort
+
+  VITE v8.3.8  ready in 98 ms
+
+  ➜  Local:   http://localhost:5173/
+  ➜  Network: use --host to expose
+
+$ curl -sS -o /dev/null -w '%{http_code}' http://localhost:5173/
+GET / -> 200 (894 B)
+
+## 二、生产预览 preview（服务 dist/ 目录，即 Build A/B 产物）
+$ node ./node_modules/.bin/vite preview --port 4173 --strictPort
+  ➜  Local:   http://localhost:4173/
+  ➜  Network: use --host to expose
+
+$ curl -sS -o /dev/null -w '%{http_code}' http://localhost:4173/
+GET / -> 200 (1324 B)
+$ curl -sS http://localhost:4173/ | grep -o 'assets/index-[A-Za-z0-9_-]*\.js'
+assets/index-WVpvXHVT.js
+  ↑ 生产页面实际引用的主 chunk 文件名（应与 Build A/B 一致）
+
+## 三、浏览器实测（Playwright + Firefox 146 headful + Xvfb :99 + LIBGL_ALWAYS_SOFTWARE=1）
+
+### dev（http://localhost:5173/）
+=== HUD ===
+ST2-001 spike | Babylon.js 9.36.0
+engine: WebGL (Engine 默认后端)
+WebGL2 context: YES
+WebGPU probe: api=absent (navigator.gpu undefined)
+NOTE: WebGPU engine NOT run — probe only, not validated
+fps: 58.9 | frames rendered: 412
+meshes: 3 | viewport: 1280x800
+=== ENV ===
+{
+ "ua": "Mozilla/5.0 (X11; Linux x86_64; rv:146.0) Gecko/20100101 Firefox/146.0",
+ "renderer": "llvmpipe, or similar",
+ "webgl2": true
+}
+=== CONSOLE ===
+[debug] [vite] connecting...
+[debug] [vite] connected.
+[log] BJS - [12:09:30]: Babylon.js v9.36.0 - WebGL2
+[warning] [JavaScript Warning: "WEBGL_debug_renderer_info is deprecated in Firefox and will be removed. Please use RENDERER." {file: "http://localhost:5173/node_modules/.vite/deps/engine.dynamicBuffer.pure-CE85spia.js?v=b1761b4b" line: 5278}]
+saved: /tmp/st2001-final/evidence/shot-dev-firefox.png
+
+### preview（http://localhost:4173/）
+=== HUD ===
+ST2-001 spike | Babylon.js 9.36.0
+engine: WebGL (Engine 默认后端)
+WebGL2 context: YES
+WebGPU probe: api=absent (navigator.gpu undefined)
+NOTE: WebGPU engine NOT run — probe only, not validated
+fps: 58.9 | frames rendered: 413
+meshes: 3 | viewport: 1280x800
+=== ENV ===
+{
+ "ua": "Mozilla/5.0 (X11; Linux x86_64; rv:146.0) Gecko/20100101 Firefox/146.0",
+ "renderer": "llvmpipe, or similar",
+ "webgl2": true
+}
+=== CONSOLE ===
+[log] BJS - [12:09:42]: Babylon.js v9.36.0 - WebGL2
+[warning] [JavaScript Warning: "WEBGL_debug_renderer_info is deprecated in Firefox and will be removed. Please use RENDERER." {file: "http://localhost:4173/assets/index-WVpvXHVT.js" line: 21}]
+saved: /tmp/st2001-final/evidence/shot-preview-firefox.png
