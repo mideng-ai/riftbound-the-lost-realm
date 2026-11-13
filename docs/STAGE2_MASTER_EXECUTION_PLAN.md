@@ -111,10 +111,11 @@ WorkBuddy 准备一页式可执行清单：
 - 复核输入接口、场景生命周期、资源释放、存档接口隔离。
 - 汇总真实设备矩阵、负责人决策状态、未测项、风险和阶段2验收追踪矩阵。
 - 交付建议目录：
-  - spikes/ST2-003-C-VFX/
-  - spikes/ST2-003-D-INPUT/
-  - spikes/ST2-003-E-SAVE/
-  - spikes/ST2-003-F-PERF/
+  - st2003/c-vfx/
+  - st2003/d-input/
+  - st2003/e-save/
+  - st2003/f-perf/
+  - st2003/regression/
   - docs/STAGE2_DEVICE_TEST_CHECKLIST.md
   - 正式工程目录（按仓库现状提出并确认）
   - docs/TECH_ARCHITECTURE.md
