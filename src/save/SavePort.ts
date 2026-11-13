@@ -2,7 +2,7 @@
  * SavePort — persistence interface. DECISION GATE (D-207): the concrete
  * backend (localStorage vs IndexedDB) is NOT decided. Until the owner
  * confirms, only this interface and the MockSaveAdapter are wired.
- * See spikes/ST2-003-E-SAVE/README.md for the comparison & recommendation.
+ * See st2003/e-save/README.md for the comparison & recommendation.
  */
 
 export interface SaveDataV2 {
