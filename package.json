@@ -6,8 +6,9 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "preview": "vite preview",
-    "typecheck": "tsc --noEmit"
+    "preview": "vite preview --port 4170 --strictPort",
+    "typecheck": "tsc --noEmit",
+    "test:input": "tsc -p tsconfig.test.json && node tests/prepare.cjs && node tests/input-regression.cjs"
   },
   "dependencies": {
     "@babylonjs/core": "9.36.0"
