@@ -1,40 +1,51 @@
 # ============================================================
-# ST2-002 — 运行验证（干净 npm ci + 构建产物 preview）
+# ST2-002 — 运行验证（整改 round 1，干净 npm ci + 构建产物 preview）
 # ============================================================
 
 环境: Ubuntu 24.04.3 LTS | Node v22.13.1 | npm 11.9.0
 浏览器取证: Playwright + Firefox 146 (headful, Xvfb :99, LIBGL_ALWAYS_SOFTWARE=1 → llvmpipe 软件渲染 WebGL2)
-时间(UTC): 2026-11-13T04:48:25Z
+被测源码: 整改 round 1 版（A/B 统一着色方程 base*(ambient+light*band), T=0.08/0.44/0.78；rim 隔离到 C 列；描边隔离到 D 列；4 列布局）
+时间(UTC): 2026-11-13T05:58:55Z
 
 ## 一、开发服务器 dev
 $ node ./node_modules/.bin/vite --port 5173 --strictPort
 
-  VITE v8.3.8  ready in 99 ms
+  VITE v8.3.8  ready in 105 ms
 
   ➜  Local:   http://localhost:5173/
   ➜  Network: use --host to expose
-
-$ curl HTTP 状态
 GET / -> 200 (903 B)
 
 ## 二、生产预览 preview（服务 dist/ = Build A/B 产物）
 $ node ./node_modules/.bin/vite preview --port 4173 --strictPort
   ➜  Local:   http://localhost:4173/
   ➜  Network: use --host to expose
-
 GET / -> 200 (1677 B)
 preview 页面引用的主 chunk：
-assets/index-fYMmSF9j.js
+assets/index-CsD54Yy_.js
+  ↑ 应与 Build A/B 产物 index-CsD54Yy_.js 一致
 
-## 三、浏览器实测截图（Playwright harness，日志见各 shot 日志）
-  evidence/shot-dev-focus-a.png  95021 B
-  evidence/shot-dev-focus-b.png  109792 B
-  evidence/shot-dev-focus-c.png  101749 B
+## 三、浏览器实测截图（Playwright harness）
+  evidence/shot-dev-focus-a.png  100857 B
+  evidence/shot-dev-focus-b.png  115002 B
+  evidence/shot-dev-focus-c.png  115023 B
+  evidence/shot-dev-focus-d.png  104938 B
   evidence/shot-dev-full.png  97326 B
-  evidence/shot-preview-full.png  97370 B
+  evidence/shot-preview-full.png  97193 B
 
-## 四、控制台要点（dev-full 截图会话）
-WebGL2 context: YES | renderer: llvmpipe, or similar
- "renderer": "llvmpipe, or similar",
-[log] BJS - [12:47:23]: Babylon.js v9.36.0 - WebGL2
-[warning] [JavaScript Warning: "WEBGL_debug_renderer_info is deprecated in Firefox and will be removed. Please use RENDERER." {file: "http://localhost:5173/node_modules/.vite/deps/thinEngine.pure-DDwC4vSF.js?v=a82643ff" line: 562}]
+## 四、各截图会话控制台错误统计
+  dev-full: [error] 行数 = 0
+  dev-A: [error] 行数 = 0
+  dev-B: [error] 行数 = 0
+  dev-C: [error] 行数 = 0
+  dev-D: [error] 行数 = 0
+  preview: [error] 行数 = 0
+0
+
+## 五、HUD 要点（截图确认）
+WebGL2 context: YES | renderer: llvmpipe | WebGPU probe: api=absent (engine NOT run)
+fps 区间（软件渲染观察值，不作性能结论）: 39.1–49.7
+
+## 六、已知限制（如实记录）
+- dev 模式首轮曾出现 EdgeRenderer 'line' effect 动态导入时序错误（Vite dev ESM 加载），最终帧渲染正常；本轮全部截图会话 [error]=0；生产构建无此问题
+- WebGPU adapter/device/Babylon WebGPUEngine 未运行、未验证
