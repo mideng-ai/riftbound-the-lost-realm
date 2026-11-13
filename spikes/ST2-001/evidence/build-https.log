@@ -1,0 +1,201 @@
+# ============================================================
+# ST2-001 — npm ci 之后的 npm run build 完整日志（HTTPS lockfile 版）
+# 复审整改 round 2；含两次重复构建以直接验证产物确定性
+# ============================================================
+
+环境: Ubuntu 24.04.3 LTS | Node v22.13.1 | npm 11.9.0 | registry=https://registry.npmjs.org/
+前置: 同目录 npm ci 完成（added 19 packages，exit 0），node_modules 由 lockfile 全新安装
+被测源码: 本目录 src/main.ts（= 仓库 spikes/ST2-001/src/main.ts，整改 round 1 最终版）
+时间(UTC): 2026-11-13T04:08:32Z
+
+## 一、Build A
+$ rm -rf dist && npm run build
+
+> spike-st2-001-babylon-baseline@0.0.0 build
+> tsc && vite build
+
+vite v8.3.8 building client environment for production...
+transforming...
+✓ 508 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                                           1.32 kB │ gzip:   0.64 kB
+dist/assets/postprocess.vertex-DJCmMhI8.js                0.46 kB │ gzip:   0.30 kB
+dist/assets/shaderStore-D-XQlhUT.js                       0.46 kB │ gzip:   0.17 kB
+dist/assets/rgbdDecode.fragment-ycGs1SRq.js               0.52 kB │ gzip:   0.34 kB
+dist/assets/postprocess.vertex-CmVXXq2T.js                0.58 kB │ gzip:   0.35 kB
+dist/assets/rgbdDecode.fragment-B_fN_Tca.js               0.66 kB │ gzip:   0.38 kB
+dist/assets/math.scalar.functions-lnL7TJ7T.js             0.76 kB │ gzip:   0.41 kB
+dist/assets/color.fragment-SH3AKoaS.js                    0.87 kB │ gzip:   0.42 kB
+dist/assets/mesh.vertexData.functions-CD4JOR2q.js         0.93 kB │ gzip:   0.48 kB
+dist/assets/color.fragment-DVaYbzXa.js                    0.98 kB │ gzip:   0.45 kB
+dist/assets/ddsTextureLoader-RnGfvVR6.js                  1.25 kB │ gzip:   0.62 kB
+dist/assets/color.vertex-UAuK67V9.js                      1.35 kB │ gzip:   0.61 kB
+dist/assets/color.vertex-BYaj1Jpp.js                      1.41 kB │ gzip:   0.61 kB
+dist/assets/logger-CuBYPcDK.js                            1.88 kB │ gzip:   0.82 kB
+dist/assets/logDepthDeclaration-BKcd_JEL.js               2.16 kB │ gzip:   0.85 kB
+dist/assets/fogFragment-WPqtYpyX.js                       2.20 kB │ gzip:   0.70 kB
+dist/assets/hdrTextureLoader-BQVwkxK1.js                  2.31 kB │ gzip:   1.13 kB
+dist/assets/fogFragment-NFgubt9V.js                       2.43 kB │ gzip:   0.76 kB
+dist/assets/iesTextureLoader-3O5bSkSd.js                  2.47 kB │ gzip:   1.07 kB
+dist/assets/logDepthDeclaration-KY4JHaIP.js               2.60 kB │ gzip:   0.86 kB
+dist/assets/tgaTextureLoader-CqhhocF6.js                  3.40 kB │ gzip:   1.35 kB
+dist/assets/cubemapToSphericalPolynomial-ALAhJbmy.js      3.66 kB │ gzip:   1.61 kB
+dist/assets/halfFloat-CXxwV7oo.js                         4.87 kB │ gzip:   1.80 kB
+dist/assets/helperFunctions-qGTG1bM_.js                   6.57 kB │ gzip:   2.21 kB
+dist/assets/dds.pure-DTEGGN4_.js                          6.92 kB │ gzip:   2.52 kB
+dist/assets/helperFunctions-D89zo_74.js                   6.92 kB │ gzip:   2.32 kB
+dist/assets/vertexColorMixing-HinktY3n.js                10.39 kB │ gzip:   2.14 kB
+dist/assets/vertexColorMixing-CBmtHj8r.js                11.72 kB │ gzip:   2.17 kB
+dist/assets/exrTextureLoader-sVVw8VSq.js                 13.12 kB │ gzip:   4.82 kB
+dist/assets/ktxTextureLoader-Dcut0fA_.js                 16.69 kB │ gzip:   4.91 kB
+dist/assets/bufferUtils-CcquopDk.js                      18.49 kB │ gzip:   6.43 kB
+dist/assets/default.vertex-DCe4kRBL.js                   19.66 kB │ gzip:   4.39 kB
+dist/assets/basisTextureLoader-DryRH4Lm.js               29.72 kB │ gzip:   8.98 kB
+dist/assets/envTextureLoader-CtXO9SZ0.js                 31.53 kB │ gzip:   8.88 kB
+dist/assets/baseTexture.pure-DnbrS98y.js                 31.78 kB │ gzip:   8.67 kB
+dist/assets/default.vertex-v6-sLXSk.js                   38.79 kB │ gzip:   6.43 kB
+dist/assets/math.color.pure-caH1cJ-T.js                  77.33 kB │ gzip:  18.33 kB
+dist/assets/default.fragment-DrfZk1h8.js                110.47 kB │ gzip:  22.57 kB
+dist/assets/default.fragment-CnDsnXeI.js                118.62 kB │ gzip:  22.64 kB
+dist/assets/index-WVpvXHVT.js                         1,074.48 kB │ gzip: 259.56 kB
+
+[plugin builtin:vite-reporter] 
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 227ms
+[time] wall=1.58s maxrss=497916KB
+[exit] buildA=0
+$ ls -l dist/assets/index-*.js
+-rw-r--r-- 1 root root 1074489 Nov 13 12:08 dist/assets/index-WVpvXHVT.js
+$ sha256sum dist/assets/index-*.js
+ac776b0ba94130d19b2d365fadc9f18091c3cdf28b349ebfc0d864ba7ec5eec1  dist/assets/index-WVpvXHVT.js
+
+## 二、Build B（同一目录、同一 node_modules、清空 dist 后重跑）
+$ rm -rf dist && npm run build
+
+> spike-st2-001-babylon-baseline@0.0.0 build
+> tsc && vite build
+
+vite v8.3.8 building client environment for production...
+transforming...
+✓ 508 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                                           1.32 kB │ gzip:   0.64 kB
+dist/assets/postprocess.vertex-DJCmMhI8.js                0.46 kB │ gzip:   0.30 kB
+dist/assets/shaderStore-D-XQlhUT.js                       0.46 kB │ gzip:   0.17 kB
+dist/assets/rgbdDecode.fragment-ycGs1SRq.js               0.52 kB │ gzip:   0.34 kB
+dist/assets/postprocess.vertex-CmVXXq2T.js                0.58 kB │ gzip:   0.35 kB
+dist/assets/rgbdDecode.fragment-B_fN_Tca.js               0.66 kB │ gzip:   0.38 kB
+dist/assets/math.scalar.functions-lnL7TJ7T.js             0.76 kB │ gzip:   0.41 kB
+dist/assets/color.fragment-SH3AKoaS.js                    0.87 kB │ gzip:   0.42 kB
+dist/assets/mesh.vertexData.functions-CD4JOR2q.js         0.93 kB │ gzip:   0.48 kB
+dist/assets/color.fragment-DVaYbzXa.js                    0.98 kB │ gzip:   0.45 kB
+dist/assets/ddsTextureLoader-RnGfvVR6.js                  1.25 kB │ gzip:   0.62 kB
+dist/assets/color.vertex-UAuK67V9.js                      1.35 kB │ gzip:   0.61 kB
+dist/assets/color.vertex-BYaj1Jpp.js                      1.41 kB │ gzip:   0.61 kB
+dist/assets/logger-CuBYPcDK.js                            1.88 kB │ gzip:   0.82 kB
+dist/assets/logDepthDeclaration-BKcd_JEL.js               2.16 kB │ gzip:   0.85 kB
+dist/assets/fogFragment-WPqtYpyX.js                       2.20 kB │ gzip:   0.70 kB
+dist/assets/hdrTextureLoader-BQVwkxK1.js                  2.31 kB │ gzip:   1.13 kB
+dist/assets/fogFragment-NFgubt9V.js                       2.43 kB │ gzip:   0.76 kB
+dist/assets/iesTextureLoader-3O5bSkSd.js                  2.47 kB │ gzip:   1.07 kB
+dist/assets/logDepthDeclaration-KY4JHaIP.js               2.60 kB │ gzip:   0.86 kB
+dist/assets/tgaTextureLoader-CqhhocF6.js                  3.40 kB │ gzip:   1.35 kB
+dist/assets/cubemapToSphericalPolynomial-ALAhJbmy.js      3.66 kB │ gzip:   1.61 kB
+dist/assets/halfFloat-CXxwV7oo.js                         4.87 kB │ gzip:   1.80 kB
+dist/assets/helperFunctions-qGTG1bM_.js                   6.57 kB │ gzip:   2.21 kB
+dist/assets/dds.pure-DTEGGN4_.js                          6.92 kB │ gzip:   2.52 kB
+dist/assets/helperFunctions-D89zo_74.js                   6.92 kB │ gzip:   2.32 kB
+dist/assets/vertexColorMixing-HinktY3n.js                10.39 kB │ gzip:   2.14 kB
+dist/assets/vertexColorMixing-CBmtHj8r.js                11.72 kB │ gzip:   2.17 kB
+dist/assets/exrTextureLoader-sVVw8VSq.js                 13.12 kB │ gzip:   4.82 kB
+dist/assets/ktxTextureLoader-Dcut0fA_.js                 16.69 kB │ gzip:   4.91 kB
+dist/assets/bufferUtils-CcquopDk.js                      18.49 kB │ gzip:   6.43 kB
+dist/assets/default.vertex-DCe4kRBL.js                   19.66 kB │ gzip:   4.39 kB
+dist/assets/basisTextureLoader-DryRH4Lm.js               29.72 kB │ gzip:   8.98 kB
+dist/assets/envTextureLoader-CtXO9SZ0.js                 31.53 kB │ gzip:   8.88 kB
+dist/assets/baseTexture.pure-DnbrS98y.js                 31.78 kB │ gzip:   8.67 kB
+dist/assets/default.vertex-v6-sLXSk.js                   38.79 kB │ gzip:   6.43 kB
+dist/assets/math.color.pure-caH1cJ-T.js                  77.33 kB │ gzip:  18.33 kB
+dist/assets/default.fragment-DrfZk1h8.js                110.47 kB │ gzip:  22.57 kB
+dist/assets/default.fragment-CnDsnXeI.js                118.62 kB │ gzip:  22.64 kB
+dist/assets/index-WVpvXHVT.js                         1,074.48 kB │ gzip: 259.56 kB
+
+[plugin builtin:vite-reporter] 
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 236ms
+[time] wall=1.54s maxrss=481856KB
+[exit] buildB=0
+$ ls -l dist/assets/index-*.js
+-rw-r--r-- 1 root root 1074489 Nov 13 12:08 dist/assets/index-WVpvXHVT.js
+$ sha256sum dist/assets/index-*.js
+ac776b0ba94130d19b2d365fadc9f18091c3cdf28b349ebfc0d864ba7ec5eec1  dist/assets/index-WVpvXHVT.js
+
+## 三、两次构建产物一致性
+$ cmp /tmp/final-buildA.js dist/assets/index-*.js && echo IDENTICAL
+IDENTICAL（逐字节相同）
+
+## 四、dist 全量产物与 hash
+$ find dist -type f | sort | xargs sha256sum
+ff82e9084a0592c1e3fe3cca6e3d7f5178ca05f7b2ffd3bd8944b7cd1c857aa0  dist/assets/baseTexture.pure-DnbrS98y.js
+383a5c6021cd7a2360f6b9073c6efb5808ab2f7a5762c1cf7c0d96cd02cdaafa  dist/assets/basisTextureLoader-DryRH4Lm.js
+27737cb187b3122a6e3e359a945e9e82031ab476f3ff071141e702c022fcdf02  dist/assets/bufferUtils-CcquopDk.js
+f7a9dc5b02009a66dd839d60b53371eae716d9ab668c43591a03dccd89723c43  dist/assets/color.fragment-DVaYbzXa.js
+1c320101aed7a2c3f3c745bcc48db7128b2b3cd5476a7be5ff0f92e5b168f08f  dist/assets/color.fragment-SH3AKoaS.js
+9a24b270733ec21730e168537515b72d59372e45c4953550d4b8e565b94ff1e4  dist/assets/color.vertex-BYaj1Jpp.js
+7426d8d1445626cc1a093ce6aa6c34df059d8b6f0ca3d8f7c1322164485f470f  dist/assets/color.vertex-UAuK67V9.js
+38f73cbf41bcd430f0cb88aed1d240255db7a0d4a0a00402ae3bd6f6e1537958  dist/assets/cubemapToSphericalPolynomial-ALAhJbmy.js
+f4f228e5c16fdd1d0754ab48999aea842d97d6af94f2489f95e73478cd9aaca8  dist/assets/dds.pure-DTEGGN4_.js
+07176aea9e951bb2161850ebe38a50bef942dc9065347d92573086c24559d470  dist/assets/ddsTextureLoader-RnGfvVR6.js
+52b7f28b6847146ee197f65f9e6b168daaa44f31f681951aa3ff82291ecec1f0  dist/assets/default.fragment-CnDsnXeI.js
+7873e0aae77c2756b354393a2ed515a2b7d0e49bc9b2b90a051d40c004b76263  dist/assets/default.fragment-DrfZk1h8.js
+962109b00c2a32eeef380628d5253a4a28f5570b16ae47c2c2f7594ebdbe008d  dist/assets/default.vertex-DCe4kRBL.js
+3f2faa5dfd174c7f57926238de6bedcceb912c052dd73e69a6723c02f4fa6478  dist/assets/default.vertex-v6-sLXSk.js
+f60c93138169af2e903287d5be93734ee4aa37f929dc99cb979c8946f44ad9bc  dist/assets/envTextureLoader-CtXO9SZ0.js
+033d4c289e0730ed4186f174f1b37da90ed5581abf927aa4da5087cc7937aa63  dist/assets/exrTextureLoader-sVVw8VSq.js
+054bc520779bc8e3797647ce5f6ecb35a6495a88efc6755833ba9bcf4228745e  dist/assets/fogFragment-NFgubt9V.js
+b26c23e02289a3aa6d6abc66cc1f7a8b680ae042813afb3909033bcfbeef0018  dist/assets/fogFragment-WPqtYpyX.js
+00d984a536e2ae0092a3739317c78bd1ba6207236b041de3154c56f5f0a1f5f0  dist/assets/halfFloat-CXxwV7oo.js
+c1dfa7a7928d2c03e86324a093297ad10c35caefff14518691c5fe4d4172447a  dist/assets/hdrTextureLoader-BQVwkxK1.js
+12df33faa3c797a6325ddfa9a87b17faa4c4dfd4ef6d4e6b7bac2f1f24ed5df2  dist/assets/helperFunctions-D89zo_74.js
+ba91ba0104ece063c078bfd9c9ec11a5211028d59539f056177376217fc7360e  dist/assets/helperFunctions-qGTG1bM_.js
+ba6cbc6a680efda56c5507ab3ca58c7d7ed0d986242c005828a60fe6cec0892a  dist/assets/iesTextureLoader-3O5bSkSd.js
+ac776b0ba94130d19b2d365fadc9f18091c3cdf28b349ebfc0d864ba7ec5eec1  dist/assets/index-WVpvXHVT.js
+8a2561e2457ad43c66fb001a2388409b7cbddd92ab1d0cb25c6d00932f5602c9  dist/assets/ktxTextureLoader-Dcut0fA_.js
+fa28fea64fd32656afcd71c7cd7500f62ba35b7b69e4c5280d6ed6590bea1db6  dist/assets/logDepthDeclaration-BKcd_JEL.js
+c3081325c6d1c796a45fd5469c2ecdf5057bb050e018e8527d396f4c596948b3  dist/assets/logDepthDeclaration-KY4JHaIP.js
+30a999582eace71f2e78a479182e71e943508bbda9574b17e5b29575c49a3b9e  dist/assets/logger-CuBYPcDK.js
+8b651ddae5580517a29596d67257b7c32da8209a62ecb32d5b727b36e470c99e  dist/assets/math.color.pure-caH1cJ-T.js
+4a5ef6436ef4c8fd85de14835c3bf62ccf5d1fbe38f71c727cc79760f1a1ff79  dist/assets/math.scalar.functions-lnL7TJ7T.js
+bdeb852116676b6289101b6ef271fb52200959188fba6863858942ec2e068338  dist/assets/mesh.vertexData.functions-CD4JOR2q.js
+7f3cb8f402651e0c1378f484fdd319a6859ce17c20cb877ede973037d487ca79  dist/assets/postprocess.vertex-CmVXXq2T.js
+520bb6e9e2851654258b110a11a5d138f1e77aaaaa22013e6d723cdd59bdeacd  dist/assets/postprocess.vertex-DJCmMhI8.js
+d64c09db6efbfdac3f44d06f5a0ef93b63102e241dc0b50938e7bda3c1e3de47  dist/assets/rgbdDecode.fragment-B_fN_Tca.js
+1c96a975b5ec64806ea932211113adec35407faa529726c503fa8ebcf1047a5b  dist/assets/rgbdDecode.fragment-ycGs1SRq.js
+db600316439f2fedb7bfd3bcbc61b24d30c2b2646828dcea1c7c778cd07d5e3e  dist/assets/shaderStore-D-XQlhUT.js
+7edd7f23ff0ade28e79de5a87b7c966629d4e26d815fa3321589c50632179ae0  dist/assets/tgaTextureLoader-CqhhocF6.js
+8c2f381f6d64926c7225149709007280074fd7959e6bc679bf39ae7ceede100d  dist/assets/vertexColorMixing-CBmtHj8r.js
+5722816c8048e24c799920477614f325900c4183d42f132d652bc8e61b60227e  dist/assets/vertexColorMixing-HinktY3n.js
+16aee4e42e5958a1c2e9875a9d9c55533735fc8db95ed7d559da6c896011fcf3  dist/index.html
+
+## 五、vite chunk 体积告警（保留原状，未做优化）
+
+## 六、vite chunk 体积告警（保留原状，未做优化 — 按复审要求）
+$ grep -A4 "Some chunks are larger" 构建输出
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 227ms
+--
+
+## 七、构建结论
+- Build A / Build B 主 chunk 文件名与 sha256 完全一致：index-WVpvXHVT.js / ac776b0ba94130d19b2d365fadc9f18091c3cdf28b349ebfc0d864ba7ec5eec1（1,074,489 B）
+- 与复审整改 round 1 的旧源码产物(index-C7U3W4VK.js, 1,074,191 B)不同，原因已定位并单独验证：src/main.ts 在 round 1 整改中改写（WebGPU 分级探测 + HUD 措辞），见 evidence/hash-attribution.log
