@@ -1,0 +1,40 @@
+# ============================================================
+# ST2-002 — 运行验证（干净 npm ci + 构建产物 preview）
+# ============================================================
+
+环境: Ubuntu 24.04.3 LTS | Node v22.13.1 | npm 11.9.0
+浏览器取证: Playwright + Firefox 146 (headful, Xvfb :99, LIBGL_ALWAYS_SOFTWARE=1 → llvmpipe 软件渲染 WebGL2)
+时间(UTC): 2026-11-13T04:48:25Z
+
+## 一、开发服务器 dev
+$ node ./node_modules/.bin/vite --port 5173 --strictPort
+
+  VITE v8.3.8  ready in 99 ms
+
+  ➜  Local:   http://localhost:5173/
+  ➜  Network: use --host to expose
+
+$ curl HTTP 状态
+GET / -> 200 (903 B)
+
+## 二、生产预览 preview（服务 dist/ = Build A/B 产物）
+$ node ./node_modules/.bin/vite preview --port 4173 --strictPort
+  ➜  Local:   http://localhost:4173/
+  ➜  Network: use --host to expose
+
+GET / -> 200 (1677 B)
+preview 页面引用的主 chunk：
+assets/index-fYMmSF9j.js
+
+## 三、浏览器实测截图（Playwright harness，日志见各 shot 日志）
+  evidence/shot-dev-focus-a.png  95021 B
+  evidence/shot-dev-focus-b.png  109792 B
+  evidence/shot-dev-focus-c.png  101749 B
+  evidence/shot-dev-full.png  97326 B
+  evidence/shot-preview-full.png  97370 B
+
+## 四、控制台要点（dev-full 截图会话）
+WebGL2 context: YES | renderer: llvmpipe, or similar
+ "renderer": "llvmpipe, or similar",
+[log] BJS - [12:47:23]: Babylon.js v9.36.0 - WebGL2
+[warning] [JavaScript Warning: "WEBGL_debug_renderer_info is deprecated in Firefox and will be removed. Please use RENDERER." {file: "http://localhost:5173/node_modules/.vite/deps/thinEngine.pure-DDwC4vSF.js?v=a82643ff" line: 562}]
