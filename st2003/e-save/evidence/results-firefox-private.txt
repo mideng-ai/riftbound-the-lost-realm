@@ -1,0 +1,19 @@
+=== RESULTS TABLE ===
+completed 8 | PASS 8 | FAIL 0#testresultdetailL1ls versioned write/readPASSroundtrip ok, bytes=72L2ls v1→v2 migrationPASSmigrated: {"schemaVersion":2,"gold":50,"items":["shield"],"settings":{"sfx":true}}L3ls corruption recoveryPASSparse failure quarantined to _corrupt_backup, default returnedL4ls quota behaviorINFOQuotaExceededError thrown after ~4 MB synchronous throws, prior keys unaffectedL5ls sync write cost (300×10KB)PASS5.0ms total, 0.017ms/op, 300 writes — all on main thread (note: 1000×10KB would exceed the ~5MB quota)I1idb versioned write/readPASSstructured clone roundtrip okI2idb v1→v2 onupgradeneeded migrationPASSin-upgrade-transaction migration ok: {"schemaVersion":2,"gold":75,"items":["ring"],"settings":{"sfx":true}}I3idb transaction atomicity (abort)PASSsync-aborted tx with 3 puts left 0 rows — all-or-nothing confirmed (engine-independent)I3bidb invalid data rejected (DataCloneError)PASSwrite rejected upfront: DataCloneErrorI4idb storage estimate()INFOusage=4MB quota=10240MB (browser-managed eviction policy applies)I5idb async write cost (1000×10KB, batched)INFO34.0ms total, 0.034ms/op — off main-thread commit, batched txP1private-mode probeINFOsee README browser matrix — separate -private browser run required
+=== CONSOLE ===
+[log] [PASS] L1 ls versioned write/read — roundtrip ok, bytes=72
+[log] [PASS] L2 ls v1→v2 migration — migrated: {"schemaVersion":2,"gold":50,"items":["shield"],"settings":{"sfx":true}}
+[log] [PASS] L3 ls corruption recovery — parse failure quarantined to _corrupt_backup, default returned
+[log] [INFO] L4 ls quota behavior — QuotaExceededError thrown after ~4 MB synchronous throws, prior keys unaffected
+[log] [PASS] L5 ls sync write cost (300×10KB) — 5.0ms total, 0.017ms/op, 300 writes — all on main thread (note: 1000×10KB would exceed the ~5MB quota)
+[log] [PASS] I1 idb versioned write/read — structured clone roundtrip ok
+[log] [PASS] I2 idb v1→v2 onupgradeneeded migration — in-upgrade-transaction migration ok: {"schemaVersion":2,"gold":75,"items":["ring"],"settings":{"sfx":true}}
+[log] [PASS] I3 idb transaction atomicity (abort) — sync-aborted tx with 3 puts left 0 rows — all-or-nothing confirmed (engine-independent)
+[log] [PASS] I3b idb invalid data rejected (DataCloneError) — write rejected upfront: DataCloneError
+[log] [INFO] I4 idb storage estimate() — usage=4MB quota=10240MB (browser-managed eviction policy applies)
+[log] [INFO] I5 idb async write cost (1000×10KB, batched) — 34.0ms total, 0.034ms/op — off main-thread commit, batched tx
+[log] [INFO] P1 private-mode probe — see README browser matrix — separate -private browser run required
+[log] [suite] done
+=== ENV ===
+{"ua":"Mozilla/5.0 (X11; Linux x86_64; rv:146.0) Gecko/20100101 Firefox/146.0","storage":"supported"}
+saved: evidence/shot-firefox-private.png
