@@ -11,7 +11,7 @@
 - Stage 2: **AUTHORIZED — in progress**
 - Formal Stage 2 engineering and technical spikes: **authorized only under individually approved task scopes**
 - Stage 3 / M1 gameplay implementation: **not authorized**
-- Stage 2 phase authorization does not by itself authorize a specific WorkBuddy task; task-specific approval is required. ST2-001 has now received that approval. Stage 3 / M1 gameplay implementation remains unauthorized.
+- Stage 2 phase authorization does not by itself authorize a specific WorkBuddy task; task-specific approval is required. ST2-001 has been technically reviewed and formally owner-accepted on 2026-11-13. ST2-002 is draft-only and is not approved to start. Stage 3 / M1 gameplay implementation remains unauthorized.
 
 **Hard gate:** WorkBuddy must not execute a task unless this document contains an explicit owner approval for that exact task, identified by task ID, with status `APPROVED_TO_START`. A general approval of this collaboration process is not task approval. ChatGPT may draft tasks and review results, but cannot grant owner approval. If approval is absent, ambiguous, expired, or does not match the task ID and scope, stop and ask the owner.
 
@@ -65,7 +65,7 @@ Do not overwrite or erase previous reports or approval records. Append dated upd
 
 ## 4. ChatGPT → WorkBuddy tasks
 
-ST2-001 is approved to start. Its exact scope and approval are recorded in Section 11.2 and Section 5. Future tasks must use this template:
+ST2-001 is owner-accepted. ST2-002 is the current draft proposal and must not start until the owner approves its exact scope in Section 5. Future tasks must use this template:
 
 ### [TASK-ID] Task title
 
@@ -82,6 +82,29 @@ ST2-001 is approved to start. Its exact scope and approval are recorded in Secti
 - **Risks and stop conditions:**
 - **Owner approval:** Not granted
 
+
+### ST2-002 — Cartoon rendering direction comparison Spike
+
+- **Status:** `DRAFT` — not approved; WorkBuddy must not start.
+- **Created:** 2026-11-13
+- **Objective:** Compare a small number of technically viable cartoon/toon rendering approaches in Babylon.js and produce evidence-based recommendations for a later owner decision. This is a rendering-technique evaluation, not a final art-direction or performance-budget decision.
+- **Background / references:** `docs/STAGE2_TECH_SPIKE_PLAN.md` Section 3 (S2-B), Sections 2 and 5; D-003 and D-007; ST2-001 accepted baseline and `spikes/ST2-001/` dependency/version evidence.
+- **Exact scope:**
+  1. Create a new isolated, disposable Spike under `spikes/ST2-002/`; do not convert ST2-001 into the formal game project.
+  2. Reuse the established Babylon.js + TypeScript + Vite direction and pin exact direct dependency versions; include a lockfile and HTTPS registry configuration.
+  3. Build one controlled, minimal 3D comparison scene with consistent camera, geometry, lighting, colors, and browser/build configuration.
+  4. Compare at least two feasible cartoon-rendering approaches, and up to three only if the third is genuinely distinct and practical. Candidate techniques may include quantized/toon lighting, NodeMaterial/custom shader approaches, and outline techniques where feasible. Clearly separate base shading from optional outlines.
+  5. Record visual differences, implementation complexity, browser/runtime constraints, shader/material limitations, and measured observations under the actual test environment.
+  6. Test the scene in the available desktop browser environment. If mobile emulation is available, label it as emulation only; do not claim phone hardware validation. Record whether owner Mac or physical mobile hardware was unavailable.
+  7. Submit source, exact versions, reproducible commands, clean-install/build logs, screenshots, and a concise comparison/recommendation report.
+- **Out of scope:** final owner selection of the art/rendering direction; formal game project architecture; production rendering pipeline; gameplay, combat, entities, UI, or content implementation; spell VFX (S2-C); input abstraction (S2-D); save system/D-207; performance budget/D-210; device-wide performance conclusions; asset integration or license approval; Stage 3/M1.
+- **Instructions:** Preserve D-003 and D-007. Do not silently select a final rendering method or modify project decisions. Do not claim mobile performance based on desktop emulation or software rendering. Keep the Spike disposable and independent from any formal project directory.
+- **Files expected to change:** New files only under `spikes/ST2-002/`; this collaboration log's execution report only after an approved task is actually executed. Do not modify formal game source.
+- **Acceptance criteria:** At least two approaches are implemented in the same controlled scene; comparison screenshots and source are committed; exact dependency graph is reproducible with clean `npm ci`; `npm audit` output and production build logs are committed; test environments and limitations are explicit; conclusions distinguish visual feasibility from performance evidence; no out-of-scope work is present.
+- **Required verification / tests:** Lockfile URL/integrity checks; clean-directory `npm ci`; `npm audit`; `npm run build`; dev/preview HTTP checks; browser rendering checks for each approach; capture screenshots; record browser, OS, rendering backend, GPU/software-rendering status, and any emulation mode.
+- **Risks and stop conditions:** Stop and report if Babylon.js 9.36.0 cannot support a candidate approach without changing the approved stack, if a material/shader approach requires a substantial dependency or architecture change, if license/security concerns arise, or if scope expansion is needed. Do not switch engines or frameworks.
+- **Owner approval:** Not granted. Awaiting explicit approval for ST2-002 only.
+
 ## 5. Owner approvals
 
 Only the project owner may add an approval entry. Approval must be explicit and tied to a task ID and the exact task scope.
@@ -96,6 +119,18 @@ Only the project owner may add an approval entry. Approval must be explicit and 
 - **Conditions / limits:**
 
 An approval for one task does not approve another task, a broader scope, or a later project phase.
+
+
+### Owner acceptance record — ST2-001
+
+- **Task ID:** ST2-001
+- **Decision:** `OWNER_ACCEPTED`
+- **Accepted by:** Project owner
+- **Date:** 2026-11-13
+- **Source:** Owner's explicit response to ChatGPT's direct question asking whether ST2-001 was formally accepted: “确认，继续吧”.
+- **Accepted result:** The ST2-001 result as technically reviewed in Section 7, including the disclosed limitation that WebGL2 was demonstrated only in Firefox software rendering (llvmpipe) in WorkBuddy's Linux sandbox.
+- **Boundary:** This acceptance closes ST2-001 only. It does not establish real-GPU or mobile compatibility, does not complete Stage 2, does not approve ST2-002, and does not authorize Stage 3 / M1.
+- **Record transcription:** This entry records the owner's response in its conversational context; ChatGPT is not granting owner acceptance on the owner's behalf.
 
 ## 6. WorkBuddy → ChatGPT execution reports
 
@@ -319,10 +354,10 @@ Stage 2 is authorized. The owner explicitly approved ST2-001 on 2026-11-12 with 
 - Stage 2 technical planning and spike design may proceed.
 - WorkBuddy may execute only a task with a matching task ID, exact scope, and owner approval entry in Section 5.
 
-### 11.2 First approved task
+### 11.2 First task — closed
 
 #### ST2-001 — Babylon.js baseline rendering and build compatibility Spike
-- **Status:** `REVIEW_PASSED` — ChatGPT completed the round 2 technical re-review on 2026-11-13. Awaiting explicit project-owner acceptance; this is not yet `OWNER_ACCEPTED` and does not authorize ST2-002. (History: `APPROVED_TO_START` 2026-11-12 → initial execution `READY_FOR_REVIEW` → `CHANGES_REQUESTED_BY_REVIEW` → round 1 corrections `READY_FOR_REVIEW` → `CHANGES_REQUESTED_BY_REVIEW` (lockfile registry) → round 2 corrections `READY_FOR_REVIEW` → `REVIEW_PASSED`.)
+- **Status:** `OWNER_ACCEPTED` — ChatGPT technical re-review passed and the project owner formally accepted the result on 2026-11-13. (History: `APPROVED_TO_START` → execution/corrections → `REVIEW_PASSED` → `OWNER_ACCEPTED`.)
 - **Plan:** `docs/STAGE2_TECH_SPIKE_PLAN.md`, Section 7.
 - **Scope:** isolated disposable Vite + TypeScript + Babylon.js spike; minimal 3D scene and top-down camera; WebGL2 verification; optional WebGPU capability probe; dev server and production build verification.
 - **Out of scope:** formal game project architecture, gameplay code, full input system, cartoon-rendering decision, spell VFX, save implementation, performance-budget decision, and Stage 3 work.
@@ -366,3 +401,16 @@ Stage 2 is authorized. The owner explicitly approved ST2-001 on 2026-11-12 with 
   4. Update README/HUD wording to say exactly what was tested: WebGL2 verified in Firefox software rendering; WebGPU API presence may be probed, but adapter and Babylon WebGPU engine were not validated. Do not imply WebGPU support is established.
   5. Preserve the sandbox/llvmpipe limitation and the Vite chunk-size warning; do not optimize or expand the spike into formal architecture.
 - **Recommendation to owner:** Hold acceptance pending the above corrections. No new owner approval is required for these corrections because they remain inside ST2-001's already approved scope. After ChatGPT re-review, owner acceptance remains a separate decision. Mac real-GPU confirmation is recommended before treating the engine baseline as established for the owner’s development machine; it is not to be represented as completed by WorkBuddy.
+
+
+### 11.3 Next task — draft only
+
+#### ST2-002 — Cartoon rendering direction comparison Spike
+- **Status:** `DRAFT` — not approved; WorkBuddy must not start.
+- **Objective:** Compare at least two feasible Babylon.js cartoon-rendering approaches in a controlled, isolated scene and provide reproducible visual/technical evidence for the project owner's later decision.
+- **Plan:** `docs/STAGE2_TECH_SPIKE_PLAN.md`, Section 9.
+- **Scope:** New disposable Spike under `spikes/ST2-002/`; controlled comparison scene; at least two rendering approaches; screenshots; exact dependencies/lockfile; clean install, audit, build and browser verification; report actual environment and limitations.
+- **Out of scope:** final rendering decision, production pipeline, formal game architecture, gameplay, spell VFX, input system, save implementation, D-207/D-210 decisions, Stage 3/M1, and physical mobile performance claims without real-device evidence.
+- **Owner approval:** Not granted. The owner's ST2-001 acceptance does not authorize ST2-002.
+
+- 2026-11-13 — Project owner formally accepted ST2-001 after ChatGPT's round 2 technical re-review. Status changed to `OWNER_ACCEPTED`; acceptance is limited to ST2-001 and its disclosed sandbox-only WebGL2 evidence. ST2-002 drafted as a separate task; no execution approval granted.
