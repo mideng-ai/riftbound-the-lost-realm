@@ -81,7 +81,7 @@ Linux 沙箱或桌面模拟结果不能冒充手机真机结果；负责人 Mac 
 
 ### ST2-001 — Babylon.js 基础渲染与构建兼容性 Spike
 
-- **状态：** `APPROVED_TO_START`（负责人于 2026-11-12 明确批准；仅限本任务准确范围）
+- **状态：** `OWNER_ACCEPTED`（负责人于 2026-11-13 在 ChatGPT 技术复审通过后正式验收；任务已关闭。历史开始授权日期为 2026-11-12，仅限本任务准确范围）
 - **目标：** 在隔离的临时 Spike 目录中验证 Babylon.js 与 Vite + TypeScript 的最小集成，以及浏览器 WebGL2 基础 3D 场景可运行性。
 - **范围：**
   1. 调研并记录当前稳定 Babylon.js 版本与官方支持/兼容信息。
@@ -116,6 +116,7 @@ Linux 沙箱或桌面模拟结果不能冒充手机真机结果；负责人 Mac 
 
 - 2026-11-13 v1.1 — ST2-001 owner acceptance recorded; ST2-002 cartoon-rendering comparison added as a draft only. No ST2-002 execution approval and no rendering decision made.
 
-## 8. 变更记录
+## 10. 变更记录
 
 - 2026-11-12 v1.0：负责人授权开始阶段2；建立技术 Spike 工作包、证据规则与阶段验收门槛；ST2-001 建立为待单独批准的首个 WorkBuddy 执行任务。
+- 2026-11-13 v1.1：ST2-001 经 ChatGPT 技术复审通过并由负责人正式验收；新增 ST2-002 卡通渲染方向比较 Spike 草案，尚未获准开始。
