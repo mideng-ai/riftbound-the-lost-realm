@@ -11,7 +11,7 @@
 - Stage 2: **AUTHORIZED — in progress**
 - Formal Stage 2 engineering and technical spikes: **authorized only under individually approved task scopes**
 - Stage 3 / M1 gameplay implementation: **not authorized**
-- Stage 2 phase authorization does not by itself authorize a specific WorkBuddy task; task-specific approval is required. ST2-001 has been technically reviewed and formally owner-accepted on 2026-11-13. ST2-002 is draft-only and is not approved to start. Stage 3 / M1 gameplay implementation remains unauthorized.
+- Stage 2 phase authorization does not by itself authorize a specific WorkBuddy task; task-specific approval is required. ST2-001 has been technically reviewed and formally owner-accepted on 2026-11-13. ST2-002 has been approved to start and WorkBuddy submitted it as `READY_FOR_REVIEW`; ChatGPT review has requested corrections, and owner acceptance is pending. Stage 3 / M1 gameplay implementation remains unauthorized.
 
 **Hard gate:** WorkBuddy must not execute a task unless this document contains an explicit owner approval for that exact task, identified by task ID, with status `APPROVED_TO_START`. A general approval of this collaboration process is not task approval. ChatGPT may draft tasks and review results, but cannot grant owner approval. If approval is absent, ambiguous, expired, or does not match the task ID and scope, stop and ask the owner.
 
@@ -65,7 +65,7 @@ Do not overwrite or erase previous reports or approval records. Append dated upd
 
 ## 4. ChatGPT → WorkBuddy tasks
 
-ST2-001 is owner-accepted. ST2-002 is the current draft proposal and must not start until the owner approves its exact scope in Section 5. Future tasks must use this template:
+ST2-001 is owner-accepted. ST2-002 is the current task under technical review after execution; its approval is recorded in Section 5. Do not treat that approval as acceptance of its result or authorization for another task. Future tasks must use this template:
 
 ### [TASK-ID] Task title
 
@@ -265,6 +265,28 @@ Never claim a test passed unless it was actually run. Distinguish “not run”,
 
 ## 7. ChatGPT review records
 
+
+### ST2-002 Review — initial technical review
+
+- **Review date:** 2026-11-13
+- **Decision:** `CHANGES_REQUESTED`
+- **Evidence inspected:** `spikes/ST2-002/README.md`, `package.json`, `package-lock.json`, `.npmrc`, `tsconfig.json`, `index.html`, `src/main.ts`, `evidence/npmci.log`, `evidence/npm-audit.log`, `evidence/build.log`, `evidence/run.log`, `evidence/browser-harness.mjs`, and the ST2-002 execution report in Section 6. Screenshot files are present in the repository; their pixel contents were not independently decoded during this review.
+- **Acceptance criteria results:**
+  - Isolated disposable Spike and scope boundaries: **PASS by inspected paths/source/report**.
+  - Exact direct dependency pins, HTTPS lockfile, and integrity entries: **PASS based on manifest and committed install log** — Babylon.js 9.36.0, TypeScript 5.9.3, Vite 8.3.8; 49/49 resolved URLs use the official HTTPS npm registry and 49/49 integrity entries are present.
+  - Clean-directory `npm ci`: **PASS based on committed log** — no `node_modules` before install; exit 0; direct versions verified.
+  - Security audit: **PASS based on committed full output** — default, JSON, and moderate-threshold audit all exit 0 with 0 vulnerabilities reported.
+  - Production build and repeatability: **PASS based on committed log** — TypeScript/Vite build exit 0; two builds produce the same main-chunk SHA-256; chunk-size warning is retained.
+  - Dev/preview serving and desktop browser WebGL2: **PASS within the disclosed sandbox scope based on committed logs/report** — HTTP 200; Firefox 146 with llvmpipe software-rendered WebGL2. This is not real-GPU, Mac, mobile-device, or performance-budget evidence.
+  - WebGPU: **correctly disclosed as not validated**; Babylon WebGPUEngine was not run.
+  - Controlled A/B visual comparison: **FAIL / requires correction** — source does not apply equivalent color equations. In A, the NodeMaterial graph outputs `baseColor * posterized(N·L) + ambientColor`; in B, the GLSL shader outputs `baseColor * (ambientColor + lightColor * band)` plus an additional rim-light term. Therefore ambient contribution and overall color response differ independently of the rendering approach. B also includes rim lighting while A does not. The README's claim that the A/B color difference is attributable only to the distribution of quantization bands is not supported by the inspected source.
+- **Required corrections (within the existing ST2-002 approval):**
+  1. Make the A and B base-shading equations comparable: use the same base-color multiplication, ambient contribution, light color, and equivalent quantization thresholds/levels. If exact equivalence cannot be expressed with the current NME `PosterizeBlock`, explicitly document the technical limitation and implement a comparable threshold graph or otherwise isolate the difference; do not attribute formula differences to the rendering pipeline.
+  2. Isolate rim lighting from the A/B base-shading comparison. Either remove it from B's baseline and evaluate it as a separately identified optional effect, or implement an equivalent rim term in A. Keep outline overlays separately identified as already intended.
+  3. Re-run browser captures for A/B/C after the correction; update README conclusions so every visual claim matches the corrected implementation. Re-run `npm run build` and browser verification, and commit updated logs/screenshots. Dependency install/audit evidence need not be repeated if dependency files remain unchanged.
+  4. Correct stale status text in this collaboration log so ST2-002 is not simultaneously described as draft-only and ready for review.
+- **Recommendation to owner:** Do not accept ST2-002 yet. The engineering/reproducibility evidence is substantially complete, but the central comparison is not controlled enough to support its visual recommendation. The above corrections remain within the original approved scope and do not require a new owner approval. No final rendering decision or Stage 3/M1 work is authorized.
+
 ### [TASK-ID] Review
 
 - **Review date:**
@@ -328,6 +350,7 @@ The following scope decisions remain binding:
 For detailed product decisions and requirements, consult the current authoritative project documents in `docs/`. If this collaboration log conflicts with an approved scope or decision record, stop and ask the owner rather than choosing one silently.
 
 ## 9. Change log
+- 2026-11-13 — ST2-002 initial technical review: `CHANGES_REQUESTED`. Dependency, clean-install, audit, build-repeatability, dev/preview and disclosed sandbox WebGL2 evidence pass within scope. The central A/B comparison is confounded by different ambient/base-color equations and an extra rim term in B. Requested equivalent base-shading equations, isolated rim treatment, corrected captures/report, and removal of stale contradictory status text. Corrections are within the existing owner-approved ST2-002 scope; no new approval required.
 - 2026-11-13 — ST2-002 executed within approved scope: isolated `spikes/ST2-002/` comparison Spike (NME posterized toon vs hand-written GLSL cel+rim, outline overlays evaluated separately), exact pins + HTTPS official-registry lockfile (49/49 https, 0 plaintext http), clean `npm ci` exit 0, `npm audit` 3 modes 0 vulnerabilities, byte-identical double build (sha256-verified), dev/preview HTTP 200, Firefox/llvmpipe screenshots incl. per-approach focus mode. Advisory recommendation recorded; no final rendering decision made. Status `READY_FOR_REVIEW`; awaiting ChatGPT review and owner acceptance.
 - 2026-11-13 — ST2-001 correction round 2 completed (within original approval scope): lockfile regenerated with all 49 resolved URLs on `https://registry.npmjs.org/` (0 plaintext http), directory `.npmrc` added, clean-directory `npm ci` re-run, full `npm audit` output committed (0 vulnerabilities, exit 0), `npm run build` executed twice with byte-identical output (sha256-verified), screenshots retaken. WorkBuddy also self-corrected a round 1 evidence-chain defect: the round 1 build log predated the source rewrite; attribution experiment committed. Status returned to `READY_FOR_REVIEW`; awaiting ChatGPT re-review and owner acceptance.
 - 2026-11-13 — ST2-001 correction round 1 re-reviewed. Exact pins/lockfile, clean `npm ci`, post-install build, `npm audit`, corrected WebGPU wording, and preserved scope limits are supported by committed evidence. Review found all 49 lockfile tarball URLs use plaintext `http://mirrors.tencent.com/...`; requested an HTTPS official/approved registry lockfile and clean-install/audit/build re-verification. Status remains `CHANGES_REQUESTED_BY_REVIEW`; owner acceptance remains pending.
@@ -371,7 +394,7 @@ Note: this log records that Stage 1 formal acceptance has passed. I have not ind
 
 ### 10.4 Current status
 
-Stage 2 is authorized. ST2-001 was approved to start on 2026-11-12 and formally owner-accepted on 2026-11-13 after ChatGPT's round 2 technical re-review; see the approval and acceptance records above. ST2-002 is a draft only and has no `APPROVED_TO_START` entry. WorkBuddy must not begin ST2-002 until the owner explicitly approves its exact scope. Stage 3 / M1 gameplay work is not authorized.
+Stage 2 is authorized. ST2-001 was approved to start on 2026-11-12 and formally owner-accepted on 2026-11-13 after ChatGPT's round 2 technical re-review; see the approval and acceptance records above. ST2-002 was explicitly approved on 2026-11-13, executed, and submitted as `READY_FOR_REVIEW`; ChatGPT has requested a correction to the controlled visual comparison. Owner acceptance is pending. Stage 3 / M1 gameplay work is not authorized.
 
 
 ## 11. Stage 2 authorization and first task
@@ -439,7 +462,7 @@ Stage 2 is authorized. ST2-001 was approved to start on 2026-11-12 and formally 
 ### 11.3 Second approved task
 
 #### ST2-002 — Cartoon rendering direction comparison Spike
-- **Status:** `READY_FOR_REVIEW` — executed by WorkBuddy on 2026-11-13 within the approved scope; see execution report in Section 6. Awaiting ChatGPT technical review, then owner acceptance. (History: `APPROVED_TO_START` 2026-11-13 → execution `READY_FOR_REVIEW`.)
+- **Status:** `CHANGES_REQUESTED_BY_REVIEW` — initial technical review on 2026-11-13 found the A/B visual comparison is confounded by non-equivalent color formulas and an extra rim-light term in B. WorkBuddy may correct these issues within the existing approved scope; owner acceptance is pending.
 - **Objective:** Compare at least two feasible Babylon.js cartoon-rendering approaches in a controlled, isolated scene and provide reproducible visual/technical evidence for the project owner's later decision.
 - **Plan:** `docs/STAGE2_TECH_SPIKE_PLAN.md`, Section 9.
 - **Scope:** New disposable Spike under `spikes/ST2-002/`; controlled comparison scene; at least two rendering approaches; screenshots; exact dependencies/lockfile; clean install, audit, build and browser verification; report actual environment and limitations.
