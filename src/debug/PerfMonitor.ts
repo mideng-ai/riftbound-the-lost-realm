@@ -1,7 +1,7 @@
 /**
  * PerfMonitor — debug/performance observation HUD (fps, frame-time percentiles).
  * D-210 gate: displayed numbers are observations, NOT budget assertions.
- * Methodology reference: spikes/ST2-003-F-PERF/
+ * Methodology reference: st2003/f-perf/
  */
 import { Scene, Engine } from '@babylonjs/core';
 
