@@ -1,6 +1,7 @@
 # Stage 2 Final Report — Remaining Work Execution (ST2-003)
 
-> **Status: READY_FOR_REVIEW** — awaiting ChatGPT technical review and project-owner acceptance.
+> **Status: READY_FOR_REVIEW (resubmitted after correction round)** — awaiting ChatGPT re-review and project-owner acceptance.
+> **Correction round:** 2026-11-13, addresses `docs/ST2-003_TECHNICAL_REVIEW.md` findings R1–R4 within the existing ST2-003 approval (see §11).
 > **Executed by:** WorkBuddy, under the single owner approval `ST2-003 APPROVED_TO_START` (2026-11-13).
 > **Scope document:** `docs/STAGE2_MASTER_EXECUTION_PLAN.md` v1.0 (Sections 3–9).
 > **Not included by design:** Stage 3 / M1 gameplay; final D-207 / D-210 / rendering-direction decisions (owner-reserved); real-device test execution (owner hardware).
@@ -126,6 +127,56 @@ All Stage-2 work packages S2-C through S2-G were executed and pushed to `main` a
 
 ## 10. Next actions requested
 
-1. **ChatGPT:** technical review of ST2-003 (Section 6 report in `AGENT_COLLABORATION.md`).
+1. **ChatGPT:** re-review of ST2-003 after the correction round (§11; Section 6 report in `AGENT_COLLABORATION.md`).
 2. **Owner:** run the device checklist (Mac mini + phone); decide D-207, D-210, rendering direction.
 3. After owner acceptance of Stage 2: Stage 3 authorization remains a separate owner decision (not requested here).
+
+## 11. Correction round — R1–R4 (2026-11-13, post-review)
+
+Trigger: `docs/ST2-003_TECHNICAL_REVIEW.md` (`CHANGES_REQUESTED`). All four findings were corrected inside the existing owner approval; no new start approval was requested, no Stage-3/M1 work, no decision gate was closed.
+
+### 11.1 R1 — device-checklist / plan paths (blocking) → fixed
+
+- All `spikes/ST2-003-*` references replaced with the real directories (`st2003/c-vfx/`, `st2003/d-input/`, `st2003/e-save/`, `st2003/f-perf/`) in `docs/STAGE2_DEVICE_TEST_CHECKLIST.md`, `docs/STAGE2_MASTER_EXECUTION_PLAN.md` §9, `docs/TECH_ARCHITECTURE.md`, root `README.md` and the migration comments in `src/**`.
+- The checklist now contains a complete copy-pasteable sequence (clone → `cd` → `npm ci` → `npm run build` → `npm run preview`) per directory.
+- Ports were **fixed in code** (`--strictPort`) and then verified by actually starting each preview: `4176` f-perf, `4173` c-vfx, `4174` d-input, `4175` e-save, `4170` formal skeleton. Raw log: `evidence/correction-2026-11-13/preview-ports.log` (each entry: HTTP 200, served `<title>`, and the server's own "Local:" line confirming the port).
+
+### 11.2 R2 — `bindActionButton` listener lifecycle (blocking) → fixed
+
+- `src/input/InputSystem.ts` now retains every bound element + handler in `boundButtons`; `dispose()` removes both `touchstart` and `mousedown`; `TouchAdapter` tracks and clears the pending 120 ms hold-release timer on dispose.
+- Regression test: `npm run test:input` → `tests/input-regression.cjs` (compiled via `tsconfig.test.json`, DOM stubs, no new runtime dependency).
+- Checks R2-1…R2-8: button intent fires once per press; after `dispose()` no intents and no listener callbacks are observed; a re-created instance receives exactly one intent (no duplicated listeners); a pending hold-release timer does not fire after dispose.
+
+### 11.3 R3 — `touchcancel` clearing suspension (blocking) → fixed
+
+- `InputSystem.route()` now changes `SystemState.suspended` only for `blur` (→true), `focus` (→false) and `visibility` (→`document.hidden`). `touchcancel` is input-release only and never touches suspension.
+- Added a real `focus` recovery path in `KeyboardMouseAdapter` (previously only blur → suspend existed); `TouchAdapter.onTouchCancel` still releases the joystick and emits move 0.
+- Checks R3-1…R3-9: blur→touchcancel stays suspended; hidden→touchcancel stays suspended; visibility recovery and blur→focus do resume; touchcancel alone does not suspend; joystick movement is still released on touchcancel.
+
+### 11.4 R4 — D-207 quota / write-failure path (blocking for S2-E) → fixed and measured
+
+- `st2003/e-save/src/main.ts` gained three assertions: **L6** fills storage down to <512 bytes of headroom, then attempts the temp-key write of a realistic ~2 KB save; **L6b** validates interrupted-write recovery preferring a valid `save_next`; **L6c** validates fallback to `save_main` when `save_next` is corrupt.
+- Result (Chrome 157, macOS, real GPU): **11/11 PASS** — L6 observed `QuotaExceededError`, `save_next` absent, `save_main` read back intact (`gold=777`). Evidence: `st2003/e-save/evidence/results-chrome-macos.txt` + `shot-chrome-macos.png`.
+- **Firefox / Firefox private: L6 NOT VERIFIED** — no Firefox on this machine; the historical 3-profile 8/8 results were produced with the earlier suite (no L6) and are left untouched. The UI prints `NOT VERIFIED` rather than PASS when quota cannot be triggered.
+
+### 11.5 Regression re-run (this machine: macOS, Node 22.22.2, Chrome 157)
+
+| Check | Result | Evidence |
+|---|---|---|
+| `npm ci` (clean) | ✅ 0 vulnerabilities | `evidence/correction-2026-11-13/npmci.log` |
+| `npm audit` | ✅ 0 vulnerabilities | `…/npm-audit.log` |
+| `npm run typecheck` | ✅ clean | `…/typecheck.log` |
+| `npm run test:input` | ✅ 18/18 PASS | `…/input-regression.log` |
+| `npm run build` | ✅ built in 1.16 s (expected chunk-size warning) | `…/build.log` |
+| preview + Chrome smoke | ✅ HUD live, `projectiles live=1`, mock-save first-run, **0 pageerror** | `…/preview-smoke.log`, `…/preview-smoke.png` |
+
+### 11.6 Honest notes from the correction round
+
+1. L6 initially **failed twice** in this environment: the first version wrote a tiny temp payload into remaining headroom (no exception); the second stopped filling at the first oversized chunk. Both were test-design defects, fixed by decreasing chunk sizes until headroom < 512 B; the final run is a real `QuotaExceededError` observation, not a simulated one.
+2. The smoke log contains one non-blocking `404` resource error (favicon); no `[pageerror]`.
+3. This round's browser evidence is **real GPU Chrome/macOS**, not the sandbox software rasterizer — but it is still desktop-only; Mac-mini checklist items A1–A10 and phone items B1–B6 remain **OWNER_DEVICE_TEST_REQUIRED**.
+4. Bundle remains unoptimized (chunk-size warning) — deliberate Stage-2 boundary.
+
+### 11.7 Files changed in this round
+
+Modified: `src/input/{InputSystem,KeyboardMouseAdapter,TouchAdapter,types}.ts`, `package.json`, `tsconfig.test.json` (new), `.gitignore` (new), `tests/input-regression.cjs` (new), `tests/prepare.cjs` (new), `st2003/{c-vfx,d-input,e-save,f-perf}/package.json` (preview ports), `st2003/e-save/src/main.ts`, `st2003/e-save/README.md`, `docs/STAGE2_DEVICE_TEST_CHECKLIST.md`, `docs/STAGE2_MASTER_EXECUTION_PLAN.md`, `docs/TECH_ARCHITECTURE.md`, `README.md`, this report, `docs/AGENT_COLLABORATION.md`. New evidence: `evidence/correction-2026-11-13/*`, `st2003/e-save/evidence/results-chrome-macos.txt`, `st2003/e-save/evidence/shot-chrome-macos.png`.
