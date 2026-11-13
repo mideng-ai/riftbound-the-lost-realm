@@ -1,0 +1,35 @@
+# ============================================================
+# ST2-001 — 产物 hash 变化归因实验（辅助证据，非复审要求项）
+# ============================================================
+
+目的：定位 round 1 报告中 'index-C7U3W4VK.js' 与本次 'index-WVpvXHVT.js' 的差异来源，
+      以排除'依赖树差异/构建非确定性'两种可能，避免复现性说法含糊。
+环境: Ubuntu 24.04.3 LTS | Node v22.13.1 | npm 11.9.0 | 同一 node_modules（由 HTTPS lockfile 安装）
+时间(UTC): 2026-11-13T04:08:50Z
+
+## 实验 A：round 1 整改前的旧 src/main.ts（仓库 commit 5c585f6b53）
+✓ 508 modules transformed.
+dist/assets/index-C7U3W4VK.js                         1,074.19 kB │ gzip: 259.43 kB
+✓ built in 251ms
+$ sha256sum dist/assets/index-*.js
+a6db8fdf73e4e101fed266a1f137a13020d915bc425c21be48e76db6d3649e34  dist/assets/index-C7U3W4VK.js
+$ stat -c '%n %s B' dist/assets/index-*.js
+dist/assets/index-C7U3W4VK.js 1074191 B
+
+## 实验 B：当前仓库 src/main.ts（整改 round 1 最终版）
+✓ 508 modules transformed.
+dist/assets/index-WVpvXHVT.js                         1,074.48 kB │ gzip: 259.56 kB
+✓ built in 234ms
+$ sha256sum dist/assets/index-*.js
+ac776b0ba94130d19b2d365fadc9f18091c3cdf28b349ebfc0d864ba7ec5eec1  dist/assets/index-WVpvXHVT.js
+$ stat -c '%n %s B' dist/assets/index-*.js
+dist/assets/index-WVpvXHVT.js 1074489 B
+
+## 结论
+- 同一依赖树、同一配置，仅替换 src/main.ts：
+  · 旧源码 → index-C7U3W4VK.js 1,074,191 B（与 round 1 首轮 npm install 构建产物一致）
+  · 新源码 → index-WVpvXHVT.js 1,074,489 B（与本次 HTTPS lockfile 干净树构建产物一致）
+- 因此 hash 差异 100% 由 round 1 整改中 src/main.ts 的改写（WebGPU 分级探测 + HUD 措辞）造成，
+  与依赖树差异、构建随机性无关；两棵树（首轮 install 树 / lockfile 树）包版本逐个比对完全相同。
+- 由此也说明：round 1 的 evidence/build-after-ci.log 所记录的构建发生在 main.ts 改写之前，
+  不能代表最终提交源码；本轮 evidence/build-https.log（Build A/B 双双一致）已取代其作为构建证据。
