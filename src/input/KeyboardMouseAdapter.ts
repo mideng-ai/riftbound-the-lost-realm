@@ -1,5 +1,5 @@
 /**
- * S2-G formal project — migrated from spikes/ST2-003-D-INPUT — Keyboard + mouse adapter (desktop).
+ * S2-G formal project — migrated from st2003/d-input — Keyboard + mouse adapter (desktop).
  * Decodes DOM events into InputEvents; owns NO game logic.
  */
 import type { InputEvent, InputListener, MoveVector } from './types';
@@ -32,6 +32,7 @@ export class KeyboardMouseAdapter {
     canvas.addEventListener('pointerdown', this.onPointerDown);
     window.addEventListener('pointerup', this.onPointerUp);
     window.addEventListener('blur', this.onBlur);
+    window.addEventListener('focus', this.onFocus);
     document.addEventListener('visibilitychange', this.onVisibility);
     document.addEventListener('pointerlockchange', this.onPointerLock);
   }
@@ -94,6 +95,11 @@ export class KeyboardMouseAdapter {
     this.emit({ kind: 'suspend', reason: 'blur', suspended: true });
   };
 
+  private onFocus = () => {
+    // only the real focus-recovery path may clear a blur suspension
+    this.emit({ kind: 'suspend', reason: 'focus', suspended: false });
+  };
+
   private onVisibility = () => {
     if (document.hidden) {
       this.keys.clear();
@@ -117,6 +123,7 @@ export class KeyboardMouseAdapter {
     this.target?.removeEventListener('pointerdown', this.onPointerDown);
     window.removeEventListener('pointerup', this.onPointerUp);
     window.removeEventListener('blur', this.onBlur);
+    window.removeEventListener('focus', this.onFocus);
     document.removeEventListener('visibilitychange', this.onVisibility);
     document.removeEventListener('pointerlockchange', this.onPointerLock);
     this.attached = false;
