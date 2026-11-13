@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>ST2-003-D — Unified Input Spike (Babylon.js)</title>
+    <style>
+      html, body { margin: 0; padding: 0; overflow: hidden; background: #0b0d12; }
+      #renderCanvas { width: 100vw; height: 100vh; display: block; touch-action: none; outline: none; }
+      #hud {
+        position: fixed; top: 8px; left: 8px; z-index: 10;
+        font: 12px/1.5 monospace; color: #d8e6ff; background: rgba(5, 8, 16, 0.78);
+        padding: 8px 10px; border-radius: 6px; white-space: pre; pointer-events: none;
+      }
+      #eventlog {
+        position: fixed; top: 8px; right: 8px; z-index: 10;
+        font: 11px/1.5 monospace; color: #9fd8b4; background: rgba(5, 8, 16, 0.78);
+        padding: 8px 10px; border-radius: 6px; white-space: pre; width: 330px;
+        pointer-events: none; max-height: 40vh; overflow: hidden;
+      }
+      /* mobile action buttons — right zone (DOM, above canvas) */
+      #actions { position: fixed; right: 16px; bottom: 16px; z-index: 20; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+      .abtn {
+        width: 64px; height: 64px; border-radius: 50%; border: 2px solid #3a5a8a;
+        background: rgba(30, 45, 80, 0.7); color: #cfe0ff; font: 13px monospace;
+        touch-action: none; user-select: none; -webkit-user-select: none;
+      }
+      .abtn:active { background: rgba(70, 110, 180, 0.8); }
+      /* virtual joystick visuals */
+      #joyBase, #joyKnob { position: fixed; z-index: 15; border-radius: 50%; pointer-events: none; display: none; }
+      #joyBase { width: 96px; height: 96px; border: 2px solid rgba(140,170,220,0.5); background: rgba(40,60,100,0.25); }
+      #joyKnob { width: 44px; height: 44px; background: rgba(160,190,240,0.55); }
+    </style>
+  </head>
+  <body>
+    <canvas id="renderCanvas"></canvas>
+    <div id="hud">initializing…</div>
+    <div id="eventlog">— event log —</div>
+    <div id="joyBase"></div>
+    <div id="joyKnob"></div>
+    <div id="actions">
+      <button class="abtn" id="btnAtk">ATK</button>
+      <button class="abtn" id="btnDash">DASH</button>
+      <button class="abtn" id="btnQ">SKILL-Q</button>
+      <button class="abtn" id="btnE">SKILL-E</button>
+    </div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
