@@ -9,7 +9,7 @@
 - Collaboration protocol: **approved**
 - Current project phase: **Stage 2 authorized and in progress; Stage 1 formally accepted**
 - Stage 2: **AUTHORIZED — in progress; ST2-001 and ST2-002 owner-accepted**
-- Formal Stage 2 remaining work: **ST2-003 submitted; ChatGPT review status `CHANGES_REQUESTED`; correction round required before owner acceptance**
+- Formal Stage 2 remaining work: **ST2-003 correction round 1 complete (R1–R4 corrected); resubmitted `READY_FOR_REVIEW`; awaiting ChatGPT re-review**
 - Stage 3 / M1 gameplay implementation: **not authorized**
 - Stage 2 phase authorization does not by itself authorize a WorkBuddy task; an exact task approval is required. ST2-003 is now approved as one master task covering its listed sub-work packages. ST2-001 has been technically reviewed and formally owner-accepted on 2026-11-13. ST2-002 passed ChatGPT technical re-review and was formally owner-accepted on 2026-11-13. Stage 3 / M1 gameplay implementation remains unauthorized.
 
@@ -340,6 +340,22 @@ WorkBuddy must append a report under the matching task ID:
 - **Accepted disclosures:** software rendering is not represented as real GPU performance; synthetic touch is not physical mobile evidence; D-207/D-210/rendering direction remain owner-reserved; no Stage 3/M1 implementation was identified.
 - **Boundary:** corrections are within existing ST2-003 approval; no new start approval is required. No owner acceptance, Stage 2 closure, decision-gate resolution, or Stage 3/M1 authorization is implied.
 
+### ST2-003 Correction report — round 1 (2026-11-13)
+
+- **Execution status:** `READY_FOR_REVIEW` (resubmitted for ChatGPT re-review)
+- **Trigger:** `docs/ST2-003_TECHNICAL_REVIEW.md` — `CHANGES_REQUESTED` (findings R1–R4)
+- **Approval record checked:** Section 5 "Approval record — ST2-003" (`APPROVED_TO_START`, 2026-11-13). The review stated the corrections fall inside the existing approval, so no new start approval was requested.
+- **Work performed:**
+  1. **R1 (paths/ports):** replaced every `spikes/ST2-003-*` reference with `st2003/c-vfx|d-input|e-save|f-perf` across the device checklist, master plan §9, TECH_ARCHITECTURE, root README and `src/**` comments; checklist now has a complete clone → `npm ci` → build → preview sequence; preview ports fixed in each `package.json` with `--strictPort` (f-perf 4176, c-vfx 4173, d-input 4174, e-save 4175, skeleton 4170) and **verified by starting each server** (HTTP 200 + served title + server "Local:" line).
+  2. **R2 (listener lifecycle):** `bindActionButton()` retains element+handler pairs; `dispose()` removes `touchstart`/`mousedown`; `TouchAdapter` clears its hold-release timer on dispose. New regression suite `tests/input-regression.cjs` (run via `npm run test:input`, compiled with `tsconfig.test.json`, no new dependency).
+  3. **R3 (touchcancel vs suspension):** `route()` changes `suspended` only for `blur`/`focus`/`visibility`; `touchcancel` is input-release only; real `focus` resume path added to `KeyboardMouseAdapter`; joystick still released on cancel.
+  4. **R4 (D-207 failure path):** added L6 (fill to quota → temp write throws `QuotaExceededError` → `save_main` readback intact), L6b (interrupted-write recovery prefers valid `save_next`), L6c (falls back to `save_main` on corrupt temp). Chrome 157/macOS real GPU: 11/11 PASS. Firefox L6 **NOT VERIFIED** (not available locally; historical 8/8 evidence untouched and clearly labelled as the earlier suite).
+- **Commands run:** `npm ci`, `npm audit`, `npm run typecheck`, `npm run test:input`, `npm run build`, `npm run preview` + Chrome smoke; four spike `npm ci`/build/preview port checks; e-save suite in Chrome/macOS.
+- **Tests and actual results:** input regression **18/18 PASS**; e-save suite **11/11 PASS (Chrome/macOS)**; npm ci/audit **0 vulnerabilities**; typecheck clean; build ✓ 1.16 s; preview smoke HUD live, `projectiles live=1`, mock-save first-run, **0 pageerror** (one non-blocking favicon 404).
+- **Screenshots / logs / evidence:** `evidence/correction-2026-11-13/` (npmci, audit, typecheck, input-regression, build, preview-smoke, preview-ports + PNG), `st2003/e-save/evidence/results-chrome-macos.txt`, `st2003/e-save/evidence/shot-chrome-macos.png`.
+- **Known issues / deviations:** L6 failed twice before the final run due to test-design defects (tiny temp payload fit in headroom; filler stopped at first oversized chunk) — documented in `STAGE2_FINAL_REPORT.md` §11.6; Firefox/phone L6 not run; bundle chunk-size warning unchanged by design.
+- **Scope changes:** None. No Stage-3/M1 work; D-207 / D-210 / render direction remain OPEN; Stage 2 acceptance is still the owner's call.
+
 ### [TASK-ID] Execution report
 
 - **Execution status:** `IN_PROGRESS` / `READY_FOR_REVIEW` / `BLOCKED`
@@ -462,6 +478,8 @@ The following scope decisions remain binding:
 For detailed product decisions and requirements, consult the current authoritative project documents in `docs/`. If this collaboration log conflicts with an approved scope or decision record, stop and ask the owner rather than choosing one silently.
 
 ## 9. Change log
+- 2026-11-13 — **ST2-003 correction round 1 completed** (within the existing approval), addressing review findings R1–R4: paths/ports corrected and verified by starting every preview server; action-button listeners retained and removed on dispose (hold-release timer cancelled); `suspended` now changes only via blur/focus/visibility, `touchcancel` releases input only; D-207 failure path added (L6/L6b/L6c) with Chrome/macOS 11/11 PASS and honest `NOT VERIFIED` for Firefox. New regression suite `npm run test:input` (18/18). npm ci/audit 0 vulnerabilities, typecheck clean, build ✓, preview smoke 0 pageerror. Status `READY_FOR_REVIEW`; `docs/STAGE2_FINAL_REPORT.md` §11 has the full evidence map.
+- 2026-11-13 — ST2-003 technical review by ChatGPT: `CHANGES_REQUESTED` (R1 device-checklist paths, R2 `bindActionButton` listener leak, R3 `touchcancel` clearing suspension, R4 D-207 quota failure path unverified). Report: `docs/ST2-003_TECHNICAL_REVIEW.md`. Corrections fall within the existing ST2-003 approval.
 - 2026-11-13 — ST2-003 executed end-to-end within the single owner approval (`APPROVED_TO_START`, 2026-11-13): S2-C VFX spike (17 files, dispose/leak + pooling experiments), S2-D unified input (20 files, 11/11 desktop + 5/5 simulated-touch e2e), S2-E D-207 storage comparison (18 files, 8/8 PASS ×3 browser profiles, recommendation only), S2-F D-210 perf ladder (17 files, all budgets PROVISIONAL), owner device-test package (`docs/STAGE2_DEVICE_TEST_CHECKLIST.md`), S2-G formal skeleton (29 files at repo root + `docs/TECH_ARCHITECTURE.md`), and clean-directory integration regression (tarball at `cdac3162`: ci/audit/typecheck/build/preview smoke all green). All decision gates remain owner-reserved; no Stage 3/M1 work. Status `READY_FOR_REVIEW`; full report in `docs/STAGE2_FINAL_REPORT.md`.
 - 2026-11-13 — ST2-003 status updated to `READY_FOR_REVIEW` after completion of all sub-packages; awaiting ChatGPT technical review and owner acceptance. Device matrix remains `OWNER_DEVICE_TEST_REQUIRED` (not executed by WorkBuddy).
 - 2026-11-13 — Owner formally accepted ST2-002 after ChatGPT technical re-review (`OWNER_ACCEPTED`). Acceptance is limited to the corrected cartoon-rendering comparison Spike; no final rendering choice, further task, Stage 2 completion, or Stage 3/M1 authorization is implied.
