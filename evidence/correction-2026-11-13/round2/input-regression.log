@@ -1,0 +1,25 @@
+
+> riftbound-the-lost-realm@0.1.0 test:input
+> tsc -p tsconfig.test.json && node tests/prepare.cjs && node tests/input-regression.cjs
+
+PASS R2-1 mousedown on bound button produces one dash intent — intent consumed
+PASS R2-1b intent not duplicated — second poll returns false
+PASS R2-2 touchstart on bound button produces one dash intent — intent consumed
+PASS R2-3 normalAttack press emits held=true — held state true
+PASS R2-4 dispose cancels pending hold-release timer — held events delta=1 (expected 1 = the press only)
+PASS R2-5 disposed instance receives no button intents — consumeIntent=false
+PASS R2-6 disposed instance records no events — events=0
+PASS R2-7 re-attached instance gets exactly one intent — count=1
+PASS R2-8 re-attached instance consumes the intent — consumed
+PASS R3-1 blur sets suspended=true — suspended=true
+PASS R3-2 blur → touchcancel keeps suspended=true — touchcancel must not resume
+PASS R3-3 visibility resume clears suspension — suspended=false
+PASS R3-4 blur → focus clears suspension — suspended=false
+PASS R3-5 hidden sets suspended=true — suspended=true
+PASS R3-6 hidden → touchcancel keeps suspended=true — still suspended
+PASS R3-7 visibility recovery after touchcancel resumes — suspended=false
+PASS R3-8 touchcancel alone does not suspend — suspended stays false
+PASS R3-9 touchcancel still releases joystick movement — moved=(1.00,0.00) → released=(0,0)
+
+summary: 18 passed, 0 failed, 18 checks
+EXIT:0
