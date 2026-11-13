@@ -1,12 +1,14 @@
 # STAGE2_DEVICE_TEST_CHECKLIST — 真实设备验证执行包（一页式）
 
-> ST2-003 真实设备验证协作包｜2026-11-13｜执行人：项目负责人
-> WorkBuddy 沙箱无 GPU 且无手机/Mac 真机；本文档所有项目标记 **OWNER_DEVICE_TEST_REQUIRED**。
-> 负责人把回传结果发到协作流程后，WorkBuddy 整理证据，ChatGPT 独立复核。
+> ST2-003 真实设备验证协作包｜2026-11-13｜执行人：**项目负责人**
+> 本文档所有项目标记 **OWNER_DEVICE_TEST_REQUIRED**；负责人把回传结果发到协作流程后，WorkBuddy 整理证据，ChatGPT 独立复核。
+> 代理侧的自动化运行**不能**替代本文档任何一项：此前 Linux 沙箱无 GPU；修正轮 R4/R5 的浏览器证据虽是 **Mac mini 主机（Macmini9,1 / Apple M1）上的 headless Chrome，并已确认走 ANGLE/Metal**，但那是无人值守的自动化会话，不含交互窗口、屏幕输出、输入延迟和手感判断，不属于真机验证。
 >
 > **修正轮 R1（2026-11-13）**：所有目录路径已对齐仓库实际结构（`st2003/*`，不是 `spikes/ST2-003-*`），
-> 所有 preview 端口已写入各 `package.json`（`--strictPort`）并在本机实测 HTTP 200；
+> 所有 preview 端口已写入各 `package.json`（`--strictPort`）并逐个启动实测 HTTP 200；
 > 以下命令可直接复制执行。
+>
+> **修正轮 R5（2026-11-13）**：本文档 A 节的口径是「负责人在 Mac mini 上亲自执行」。代理侧的自动化 headless 运行即使跑在同一台机器上，也**不填写** A1–A10 的任何结果格。
 
 ## 通用准备（一次性）
 
