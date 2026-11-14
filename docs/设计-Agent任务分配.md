@@ -1,14 +1,15 @@
 # Riftbound: The Lost Realm — Codex Multi-Agent Execution Spec V1.0
 
-> 本文件与 docs/GAME_DESIGN_BIBLE_V1.md 配套使用。
-> 游戏设计规则以 Game Design Bible 为准；本文件只定义如何分工、实现、集成和验收。
+> 本文件与 docs/设计-设计总纲.md 配套使用（原 GAME_DESIGN_BIBLE_V1.md）。
+> 游戏设计规则以设计总纲为准；本文件只定义如何分工、实现、集成和验收。
 > 项目所有者已审核通过五项独有系统。系统结构视为 CONFIRMED；具体数值仍是 PROVISIONAL，必须可配置并经实测。
+> **2026-11-14 修订**：新增 NEW-01~04 任务与 05/06/07/04 拆分（见 docs/总纲-项目规划书V1.md 第四部分）；验收项按 docs/质量-QA验收基线.md §4 改写。
 
 ## 1. 开工前的强制步骤
 
 主控 Agent 在分配任何功能开发前必须：
 
-1. 阅读根目录 README、CODEX_GAME_BRIEF.md、本文件和 GAME_DESIGN_BIBLE_V1.md。
+1. 阅读根目录 README、总纲-游戏简报.md、本文件和 设计-设计总纲.md。
 2. 检查 git status、当前分支、最近提交、实际目录结构和现有测试。
 3. 运行项目现有的 typecheck、build、test 命令，记录真实输出。
 4. 读取与本任务相关的实际实现和已有 Spike/evidence。
