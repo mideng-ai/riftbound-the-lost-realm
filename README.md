@@ -1,5 +1,14 @@
 # Riftbound: The Lost Realm — Stage 2 Formal Skeleton (S2-G)
 
+> **Documentation map (2026-11-14 reorganization, Chinese names with category prefixes):**
+> - Master plan: `docs/总纲-项目规划书V1.md`
+> - Game brief: `总纲-游戏简报.md` · Design bible: `docs/设计-设计总纲.md`
+> - Agent tasks: `docs/设计-Agent任务分配.md` · Numeric baseline: `docs/设计-数值定案表.md`
+> - Narrative: `docs/叙事-世界观与文案.md` · Art bible: `docs/美术-美术圣经V0.1.md`
+> - Audio: `docs/音频-音效事件表.md` / `docs/音频-背景音乐.md`
+> - QA baseline: `docs/质量-QA验收基线.md` · Sprints: `docs/流程-冲刺排期.md`
+> - All legacy "search-fight-extract" era docs live in `docs/归档/` (**obsolete, reference only**).
+
 > **Status: READY_FOR_REVIEW (ST2-003)** — this is the formal Stage-2 engineering
 > skeleton produced by the S2-G work package. It is **NOT gameplay**. All
 > provisional values are clearly marked and remain subject to owner decisions
@@ -91,7 +100,7 @@ evidence/               build/audit/install logs, smoke screenshot, harness
 - **Not gameplay.** No combat logic, no enemies, no level content, no audio.
 - All budgets and tuning numbers are **provisional** pending owner decisions.
 - Real-device (Mac mini / phone) verification is tracked separately in
-  `docs/STAGE2_DEVICE_TEST_CHECKLIST.md` and has **not** been executed by the
+  `docs/归档/STAGE2_DEVICE_TEST_CHECKLIST.md` and has **not** been executed by the
   agent; those cells stay empty for the owner to fill.
 - Performance data from software-rendered CI browsers must **not** be
   extrapolated to real GPUs (S2-F conclusion).
