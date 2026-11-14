@@ -1,6 +1,6 @@
 # FIRST_RELEASE_TASK_BREAKDOWN — 首版功能任务树与依赖计划
 
-> **版本：** v2.4  
+> **版本：** v2.5  
 > **日期：** 2026-11-12  
 > **状态：** 阶段1规划工作稿；任务尚未获准执行  
 > **依据：** FIRST_RELEASE_MUST_HAVE_SPEC.md、STAGE1_EXECUTION_PLAN.md v2.2、STAGE1_REQUIREMENTS_TRACEABILITY.md、DECISIONS_LOG.md v4.7  
