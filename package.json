@@ -8,7 +8,9 @@
     "build": "tsc && vite build",
     "preview": "vite preview --port 4170 --strictPort",
     "typecheck": "tsc --noEmit",
-    "test:input": "tsc -p tsconfig.test.json && node tests/prepare.cjs && node tests/input-regression.cjs"
+    "test:domain": "tsc -p tsconfig.test.json && node tests/prepare.cjs && node --test tests/domain-contract.test.mjs",
+    "test:input": "tsc -p tsconfig.test.json && node tests/prepare.cjs && node tests/input-regression.cjs",
+    "test": "npm run test:domain && npm run test:input"
   },
   "dependencies": {
     "@babylonjs/core": "9.36.0"

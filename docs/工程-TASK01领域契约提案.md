@@ -37,8 +37,8 @@
                      │
                      └─▶ 第1层  config/  【纯数据叶子】
                           现有 gameConfig.ts + 本提案新增的数值配置文件
-                          ★ config 是叶子：不 import 任何 src 模块 ★
-                          （domain 只允许 `import type` 引用 config 的类型定义）
+                          ★ config 是叶子：不 import 任何 src 模块（含 domain）★
+                          （依赖方向单向：domain → config 可以 import 值，config → domain 反向禁止）
 ```
 
 **分层铁律（继承 ST2-G 规则并扩展）**：
@@ -46,7 +46,7 @@
 | # | 规则 | 说明 |
 |---|---|---|
 | L1 | 依赖箭头只能向下 | `tsc` + 构建保证无循环引用（ST2-G 已验证） |
-| L2 | `config/` 是叶子 | 数值配置文件互相也不 import（只允许共享一个 `config/common.ts` 常量） |
+| L2 | `config/` 是叶子 | 数值配置文件互相也不 import（只允许共享一个 `config/common.ts` 常量）。依赖方向单向：**domain 可以 `import` config 的值**（既有 `import type` 也有值导入，如 `import { damageConfig }`，domain 需要用它们组装强类型对象并把数值收敛到单一来源），**config 不得反向 `import` domain / 渲染 / 引擎**。判定方法：`grep -rn "from '\.\./\(domain\|render\|scenes\)" src/config/` 必须为空 |
 | L3 | `domain/` 禁止 Babylon / DOM | TASK-01 验收标准"契约不把 Babylon 场景对象暴露给领域逻辑"的实现手段；渲染层负责在 `Vec3 ↔ Vector3` 之间转换 |
 | L4 | 场景组装只发生在 `scenes/` | `main.ts` 只接线单例、启动循环（ST2-G 规则 2 不变） |
 | L5 | 跨模块通信只有两条路 | ① 读取 domain 的**状态快照**（轮询，每帧一次）；② 订阅 domain 的**离散事件**。禁止模块间直接持有对方引用 |
@@ -62,8 +62,8 @@
 ```ts
 // src/domain/types.ts
 /**
- * 领域基础原语。本文件是全项目最底层契约：不 import 任何 Babylon/DOM 模块，
- * 只允许 `import type` 引用 config 的类型（分层铁律 L2/L3）。
+ * 领域基础原语。本文件是全项目最底层契约：不 import 任何 Babylon/DOM 模块；
+ * 对 config 的依赖遵守 L2（依赖方向单向 domain → config；本文件实际不依赖 config）。
  */
 
 /** 实体唯一 ID：连续整数（非字符串），对象池友好，可直接作数组下标。 */
@@ -85,7 +85,7 @@ export interface Rng {
   range(min: number, max: number): number; // [min, max)
   int(minInclusive: number, maxExclusive: number): number;
   pick<T>(arr: readonly T[]): T;
-  /** 导出内部状态，便于 QA 复现平衡问题（总纲 §3.4） */
+  /** 导出内部状态，便于 QA 复现平衡问题（设计-设计总纲.md §3.4） */
   snapshot(): number;
 }
 export type RngFactory = (seed: number) => Rng;
@@ -126,7 +126,7 @@ export type CurrencyId =
   | 'forestCore';
 export type EliteAffixId = 'berserk' | 'split' | 'vampiric' | 'shielded' | 'summoner' | 'toxic';
 export type WorldEventId = 'lostChest' | 'elementalAltar' | 'monsterNest' | 'ancientAltar' | 'eliteInvasion';
-export type BossPhase = 'guardian' | 'corruption' | 'coreFrenzy';   // 100–65% / 65–30% / 30–0%（总纲 §7.3）
+export type BossPhase = 'guardian' | 'corruption' | 'coreFrenzy';   // 100–65% / 65–30% / 30–0%（设计-设计总纲.md §7.3）
 export type ElementId = 'fire' | 'ice' | 'lightning' | 'shadow';    // 元素触发（规划书 §2.1）
 
 /** 敌人 ID：4 普通 + 2 精英 + 1 Boss（D-104 已确认数量；数值来源规划书 §2.2） */
@@ -158,9 +158,21 @@ export type EntityKind = 'player' | 'enemyNormal' | 'enemyElite' | 'boss' | 'pro
 
 /** A 区输入。强化表语义按裁决 #1：表中数值即该级总值（如 Lv5 = +32%），非平加。 */
 export interface OutrunBaseLayerInput {
-  weaponUpgradePct: number; // staff/sword Lv1–5 → 0 / 0.08 / 0.16 / 0.24 / 0.32（总纲 §4.2）
-  masteryPct: number;       // 金币熟练 Lv0–10 → 每级 +2%（总纲 §6.4）
+  weaponUpgradePct: number; // staff/sword Lv1–5 → 0 / 0.08 / 0.16 / 0.24 / 0.32（设计-设计总纲.md §4.2）
+  masteryPct: number;       // 金币熟练 Lv0–10 → 每级 +2%，Lv.10 里程碑额外 +5% → Lv.10 = 25%
+                            //（设计-设计总纲.md §6.4 + D-08 裁定，见 D09-D08-R01 仲裁书 §2.2）
 }
+/**
+ * ⚠ 基准算例（D-09 裁定后唯一权威值，仲裁书 §4.1）：
+ *   A = 1 + 32%（强化 Lv5）+ 25%（熟练 Lv10）= 1.57
+ *   B = 1 + 0.06 × 2.4 × 2.0（力量传说×3）= 1.288
+ *   C = 1 + 12% + 18% + 20%（攻击卡I/II + 古老祭坛）= 1.50
+ *   单发 = 8 × 1.57 × 1.288 × 1.50 = 24.2659 ≈ 24.27/发
+ *   DPS  = 24.2659 ÷ 0.50 = 48.5318 ≈ 48.53
+ *   Boss 6000 HP ÷ (48.5318 × 0.7) = 176.6s ≈ 2.94 分（2–3 分带内）
+ * 旧值 22.4 / 44.8 来自「强化 Lv5 = 20%」的笔误，已按 D-09 作废。
+ * 熟练 Lv0–Lv10 完整曲线见仲裁书 §2.2（Lv9 = 18%，Lv10 = 25%，断层 +7%）。
+ */
 
 /**
  * B 区输入：按宝石种类各留一条槽位（7 种 GemId 固定）。
@@ -169,15 +181,15 @@ export interface OutrunBaseLayerInput {
  */
 export interface GemDamageEntry {
   gemId: 'power';              // V1.0 进伤害乘区的属性宝石只有力量
-  basePct: number;             // 普通品质基础值 0.06（总纲 §5.3）
-  qualityMult: number;         // 1.00/1.25/1.55/1.95/2.40（总纲 §5.4）
-  repeatMult: number;          // 1 颗 1.0 / 2 颗 1.5 / 3 颗 2.0（总纲 §5.5）
+  basePct: number;             // 普通品质基础值 0.06（设计-设计总纲.md §5.3）
+  qualityMult: number;         // 1.00/1.25/1.55/1.95/2.40（设计-设计总纲.md §5.4）
+  repeatMult: number;          // 1 颗 1.0 / 2 颗 1.5 / 3 颗 2.0（设计-设计总纲.md §5.5）
 }
 export interface GemDamageLayerInput { readonly entries: readonly GemDamageEntry[] }
 
 /** C 区输入：升级卡与事件 buff 的逐条加成，按类别分组以便施加类别上限。 */
 export type InRunBuffCategory =
-  | 'damage'        // C 区伤害类，类别上限 +100%（升级池 #5/#6/#9）
+  | 'damage'        // C 区伤害类，类别上限 +100%（升级池 #5/#6；与 domain/damage.ts InRunBuffCategory 注释一致，#9 破甲是独立类别 armorBreak，不属于伤害类）
   | 'interval'      // 攻速类（=间隔缩短），合计上限 −40%，升级卡 #2 与 #8 共享
   | 'moveSpeed'     // 疾风步 #11，上限 +40%
   | 'damageTaken'   // 石肤 #12，受伤减免上限 −40%
@@ -210,8 +222,19 @@ export function rebuildDamageLayers(
 
 /** 上限表：全部来自规划书/升级文档定案，数值在 config/damageConfig.ts */
 export interface DamageCaps {
-  inRunTotalPct: 1.5;       // C 区总上限 +150%（规划书 §2.1）
+  /**
+   * C 区总上限 +150%（规划书 §2.1）——保留，但**当前卡池不可达**（R-01 裁定）。
+   * C 区只计 damage 一类，其单类上限 +100% 使 C ≤ 2.00，永不可能触发总上限。
+   * 职责是约束"未来新增的、不属于 damage 的 C 区放大类别"与可重复事件 buff。
+   * ⚠ 数值待定：Q-NEW-4（总上限与单类上限顺序倒置）未裁定前保持 1.5。
+   */
+  inRunTotalPct: 1.5;
   inRunDamagePct: 1.0;      // C 区伤害类 +100%（升级池 #5）
+  /**
+   * ⚠ 破甲**不得**计入 C 区（R-01 裁定）：它由 `resolveDamageHit` 作为目标维度独立乘区结算，
+   * 重复计入会破甲双计 → Boss TTK 从 2.94 分塌到约 1.18 分。
+   * `C_ZONE_DERIVED_CATEGORIES` 必须保持 `['damage']`。
+   */
   intervalReductionPct: 0.4;// 间隔类合计 −40%，#2/#8 共享（升级池 #2/#8）
   procChanceAbs: 0.5;       // 触发概率总上限 50%（升级池 #4）
   armorBreakPct: 0.5;       // 破甲 +50%（升级池 #9）
@@ -287,7 +310,7 @@ export type EnemyBehavior =
       onDeathSplit: { count: 2; hp: 5; damage: 4 } }        // 滋养体：6m 光环 +20%，死亡分裂 2 幼体
   | { kind: 'eliteMelee' } | { kind: 'eliteCaster' };       // 精英行为，词缀叠加见下
 
-/** 精英词缀（六词缀，总纲 §8.1；数值 PROVISIONAL 进 config） */
+/** 精英词缀（六词缀，设计-设计总纲.md §8.1；数值 PROVISIONAL 进 config） */
 export interface EliteAffixDef { id: EliteAffixId; nameKey: string; params: EliteAffixParams }
 export type EliteAffixParams =
   | { kind: 'berserk';  moveSpeedPct: 0.25; attackSpeedPct: 0.20 }
@@ -296,7 +319,7 @@ export type EliteAffixParams =
   | { kind: 'shielded'; shieldPctOfMaxHp: 0.30 }
   | { kind: 'summoner'; intervalSec: 12; maxSummons: 3 }
   | { kind: 'toxic';    zoneSec: 3; dps: 4 };
-/** 禁止组合（总纲 §8.2）：护盾+吸血 / 召唤+分裂 / 狂暴+吸血 —— 数据驱动，TASK-05 查表过滤 */
+/** 禁止组合（设计-设计总纲.md §8.2）：护盾+吸血 / 召唤+分裂 / 狂暴+吸血 —— 数据驱动，TASK-05 查表过滤 */
 export const FORBIDDEN_AFFIX_PAIRS: readonly [EliteAffixId, EliteAffixId][] = [
   ['shielded', 'vampiric'], ['summoner', 'split'], ['berserk', 'vampiric'],
 ];
@@ -304,7 +327,7 @@ export const FORBIDDEN_AFFIX_PAIRS: readonly [EliteAffixId, EliteAffixId][] = [
 /** 精英词缀外加成（规划书 §2.2）：HP×4、伤害×1.5、体型×1.5、经验×5——基底见开放问题 Q2 */
 export interface EliteStatMultipliers { hp: 4; damage: 1.5; size: 1.5; xp: 5 }
 
-/** Boss（EN-B01 裂隙守望者，6000 HP 校验见规划书 §2.2；三阶段阈值总纲 §7.3） */
+/** Boss（EN-B01 裂隙守望者，6000 HP 校验见规划书 §2.2；三阶段阈值设计-设计总纲.md §7.3） */
 export interface BossDefinition {
   id: 'riftWarden'; baseHp: 6000; titleKey: string; nameKey: string; // 方案 A：主名 Rift Warden
   phases: readonly [
@@ -312,7 +335,7 @@ export interface BossDefinition {
     { phase: 'corruption'; hpFromPct: 0.65; hpToPct: 0.30 },
     { phase: 'coreFrenzy'; hpFromPct: 0.30; hpToPct: 0.00 },
   ];
-  /** 六种攻击（总纲 §7.4，伤害与时序 PROVISIONAL 进 config；预警判定须与碰撞一致） */
+  /** 六种攻击（设计-设计总纲.md §7.4，伤害与时序 PROVISIONAL 进 config；预警判定须与碰撞一致） */
   attacks: readonly BossAttackDef[];
   summonCap: number; // 森林召唤物有上限，不允许无限生成
 }
@@ -363,9 +386,9 @@ export interface WorldEventSchedule {
   intervalSec: 108;
   maxConcurrent: 1;
   noImmediateRepeat: true;
-  stopAfterSec: 510; // Boss 预警后停刷主要事件（总纲 §8.5 / 规划书 §2.5）
+  stopAfterSec: 510; // Boss 预警后停刷主要事件（设计-设计总纲.md §8.5 / 规划书 §2.5）
 }
-/** 事件定义（总纲 §8.4；巢穴 HP 1000、祭坛增益 90s 等数值进 config） */
+/** 事件定义（设计-设计总纲.md §8.4；巢穴 HP 1000、祭坛增益 90s 等数值进 config） */
 export interface WorldEventDef { id: WorldEventId; nameKey: string; params: WorldEventParams; timeoutSec: number }
 ```
 
@@ -398,13 +421,13 @@ export interface PlayerRuntime {
 export type RunPhase =
   | 'boot'          // 资源/存档加载
   | 'menu'          // 主菜单
-  | 'metaHub'       // 局外准备：宝石镶嵌/合成/强化/金币成长（总纲 §9）
+  | 'metaHub'       // 局外准备：宝石镶嵌/合成/强化/金币成长（设计-设计总纲.md §9）
   | 'runStarting'   // 选 seed、生成局面
   | 'running'       // 战斗中，唯一推进 RunClock 的状态
   | 'upgradePick'   // 升级三选一：时间冻结（升级文档 §1）+ 暂停语义
   | 'paused'        // 手动暂停 / 切后台（input SystemState.suspended 映射到这里）
   | 'victory'       // Boss 击败
-  | 'defeat';       // 生命归零 / 中途退出按失败结算（总纲 §6.5）
+  | 'defeat';       // 生命归零 / 中途退出按失败结算（设计-设计总纲.md §6.5）
 /** 合法迁移表（数据驱动，非法迁移在开发期 console.error） */
 export const RUN_PHASE_TRANSITIONS: Readonly<Record<RunPhase, readonly RunPhase[]>> = {
   boot: ['menu'], menu: ['metaHub', 'runStarting'], metaHub: ['menu', 'runStarting'],
@@ -525,7 +548,7 @@ export interface SaveDataV3 {
     gold: number; forestMaterial: number;
     elementalShards: Record<ElementId, number>; forestCore: number;
   };
-  metaProgress: { staffMastery: number; swordMastery: number; forestSurvival: number }; // 0–10，总纲 §6.4
+  metaProgress: { staffMastery: number; swordMastery: number; forestSurvival: number }; // 0–10，设计-设计总纲.md §6.4（Lv.10 里程碑 +5%，D-08）
   settings: { volumes: { sfx: number; music: number }; quality: string; colorblind: boolean; language: string };
   stats: { runsPlayed: number; bossKills: number; bestTimeSec: number | null };
 }
