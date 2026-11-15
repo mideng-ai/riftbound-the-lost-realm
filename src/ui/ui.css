@@ -1,0 +1,373 @@
+/* TASK-07 UI 样式表 — Riftbound DOM overlay 层
+   视觉 token 来源：docs/美术-美术圣经V0.5.md §1（米白 UI 底 / 炭黑绿描边 / 回响金）
+   §5 触控 ≥12mm（≈45px，TASK-07 验收 ≥44px）、§4.1 形状双通道
+   布局约束：不遮挡关键战斗信息；横屏优先，竖屏适配。 */
+
+:root {
+  --tap-min: 44px;
+  --rb-font: 'Trebuchet MS', 'Segoe UI', system-ui, sans-serif;
+  --rb-radius: 12px;
+  --rb-ink: #1e2a24;
+  --rb-base: #f5efe0;
+  --rb-gold: #f2a93b;
+  --rb-panel: rgba(30, 42, 36, 0.92);
+  --rb-border: rgba(245, 239, 224, 0.32);
+}
+
+.rb-ui-root {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  pointer-events: none;
+  font-family: var(--rb-font);
+  color: var(--rb-base);
+  user-select: none;
+  -webkit-user-select: none;
+  overflow: hidden;
+}
+
+.rb-ui-root button {
+  pointer-events: auto;
+  font-family: var(--rb-font);
+  color: var(--rb-base);
+  background: rgba(30, 42, 36, 0.92);
+  border: 2px solid var(--rb-border);
+  border-radius: var(--rb-radius);
+  cursor: pointer;
+  transition: transform 0.08s ease, filter 0.08s ease;
+}
+
+.rb-ui-root button:active { transform: scale(0.96); filter: brightness(1.2); }
+.rb-ui-root button:focus-visible { outline: 3px solid #4fc3e8; outline-offset: 2px; }
+.rb-ui-root button:disabled { opacity: 0.45; cursor: not-allowed; }
+.rb-hidden { display: none !important; }
+.rb-shape { display: inline-block; flex: none; }
+
+/* ── 战斗 HUD ── */
+.rb-hud { position: absolute; inset: 0; z-index: 10; pointer-events: none; }
+
+.rb-hud-left { position: absolute; top: 10px; left: 12px; display: flex; flex-direction: column; gap: 4px; }
+
+.rb-hp-box {
+  position: relative;
+  width: min(240px, 32vw);
+  height: 22px;
+  background: rgba(0, 0, 0, 0.55);
+  border: 2px solid var(--rb-border);
+  border-radius: 11px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+.rb-hp-bar { height: 100%; width: 100%; background: linear-gradient(90deg, #2e7d4f, #8fd14f); transition: width 0.12s linear; }
+.rb-hp-box[data-state='mid'] .rb-hp-bar { background: linear-gradient(90deg, #f2a93b, #ffe14d); }
+.rb-hp-box[data-state='low'] .rb-hp-bar { background: linear-gradient(90deg, #e0453a, #ff7a2f); animation: rb-pulse 0.8s infinite alternate; }
+
+@keyframes rb-pulse { from { filter: brightness(0.9); } to { filter: brightness(1.4); } }
+
+.rb-hp-text {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  text-shadow: 0 1px 2px #000;
+}
+
+.rb-xp-row { display: flex; align-items: center; gap: 8px; }
+.rb-level { font-size: 13px; font-weight: 800; text-shadow: 0 1px 3px #000; }
+.rb-xp-track { width: min(150px, 20vw); height: 8px; background: rgba(0, 0, 0, 0.55); border-radius: 4px; overflow: hidden; }
+.rb-xp-bar { height: 100%; width: 0; background: linear-gradient(90deg, #4fc3e8, #a8d8d0); transition: width 0.15s linear; }
+.rb-mastery { font-size: 10px; opacity: 0.85; letter-spacing: 0.5px; text-shadow: 0 1px 2px #000; }
+
+.rb-hud-center {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.rb-timer { font-size: 22px; font-weight: 900; letter-spacing: 1px; text-shadow: 0 2px 6px #000; font-variant-numeric: tabular-nums; }
+
+.rb-frozen-badge {
+  display: none;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  color: #4fc3e8;
+  background: rgba(30, 42, 36, 0.92);
+  border: 1px solid #4fc3e8;
+  border-radius: 999px;
+  padding: 3px 12px;
+}
+
+.rb-frozen-badge.rb-on { display: inline-block; animation: rb-pulse 0.9s infinite alternate; }
+
+.rb-hud-right { position: absolute; top: 10px; right: 12px; display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+
+.rb-currency-row { display: flex; gap: 5px; flex-wrap: wrap; justify-content: flex-end; max-width: 52vw; }
+
+.rb-currency-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--rb-panel);
+  border: 1px solid var(--rb-border);
+  border-radius: 999px;
+  padding: 4px 9px;
+  font-size: 12px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.rb-chip-badge { display: inline-flex; }
+.rb-last-pickup { font-size: 10px; opacity: 0.8; text-shadow: 0 1px 2px #000; }
+
+.rb-gem-btn { font-size: 13px; font-weight: 800; padding: 0 16px; letter-spacing: 0.5px; }
+
+.rb-weapons { position: absolute; left: 12px; bottom: 12px; display: flex; gap: 10px; pointer-events: auto; }
+.rb-weapon-card { position: relative; }
+
+.rb-weapon-btn { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; padding: 8px; }
+.rb-weapon-label, .rb-weapon-level { position: relative; z-index: 1; }
+.rb-weapon-label { font-size: 11px; font-weight: 800; }
+.rb-weapon-level { font-size: 10px; opacity: 0.9; }
+.rb-weapon-card.rb-active .rb-weapon-btn { border-color: var(--rb-gold); box-shadow: 0 0 12px rgba(242, 169, 59, 0.55); }
+
+.rb-weapon-cd {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: var(--rb-radius);
+  background: conic-gradient(rgba(0, 0, 0, 0.65) calc(var(--cd) * 360deg), transparent 0deg);
+  pointer-events: none;
+}
+
+/* ── Boss HUD ── */
+.rb-boss-hud {
+  position: absolute;
+  top: 52px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(560px, 72vw);
+  z-index: 12;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.rb-boss-bar-wrap { width: 100%; height: 16px; background: rgba(0, 0, 0, 0.6); border: 2px solid var(--rb-border); border-radius: 8px; overflow: hidden; }
+.rb-boss-bar { height: 100%; width: 100%; transition: width 0.1s linear, background 0.3s ease; }
+.rb-boss-meta { display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 12px; font-weight: 800; text-shadow: 0 1px 3px #000; }
+.rb-boss-phase-label { letter-spacing: 1px; text-transform: uppercase; }
+
+.rb-warn-banner {
+  display: none;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 18px;
+  background: var(--rb-panel);
+  border: 2px solid var(--rb-gold);
+  border-radius: var(--rb-radius);
+  font-weight: 800;
+  letter-spacing: 0.5px;
+}
+
+.rb-warn-banner.rb-on { display: flex; animation: rb-slide-in 0.25s ease; }
+@keyframes rb-slide-in { from { transform: translateY(-14px); opacity: 0; } to { transform: none; opacity: 1; } }
+.rb-warn-countdown { font-variant-numeric: tabular-nums; color: var(--rb-gold); }
+
+/* ── Toasts ── */
+.rb-toasts {
+  position: absolute;
+  top: 26%;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 15;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  pointer-events: none;
+}
+
+.rb-toast {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--rb-panel);
+  border: 1px solid var(--rb-border);
+  border-radius: var(--rb-radius);
+  padding: 8px 16px;
+  font-weight: 700;
+  animation: rb-slide-in 0.25s ease;
+}
+
+.rb-toast-elite { border-color: #8b5cf6; }
+.rb-toast-boss-phase { border-color: #e0453a; }
+.rb-toast-out { opacity: 0; transition: opacity 0.3s ease; }
+.rb-affix-row { display: flex; gap: 6px; }
+.rb-affix-chip { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; text-transform: uppercase; }
+.rb-toast-kicker { font-size: 10px; letter-spacing: 1px; opacity: 0.8; text-transform: uppercase; }
+.rb-toast-head { font-size: 13px; }
+
+/* ── 升级三选一 ── */
+.rb-upgrade-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  background: rgba(10, 14, 12, 0.72);
+  backdrop-filter: blur(3px);
+  pointer-events: auto;
+}
+
+.rb-upgrade-title { font-size: 24px; font-weight: 900; letter-spacing: 2px; text-shadow: 0 2px 8px #000; margin: 0; }
+.rb-upgrade-frozen { font-size: 13px; color: #4fc3e8; font-weight: 800; letter-spacing: 1.5px; margin: 0; }
+.rb-upgrade-cards { display: flex; gap: 16px; padding: 0 16px; flex-wrap: wrap; justify-content: center; }
+
+.rb-upgrade-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  width: min(200px, 44vw);
+  padding: 22px 14px;
+  background: linear-gradient(180deg, rgba(46, 125, 79, 0.95), rgba(30, 42, 36, 0.95));
+  border-width: 2px;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+}
+
+.rb-upgrade-card:hover { transform: translateY(-4px); border-color: var(--rb-gold); }
+.rb-card-scope { display: inline-flex; align-items: center; gap: 5px; font-size: 10px; font-weight: 800; letter-spacing: 1px; opacity: 0.95; }
+.rb-card-title { font-size: 18px; font-weight: 900; text-align: center; }
+.rb-card-desc { font-size: 13px; opacity: 0.9; text-align: center; line-height: 1.4; }
+.rb-card-tiers { color: var(--rb-gold); font-size: 12px; letter-spacing: 2px; font-variant-numeric: tabular-nums; }
+
+/* ── 宝石面板 ── */
+.rb-gem-panel {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 35;
+  width: min(420px, 92vw);
+  background: rgb(30, 42, 36);
+  border-left: 2px solid var(--rb-border);
+  pointer-events: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px;
+  overflow-y: auto;
+  animation: rb-panel-in 0.2s ease;
+}
+
+@keyframes rb-panel-in { from { transform: translateX(40px); opacity: 0; } to { transform: none; opacity: 1; } }
+.rb-gem-head { display: flex; align-items: center; justify-content: space-between; }
+.rb-gem-head h2 { font-size: 20px; letter-spacing: 2px; margin: 0; }
+.rb-gem-section h3 { font-size: 11px; letter-spacing: 1.5px; opacity: 0.75; margin: 4px 0; }
+.rb-sockets { display: flex; gap: 14px; flex-wrap: wrap; }
+.rb-socket-col { display: flex; flex-direction: column; gap: 6px; flex: 1; min-width: 140px; }
+.rb-socket-weapon { font-size: 12px; font-weight: 800; }
+
+.rb-socket {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: var(--tap-min);
+  padding: 6px 10px;
+  background: rgba(245, 239, 224, 0.08);
+  border: 2px dashed var(--rb-border);
+  border-radius: 10px;
+}
+
+.rb-socket.rb-filled { border-style: solid; }
+.rb-socket-empty-mark { font-size: 18px; opacity: 0.4; }
+.rb-socket-kind { font-weight: 800; font-size: 11px; }
+.rb-socket-q { font-size: 10px; opacity: 0.85; }
+.rb-unsocket { border-radius: 8px; font-size: 14px; padding: 0 10px; }
+.rb-inventory { display: flex; flex-wrap: wrap; gap: 8px; }
+.rb-empty { opacity: 0.6; }
+
+.rb-inv-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 10px;
+  color: var(--rb-ink);
+  font-weight: 800;
+}
+
+.rb-inv-chip.rb-selected { outline: 3px solid var(--rb-gold); outline-offset: 2px; }
+.rb-inv-chip.rb-legendary { box-shadow: inset 0 0 10px rgba(242, 169, 59, 0.8); color: var(--rb-base); }
+.rb-inv-kind { font-size: 11px; }
+
+.rb-gem-combine { margin-top: auto; display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 12px; background: rgba(245, 239, 224, 0.08); border-radius: var(--rb-radius); }
+.rb-combine-hint { font-size: 12px; opacity: 0.9; }
+.rb-combine-btn { padding: 0 20px; font-weight: 900; letter-spacing: 1px; }
+
+/* ── 结算页 ── */
+.rb-settlement {
+  position: absolute;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(8, 12, 10, 0.85);
+  pointer-events: auto;
+}
+
+.rb-settlement-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding: 30px 34px;
+  background: var(--rb-panel);
+  border: 2px solid var(--rb-border);
+  border-radius: 20px;
+  min-width: min(420px, 90vw);
+}
+
+.rb-st-win { color: #8fd14f; font-size: 26px; letter-spacing: 2px; margin: 0; }
+.rb-st-lose { color: #e0453a; font-size: 26px; letter-spacing: 2px; margin: 0; }
+.rb-st-sub { opacity: 0.8; margin: 0; letter-spacing: 1px; }
+.rb-st-table { border-collapse: collapse; font-variant-numeric: tabular-nums; }
+.rb-st-table th, .rb-st-table td { padding: 6px 18px; text-align: center; font-size: 14px; }
+.rb-st-table th { font-size: 11px; letter-spacing: 1px; opacity: 0.7; }
+.rb-st-table td:nth-child(2) { color: #8fd14f; font-weight: 800; }
+.rb-st-restart { font-size: 16px; font-weight: 900; letter-spacing: 2px; padding: 0 26px; }
+
+/* ── 横屏 / 竖屏适配 ── */
+@media (orientation: portrait) {
+  .rb-hud-left { top: 6px; left: 8px; }
+  .rb-hud-right { top: 6px; right: 8px; }
+  .rb-hud-center { top: 64px; }
+  .rb-timer { font-size: 18px; }
+  .rb-currency-row { max-width: 60vw; }
+  .rb-currency-chip { padding: 3px 7px; font-size: 11px; }
+  .rb-upgrade-cards { flex-direction: column; align-items: stretch; }
+  .rb-upgrade-card { width: auto; }
+  /* Boss 条下移：避免与计时器/阶段标签重叠 */
+  .rb-boss-hud { top: 112px; }
+}
+
+/* 高对比偏好（无障碍增强） */
+@media (prefers-contrast: more) {
+  .rb-ui-root { --rb-panel: rgba(0, 0, 0, 0.96); --rb-border: rgba(255, 255, 255, 0.7); }
+}

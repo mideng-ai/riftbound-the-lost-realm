@@ -19,12 +19,26 @@ import { ProjectileSystem } from '../vfx/Projectile';
 import type { SavePort } from '../save/SavePort';
 import { defaultSave } from '../save/SavePort';
 import { gameConfig } from '../config/gameConfig';
+import { createEventBus, createRunSnapshot } from '../domain/index.ts';
+import { UiRoot } from '../ui/UiRoot.ts';
+import type { UiDataSources } from '../ui/dataSources.ts';
+import type { UiCommandSink } from '../ui/commands.ts';
+import '../ui/ui.css';
 
 export interface BootstrapSceneDeps {
   engine: Engine;
   canvas: HTMLCanvasElement;
   input: InputSystem;
   save: SavePort;
+  /**
+   * TASK-07 UI 只读数据源（可选）。
+   * 未提供时：用契约工厂创建**骨架数据源**（空快照 + 独立 EventBus），
+   * UI 仍完整挂载可验收，但不代表真实玩法状态。
+   * 真实系统接线时必须提供 snapshot/bus 与各低频端口。
+   */
+  ui?: UiDataSources;
+  /** UI 命令出口（可选）。未提供时只记录命令，不改动任何领域状态。 */
+  onUiCommand?: UiCommandSink;
 }
 
 export interface BootstrapSceneResult {
@@ -32,13 +46,13 @@ export interface BootstrapSceneResult {
   cameraRig: CameraRig;
   toon: ToonMaterial;
   projectiles: ProjectileSystem;
+  ui: UiRoot;
   dispose(): void;
 }
 
 export function createBootstrapScene(deps: BootstrapSceneDeps): BootstrapSceneResult {
   const { engine, canvas, input, save } = deps;
-  const scene = new Scene(engine);
-  scene.clearColor = new Color4(0.043, 0.051, 0.071, 1);
+  const scene = new Scene(engine);  scene.clearColor = new Color4(0.043, 0.051, 0.071, 1);
 
   // camera (top-down-ish framing; gameplay never touches camera internals)
   const cameraRig = new CameraRig(scene, canvas);
@@ -69,9 +83,23 @@ export function createBootstrapScene(deps: BootstrapSceneDeps): BootstrapSceneRe
   // VFX (S2-C lightweight path, migrated)
   const projectiles = new ProjectileSystem(scene);
 
+  // ── TASK-07 UI 接线 ──
+  // 真实系统接线：宿主传 deps.ui（含 snapshot/bus 及低频只读端口）与 deps.onUiCommand。
+  // 骨架验收：未传时用契约工厂创建独立 bus + 空快照，UI 完整挂载但显示占位。
+  const demoBus = createEventBus();
+  const demoSnapshot = createRunSnapshot();
+  const uiSources: UiDataSources = deps.ui ?? { bus: demoBus, snapshot: () => demoSnapshot };
+  const ui = new UiRoot(document.body, {
+    ...uiSources,
+    // 领域总线是共享的：接线后只做逐层退订，不用 clearAll 清掉其它系统监听器。
+    clearAllOnDispose: deps.ui ? false : true,
+    onCommand: deps.onUiCommand ?? ((cmd) => console.debug('[ui] command (host not wired):', cmd.type)),
+  });
+
   // gameplay wiring demo: movement via unified input; intents pulse the player
   let dashPulse = 0;
   scene.onBeforeRenderObservable.add(() => {
+    ui.tick(); // 高频数值每帧读快照（UI 唯一更新通道）
     const dt = engine.getDeltaTime() / 1000;
     const mv = input.getMove();
     const speed = 4;
@@ -122,6 +150,10 @@ export function createBootstrapScene(deps: BootstrapSceneDeps): BootstrapSceneRe
     cameraRig,
     toon,
     projectiles,
-    dispose: () => scene.dispose(),
+    ui,
+    dispose: () => {
+      ui.dispose(); // 逐层退订 + clearAll 兜底（防监听器泄漏）
+      scene.dispose();
+    },
   };
 }
