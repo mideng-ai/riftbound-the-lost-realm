@@ -1,0 +1,84 @@
+(node:16352) ExperimentalWarning: Type Stripping is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+TAP version 13
+# (node:16358) ExperimentalWarning: Type Stripping is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# [EventBus] handler 抛错（事件 boss.phase_changed），已隔离以免中断其余监听: Error: isolated
+#     at file:///workspace/riftbound-the-lost-realm/tests/ui-contract.test.mjs:186:53
+#     at EventBus.publish (file:///workspace/riftbound-the-lost-realm/src/domain/events.ts:139:50)
+#     at TestContext.<anonymous> (file:///workspace/riftbound-the-lost-realm/tests/ui-contract.test.mjs:189:7)
+#     at Test.runInAsyncScope (node:async_hooks:211:14)
+#     at Test.run (node:internal/test_runner/test:931:25)
+#     at Test.processPendingSubtests (node:internal/test_runner/test:629:18)
+#     at Test.postRun (node:internal/test_runner/test:1042:19)
+#     at Test.run (node:internal/test_runner/test:970:12)
+#     at async Test.processPendingSubtests (node:internal/test_runner/test:629:7)
+# Subtest: AC-U01 formatTime / formatCount / formatPct 边界
+ok 1 - AC-U01 formatTime / formatCount / formatPct 边界
+  ---
+  duration_ms: 9.53591
+  ...
+# Subtest: AC-U02 六预警形状 / 六词缀形状互异
+ok 2 - AC-U02 六预警形状 / 六词缀形状互异
+  ---
+  duration_ms: 0.212016
+  ...
+# Subtest: AC-U03 Boss 三阶段 / 七宝石 / 五品质 / 七货币形状互异
+ok 3 - AC-U03 Boss 三阶段 / 七宝石 / 五品质 / 七货币形状互异
+  ---
+  duration_ms: 0.119458
+  ...
+# Subtest: AC-U04 文本端口：key 常量与解析器不伪造文案
+ok 4 - AC-U04 文本端口：key 常量与解析器不伪造文案
+  ---
+  duration_ms: 0.234395
+  ...
+# Subtest: AC-U05 快照 1:1 映射 + XP 需求取领域函数 xpToNextLevel
+ok 5 - AC-U05 快照 1:1 映射 + XP 需求取领域函数 xpToNextLevel
+  ---
+  duration_ms: 0.453021
+  ...
+# Subtest: AC-U06 改注入数值 → UI 跟随（验收：改 config 后 UI 跟着变）
+ok 6 - AC-U06 改注入数值 → UI 跟随（验收：改 config 后 UI 跟着变）
+  ---
+  duration_ms: 0.252435
+  ...
+# Subtest: AC-U07 低频端口注入 → 展示值来自宿主（UI 不推算）
+ok 7 - AC-U07 低频端口注入 → 展示值来自宿主（UI 不推算）
+  ---
+  duration_ms: 0.160817
+  ...
+# Subtest: AC-U08 Boss 阶段取快照 / 预警窗口与三点检查点
+ok 8 - AC-U08 Boss 阶段取快照 / 预警窗口与三点检查点
+  ---
+  duration_ms: 0.112258
+  ...
+# Subtest: AC-U09 终态隐藏 HUD / 升级选卡冻结标识
+ok 9 - AC-U09 终态隐藏 HUD / 升级选卡冻结标识
+  ---
+  duration_ms: 0.314564
+  ...
+# Subtest: AC-U10 subscribe 退订 / clearAll / 异常隔离
+ok 10 - AC-U10 subscribe 退订 / clearAll / 异常隔离
+  ---
+  duration_ms: 0.694557
+  ...
+# Subtest: AC-U11 src/domain/ 与 src/config/ 无本分支改动
+ok 11 - AC-U11 src/domain/ 与 src/config/ 无本分支改动
+  ---
+  duration_ms: 6.375833
+  ...
+# Subtest: AC-U12 UI 源码不写死时间轴 / XP 曲线 / 槽位数字面量
+ok 12 - AC-U12 UI 源码不写死时间轴 / XP 曲线 / 槽位数字面量
+  ---
+  duration_ms: 1.038709
+  ...
+1..12
+# tests 12
+# suites 0
+# pass 12
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 140.925117
