@@ -31,7 +31,7 @@ export const enemyConfig = {
       attackIntervalSec: 1.0,
       radiusM: 0.45, // 普通体型基准半径 — PROVISIONAL（无文档定义，按猎犬体型估）
       /** 击杀经验 10 —— PROVISIONAL（Q8 首版值，升级曲线 40×L^1.35 校准） */
-      xpValue: 10,
+      xpValue: 20, // Q-NEW-3 裁定（裁决书 §5.1）：AC-6 可达性 + 卡池利用率 2420XP→Lv8/7卡
       behavior: { kind: 'meleeChase' },
     },
 
@@ -45,7 +45,7 @@ export const enemyConfig = {
       moveSpeedMps: 2.0,
       attackIntervalSec: 2.0,
       radiusM: 0.5, // — PROVISIONAL
-      xpValue: 10, // — PROVISIONAL（Q8）
+      xpValue: 20, // Q-NEW-3 裁定（裁决书 §5.1）：AC-6 可达性 + 卡池利用率 2420XP→Lv8/7卡
       /** 8m 远程弹（规划书 §2.2「8m 远程弹」）— CONFIRMED */
       behavior: { kind: 'rangedKite', rangeM: 8 },
     },
@@ -60,7 +60,7 @@ export const enemyConfig = {
       moveSpeedMps: 3.5,
       attackIntervalSec: 1.2,
       radiusM: 0.45, // — PROVISIONAL
-      xpValue: 10, // — PROVISIONAL（Q8）
+      xpValue: 20, // Q-NEW-3 裁定（裁决书 §5.1）：AC-6 可达性 + 卡池利用率 2420XP→Lv8/7卡
       /** 8m 跃进，CD 4s（规划书 §2.2）— CONFIRMED */
       behavior: { kind: 'leapStrike', leapRangeM: 8, leapCdSec: 4 },
     },
@@ -70,12 +70,12 @@ export const enemyConfig = {
       codename: 'EN-N04',
       name: 'Rift Nourisher',
       nameKey: 'enemy.riftNourisher.name',
-      baseHp: 40,
+      baseHp: 28, // Q-NEW-3 裁定（§5.1）：40 时 P1 中位 P4 = 6发/2.76s 踩线；28→67.2HP→5发/2.30s 回带内
       baseDamage: 5,
       moveSpeedMps: 1.5,
       attackIntervalSec: 2.5,
       radiusM: 0.6, // — PROVISIONAL
-      xpValue: 10, // — PROVISIONAL（Q8）
+      xpValue: 20, // Q-NEW-3 裁定（裁决书 §5.1）：AC-6 可达性 + 卡池利用率 2420XP→Lv8/7卡
       /** 光环 6m / +20% 友军移速 / 死亡分裂 2 只 HP5 伤4（规划书 §2.2）— CONFIRMED */
       behavior: {
         kind: 'supportAura',
