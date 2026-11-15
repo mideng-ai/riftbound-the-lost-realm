@@ -9,7 +9,7 @@
  *     (not on a button) are ignored for gameplay purposes.
  *   - touchcancel (browser gesture/interruption) releases the joystick.
  */
-import type { InputEvent, InputListener } from './types';
+import type { InputEvent, InputListener, InstantAction } from './types';
 
 interface JoystickFinger {
   id: number;
@@ -116,8 +116,8 @@ export class TouchAdapter {
     this.emit({ kind: 'move', vec: { x, y }, source: 'touch' });
   }
 
-  /** called by DOM action buttons (right zone) */
-  buttonIntent(action: 'normalAttack' | 'skill1' | 'skill2' | 'dash') {
+  /** called by DOM action buttons (right zone); TASK-02: 现在也接受 weaponSwitch */
+  buttonIntent(action: InstantAction) {
     this.emit({ kind: 'intent', action, source: 'touch' });
     if (action === 'normalAttack') {
       // mobile normal attack is auto-triggered per design; button also acts as hold

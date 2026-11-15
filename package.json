@@ -10,7 +10,8 @@
     "typecheck": "tsc --noEmit",
     "test:domain": "tsc -p tsconfig.test.json && node tests/prepare.cjs && node --test tests/domain-contract.test.mjs",
     "test:input": "tsc -p tsconfig.test.json && node tests/prepare.cjs && node tests/input-regression.cjs",
-    "test": "npm run test:domain && npm run test:input"
+    "test:task02": "tsc -p tsconfig.test.json && node tests/prepare.cjs && node --test tests/task02-combat.test.mjs",
+    "test": "npm run test:domain && npm run test:input && npm run test:task02"
   },
   "dependencies": {
     "@babylonjs/core": "9.36.0"

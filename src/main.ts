@@ -61,13 +61,17 @@ if (gameConfig.debug.showPerfHud) {
 setInterval(() => {
   const mv = input.getMove();
   const st = input.getSystemState();
+  // TASK-02：HUD 改读真实战斗运行时快照，不再是 Stage-2 占位文案。
+  const v = boot.combat.debugView();
   hud.textContent = [
-    'Stage-2 skeleton (NOT gameplay): move + VFX lifecycle demo + mock save',
-    `move x=${mv.x.toFixed(2)} y=${mv.y.toFixed(2)}  suspended=${st.suspended}`,
-    `projectiles live=${boot.projectiles.liveCount}`,
-    `saveAdapter=${gameConfig.saveAdapter} (D-207 pending)`,
+    `TASK-02 combat | phase=${v.phase}  LV ${v.level}  XP ${v.xp.toFixed(0)}`,
+    `HP ${v.hp.toFixed(1)}/${v.maxHp.toFixed(1)}  weapon=${v.weapon}  enemies=${v.aliveEnemies}`,
+    `staff Lv${v.staffLevel} cd=${v.staffCd.toFixed(2)}s | sword Lv${v.swordLevel} cd=${v.swordCd.toFixed(2)}s`,
+    `layers A=${v.A.toFixed(3)} B=${v.B.toFixed(3)} C=${v.C.toFixed(3)}  proj=${v.projectileCount} arc=${v.arcAngleDeg.toFixed(0)}°`,
+    `move x=${mv.x.toFixed(2)} y=${mv.y.toFixed(2)}  suspended=${st.suspended}  VFX proj=${boot.projectiles.liveCount}`,
+    `saveAdapter=${gameConfig.saveAdapter} (D-207 pending)  [Tab]切换武器 [1/2/3]选卡`,
   ].join('\n');
 }, 300);
 
 window.addEventListener('resize', () => host.engine.resize());
-console.log('[s2g] formal skeleton started; render pipeline = PROVISIONAL toon (ST2-002 path B)');
+console.log('[s2g] TASK-02 combat runtime wired; render pipeline = PROVISIONAL toon (ST2-002 path B)');

@@ -9,8 +9,14 @@ export interface MoveVector {
   y: number;
 }
 
-/** Instantaneous (edge-triggered) action intents, consumed once per fire. */
-export type InstantAction = 'normalAttack' | 'skill1' | 'skill2' | 'dash';
+/**
+ * Instantaneous (edge-triggered) action intents, consumed once per fire.
+ *
+ * TASK-02 最小扩展：新增 'weaponSwitch'（双武器快速切换）。
+ * ⚠ 待 TA（测试与代码审查）审核：本动作只做边沿触发，不改变既有四个动作语义，
+ *   也不改 held / suspend 行为，18 条 input-regression 断言保持原样。
+ */
+export type InstantAction = 'normalAttack' | 'skill1' | 'skill2' | 'dash' | 'weaponSwitch';
 
 /** Actions that can be held (continuous state). */
 export type HeldAction = 'normalAttack';
