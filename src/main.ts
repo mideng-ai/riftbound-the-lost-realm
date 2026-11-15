@@ -1,17 +1,29 @@
 /**
  * Application entry point — wires EngineHost, input, save, bootstrap scene.
+ *
+ * 本轮「真实数据源接线」：
+ *  - 通过 CombatUiBridge 把 TASK-02 CombatRuntime 接成 TASK-07 UI 的唯一数据源
+ *    （snapshot = combat 运行时状态的 adapter；bus = combat.bus；onUiCommand → combat 命令）；
+ *  - 旧 #hud 降级为调试开关：默认隐藏，?debug=1 显示。旧 300ms 轮询逻辑**完整保留**，
+ *    便于后续对照 TASK-02 debugView 与 TASK-07 真 HUD 是否一致。
  */
 import { EngineHost } from './engine/EngineHost';
 import { InputSystem } from './input/InputSystem';
 import { MockSaveAdapter } from './save/MockSaveAdapter';
 import { PerfMonitor } from './debug/PerfMonitor';
 import { createBootstrapScene } from './scenes/BootstrapScene';
+import { CombatUiBridge } from './scenes/CombatUiBridge';
 import { gameConfig } from './config/gameConfig';
 
 const canvas = document.getElementById('renderCanvas') as HTMLCanvasElement;
 const hud = document.getElementById('hud')!;
 const joyBase = document.getElementById('joyBase')!;
 const joyKnob = document.getElementById('joyKnob')!;
+
+const params = new URLSearchParams(location.search);
+/** 旧 #hud 只在 ?debug=1 时显示；玩家默认只看 TASK-07 真 HUD。 */
+const showDebugHud = params.get('debug') === '1';
+if (showDebugHud) hud.style.display = 'block';
 
 const host = new EngineHost({ canvas });
 const input = new InputSystem();
@@ -38,14 +50,32 @@ input.attachTouch(document.body, {
 });
 input.bindActionButton('btnAtk', 'normalAttack');
 input.bindActionButton('btnDash', 'dash');
+// Q/E 当前没有技能实现：按钮在 index.html 默认隐藏，避免「点了没反应」的死键。
+// 绑定与键盘 intent 保留（隐藏元素上不会触发），待技能系统接入时再放开。
 input.bindActionButton('btnQ', 'skill1');
 input.bindActionButton('btnE', 'skill2');
 
 // D-207 gate: only the mock adapter exists until the owner decides.
 const save = new MockSaveAdapter();
 
-const boot = createBootstrapScene({ engine: host.engine, canvas, input, save });
+// ── 真实数据源接线 ─────────────────────────────────────────────
+// bridge 持有共享领域总线（同时注入 CombatRuntime 与 UiRoot），
+// 把 combat.snapshot 适配成 RunSnapshot（补齐 Boss 血条字段），
+// 并把 UI 命令转成下一帧的 CombatFrameInput（升级选卡 / 武器切换）。
+const bridge = new CombatUiBridge();
+const boot = createBootstrapScene({
+  engine: host.engine,
+  canvas,
+  input,
+  save,
+  ui: bridge.sources,
+  onUiCommand: bridge.onCommand,
+  uiBridge: bridge,
+});
 host.useScene(boot.scene);
+
+/** 只读取证端口：不参与玩法，仅供 Playwright / QA 读逻辑状态（避免只靠像素猜）。 */
+(window as unknown as { __rbProbe: () => unknown }).__rbProbe = () => boot.probe();
 
 // focus loss suspends inputs (gameplay should pause on this state)
 input.addListener((ev) => {
@@ -54,14 +84,15 @@ input.addListener((ev) => {
   }
 });
 
-if (gameConfig.debug.showPerfHud) {
+// PerfMonitor 是调试设施：默认关闭，避免调试文字盖住试玩画面；?perf=1 时打开。
+if (gameConfig.debug.showPerfHud && params.get('perf') === '1') {
   new PerfMonitor(host.engine, boot.scene, true);
 }
 
+// 旧调试 HUD 逻辑：不删、不改，默认由 CSS 隐藏；?debug=1 时用于对照。
 setInterval(() => {
   const mv = input.getMove();
   const st = input.getSystemState();
-  // TASK-02：HUD 改读真实战斗运行时快照，不再是 Stage-2 占位文案。
   const v = boot.combat.debugView();
   hud.textContent = [
     `TASK-02 combat | phase=${v.phase}  LV ${v.level}  XP ${v.xp.toFixed(0)}`,
@@ -74,4 +105,4 @@ setInterval(() => {
 }, 300);
 
 window.addEventListener('resize', () => host.engine.resize());
-console.log('[s2g] TASK-02 combat runtime wired; render pipeline = PROVISIONAL toon (ST2-002 path B)');
+console.log('[s2g] real UI data source wired: combat.snapshot + combat.bus + UI command sink');

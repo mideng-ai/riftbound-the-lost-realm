@@ -1,0 +1,67 @@
+
+===== PAGE A: 默认开局（不攻击，挨打至 defeat） =====
+A0 开局: {"phase":"running","elapsedSec":1.99,"hp":100,"aliveEnemies":3,"enemies":[{"id":1,"defId":"riftHound","x":-22.57663720184614,"z":-22.57663720184614},{"id":2,"defId":"riftHound","x":18.815492572874906,"z":8.165213758040046},{"id":3,"defId":"riftHound","x":8.165213758040046,"z":18.815492572874906}],"hudText":"100 / 100","oldHudDisplay":"none","qBtnDisplay":"none"}
+A1 4s 后怪位移: {"hpA0":100,"hpA1":100,"moved":[{"id":1,"from":{"x":-22.58,"z":-22.58,"distToPlayer":31.93},"to":{"x":-9.7,"z":-9.7,"distToPlayer":13.72},"delta":{"dx":12.88,"dz":12.88}},{"id":2,"from":{"x":18.82,"z":8.17,"distToPlayer":20.51},"to":{"x":2.43,"z":0.33,"distToPlayer":2.45},"delta":{"dx":-16.39,"dz":-7.83}},{"id":3,"from":{"x":8.17,"z":18.82,"distToPlayer":20.51},"to":{"x":1.54,"z":1.9,"distToPlayer":2.45},"delta":{"dx":-6.62,"dz":-16.91}}],"elapsedSec":6.33}
+A HP 下降: {"hp":84,"maxHp":100,"elapsedSec":6.9,"aliveEnemies":3}
+A defeat: {"phase":"defeat","hp":0,"elapsedSec":15.85,"settlement":{"visible":true,"title":"Settle defeat","sub":"Settle survived 0:15","restartBtn":"Settle new Run","hudHidden":true}}
+
+===== PAGE B: 主动攻击升级（3 张卡 + 选卡） =====
+B 升级弹窗: {"steps":18,"phase":"upgradePick","level":2,"xp":0,"choices":["timeSand","swiftStep","chargeHaste"],"hp":100,"elapsedSecAtOffer":5.42,"dom":{"visible":true,"cardCount":3,"cardTitles":["Time Sand","Swift Step","Charge Haste"],"cardScopes":["Scope generic","Scope generic","Scope staff"],"cardTiers":["0.15 / 0.22 / 0.3","0.1 / 0.15 / 0.2","0.08 / 0.14 / 0.2"],"frozenBadgeOn":true}}
+B 选卡后: {"phase":"running","level":2,"elapsedSecBefore":5.42,"elapsedSecAfter":5.72,"clockAdvancedSec":0.3,"dom":{"hidden":true,"frozenBadgeOn":false}}
+
+===== PAGE C: ?t=520 时间轴快进 / Boss 预警 =====
+C 预警: {"elapsedSec":522.51,"aliveEnemies":6,"dom":{"warnBannerOn":true,"warnText":"Warning 1","countdown":"1:17","timer":"8:42","bossBarHidden":true}}
+
+===== PAGE D: ?t=610 Boss 实体 / 血条 =====
+D Boss: {"elapsedSec":612.16,"bossHpPct":1,"dom":{"bossBarHidden":false,"bossHpText":"100%","bossPhaseLabel":"Boss phase guardian","timer":"10:12"}}
+
+===== PAGE E: ?debug=1 旧 HUD 调试开关 =====
+E debug: {"oldHudDisplay":"block","oldHudText":"TASK-02 combat | phase=running  LV 1  XP 0\nHP 100.0/100.0  weapon=staff  enemies=3\nstaff Lv1 cd=0.00s | sword Lv1 cd=0.0","newHudHp":"100 / 100"}
+
+===== CONSOLE / NETWORK ERRORS (0) =====
+(none)
+
+===== SCREENSHOTS =====
+/workspace/riftbound-the-lost-realm/evidence/playable/01_opening_wave.png :: 开局刷新多只怪（probe 计数 + 画面可见怪）+ 只有一套 TASK-07 HUD
+/workspace/riftbound-the-lost-realm/evidence/playable/02_enemies_moved.png :: 与 01 同视角不同时刻，怪朝玩家移动（坐标/距离对比）
+/workspace/riftbound-the-lost-realm/evidence/playable/03_hp_dropped.png :: 玩家被怪接触攻击后 HP 从 100 下降（真伤害结算）
+/workspace/riftbound-the-lost-realm/evidence/playable/04_defeat_settlement.png :: HP 归零 → phase=defeat → TASK-07 结算屏显示
+/workspace/riftbound-the-lost-realm/evidence/playable/05_upgrade_3cards.png :: 进 upgradePick 时 UpgradeOverlay 真实弹出 3 张 rollUpgradeChoices 卡
+/workspace/riftbound-the-lost-realm/evidence/playable/06_after_pick_clock_resumed.png :: 点卡片后弹窗关闭、phase 回 running、时钟恢复推进
+/workspace/riftbound-the-lost-realm/evidence/playable/07_boss_warning_t520.png :: ?t=520 快进到 8:40，显示 8:30 Boss 预警横幅 + 距登场倒计时
+/workspace/riftbound-the-lost-realm/evidence/playable/08_boss_bar_t610.png :: ?t=610 后 Boss 实体生成 + Boss 阶段血条（adapter 补齐 bossHpPct/bossPhase）
+/workspace/riftbound-the-lost-realm/evidence/playable/09_debug_hud_toggle.png :: ?debug=1 才显示旧 #hud（默认隐藏，见 01）；两套数值可对照
+
+===== PAGE F: 键盘 1/2/3 选卡补取证 =====
+{
+  "overlayVisibleBefore": true,
+  "cards": [
+    "Time Sand",
+    "Swift Step",
+    "Charge Haste"
+  ],
+  "before": {
+    "phase": "upgradePick",
+    "level": 2,
+    "elapsedSec": 4.91,
+    "choices": [
+      "timeSand",
+      "swiftStep",
+      "chargeHaste"
+    ]
+  },
+  "after": {
+    "phase": "running",
+    "level": 2,
+    "elapsedSec": 5.21
+  },
+  "clockAdvancedSec": 0.3,
+  "dom": {
+    "hidden": true,
+    "frozenBadgeOn": false
+  },
+  "errors": []
+}
+
+===== PAGE G: ?demo=1 演示桩分支检查 =====
+see 12_demo_mode.png

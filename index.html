@@ -3,12 +3,16 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>Riftbound: The Lost Realm — Stage 2 Skeleton</title>
+    <!-- 内联空图标：避免浏览器自动请求 /favicon.ico 产生 404（试玩控制台需零 404） -->
+    <link rel="icon" href="data:," />
+    <title>Riftbound: The Lost Realm — Playable Demo</title>
     <style>
       html, body { margin: 0; padding: 0; overflow: hidden; background: #0b0d12; }
       #renderCanvas { width: 100vw; height: 100vh; display: block; touch-action: none; outline: none; }
+      /* 旧 TASK-02 调试 HUD：默认隐藏，避免与 TASK-07 真 HUD（z50）叠出两套矛盾数值。
+         main.ts 在 ?debug=1 时把它改为 display:block，旧轮询逻辑完整保留供对照。 */
       #hud {
-        position: fixed; top: 8px; left: 8px; z-index: 10;
+        position: fixed; top: 8px; left: 8px; z-index: 10; display: none;
         font: 12px/1.5 monospace; color: #d8e6ff; background: rgba(5, 8, 16, 0.75);
         padding: 8px 10px; border-radius: 6px; white-space: pre; pointer-events: none;
       }
@@ -32,8 +36,10 @@
     <div id="actions">
       <button class="abtn" id="btnAtk">ATK</button>
       <button class="abtn" id="btnDash">DASH</button>
-      <button class="abtn" id="btnQ">SKILL-Q</button>
-      <button class="abtn" id="btnE">SKILL-E</button>
+      <!-- Q/E 当前无技能实现：隐藏按钮而不是留着点了没反应的死键。
+           输入绑定与 intent 消费仍在 main.ts / BootstrapScene 中保留，待技能系统接入再放开。 -->
+      <button class="abtn" id="btnQ" style="display:none">SKILL-Q</button>
+      <button class="abtn" id="btnE" style="display:none">SKILL-E</button>
     </div>
     <script type="module" src="/src/main.ts"></script>
   </body>
