@@ -13,14 +13,16 @@
  *  - CombatUiBridge：combat → UiDataSources 的 adapter（Boss 字段补齐 / 低频端口 / 命令队列）
  *  - 刷怪事件 → combat.registry 镜像目标 + Babylon Mesh；逻辑坐标 → Mesh
  *  - EnemyManager 的 damagePlayer 端口 → CombatRuntime.step(incomingDamage)
- *  - RunClock 边沿标记 → boss.warning_started / boss.spawned 事件
+ *  - RunClock 边沿标记 → BossAgent.syncFromClock 统一发 boss.warning_started / boss.spawned
+ *  - registry.applyDamage(Boss) → BossAgent.receiveHit（HP 权威在 agent，破甲只乘一次）
  *  - run.phaseChanged(终局) → run.settled 事件（SettlementScreen 的唯一入口）
  *  - ?t=<秒> 快进：复用 RunClock + RUN_TIMELINE（510s 预警 / 600s Boss）
  *
  * 【集成层演示桩 DEMO，明确待替换】
  *  - 开局预热一波：仍走 SpawnDirector 真规则，但把 spawnTimer 一次推过阈值，
  *    避免试玩等首波 30s（config 的 phase[0].spawnIntervalSec）
- *  - Boss 实体：只有 HP/血条/胜利链路，**静止靶子，AI 未接**（TASK-06 bossAgent 未桥接）
+ *  - Boss 实体：TASK-06 BossAgent 真 AI 已桥接（三阶段 / 六攻击 / 预警 / 召唤 / 胜利）；
+ *    ⚠ 但 Boss 站桩不移动、不预判走位 —— 攻击只在预警开始瞬间朝玩家锁定一次
  *  - 玩家碰撞半径：domain/config 未定义，取渲染球半径（仅用于 TASK-05 接触判定）
  *  - ?demo=1：静止木桩 + 纯视觉 autoFire VFX（默认关闭）
  *  - DEMO 分裂弹散布角：⚠ 实际影响逻辑命中角，config 未定义，见常量注释
@@ -70,6 +72,9 @@ import { UiRoot } from '../ui/UiRoot.ts';
 import type { UiDataSources } from '../ui/dataSources.ts';
 import type { UiCommandSink } from '../ui/commands.ts';
 import { CombatUiBridge } from './CombatUiBridge.ts';
+// ── TASK-06 Boss 真 AI 接线（适配层 + 预警渲染） ──
+import { BossCombatBridge, BOSS_BRIDGE_ENTITY_ID } from '../combat/BossCombatBridge.ts';
+import { BossTelegraphView } from './BossTelegraphView.ts';
 import '../ui/ui.css';
 
 export interface BootstrapSceneDeps {
@@ -115,6 +120,13 @@ export interface BootstrapSceneResult {
     player: { x: number; z: number };
     enemies: readonly { id: number; defId: EnemyId; x: number; z: number }[];
     bossHpPct: number | null;
+    /** TASK-06 取证：BossAgent 生命周期 / 阶段 / 当前预警攻击 / 权威 HP。 */
+    bossState: 'dormant' | 'active' | 'defeated';
+    bossPhase: string | null;
+    bossTelegraph: string | null;
+    bossHp: number;
+    /** 只读取证：Boss 累计对玩家造成的原始伤害（证明预警判定真的生效）。 */
+    bossDamageDealt: number;
     choices: readonly UpgradeId[];
   };
   dispose(): void;
@@ -139,8 +151,7 @@ const PLAYER_MESH_DIAMETER_M = 0.7;
 const INTEGRATION_PLAYER_RADIUS_M = PLAYER_MESH_DIAMETER_M / 2;
 /** 集成层：Boss 站位距离（米），非平衡数值。 */
 const BOSS_STANDOFF_M = 8;
-/** Boss 使用独立 id 段，避免与 EnemyManager 的 entityId 自增相撞。 */
-const BOSS_ENTITY_ID = 1_000_001 as EntityId;
+/** Boss 镜像目标 id 段复用适配层常量（避免与 EnemyManager 的 entityId 自增相撞）。 */
 
 /** 视觉配色（纯渲染，不是玩法数值）。 */
 function enemyColor(defId: EnemyId): Color3 {
@@ -165,6 +176,16 @@ export function createBootstrapScene(deps: BootstrapSceneDeps): BootstrapSceneRe
   const skipSec = Number.isFinite(rawSkip) && rawSkip > 0
     ? Math.min(rawSkip, waveTimelineConfig.timeline.maxRunSec)
     : 0;
+  /**
+   * ⚠ 测试用调试开关（仅验证胜利链路，默认游戏完全不触发）：
+   *  ?bossHP=<n>  → Boss 登场后把 HP 削到 n（仍走 receiveHit → resolveDamageHit）
+   *  ?killboss=1  → Boss 登场后直接击杀
+   */
+  const rawBossHp = Number(params.get('bossHP') ?? '');
+  const debugBossHp = params.has('bossHP') && Number.isFinite(rawBossHp)
+    ? Math.max(0, rawBossHp)
+    : null;
+  const debugKillBoss = params.get('killboss') === '1';
 
   const scene = new Scene(engine);
   scene.clearColor = new Color4(0.043, 0.051, 0.071, 1);
@@ -242,7 +263,7 @@ export function createBootstrapScene(deps: BootstrapSceneDeps): BootstrapSceneRe
   if (skipSec > 0) combat.progression.clock.advance(skipSec);
 
   let bossTargetRef: EnemyTarget | null = null;
-  deps.uiBridge?.attach(combat, () => bossTargetRef);
+  // attach 移到 BossAgent 构造之后（下方），血条数据源优先读 BossAgent 权威值。
 
   // ── TASK-05 组合根（真模块，非演示 AI） ─────────────────────────
   const manager = new EnemyManager({
@@ -279,6 +300,48 @@ export function createBootstrapScene(deps: BootstrapSceneDeps): BootstrapSceneRe
     return mesh;
   };
 
+  // ── TASK-06 BossAgent 接线（真 AI + 集成层适配） ────────────────
+  const bossSpawnPos: Vec3 = { x: 0, y: 0, z: -BOSS_STANDOFF_M };
+  const bossBridge = new BossCombatBridge({
+    combat,
+    bus: combat.bus,
+    rng: combat.rng,
+    spawnPos: bossSpawnPos,
+    summons: {
+      // 普通怪总数由 EnemyManager 权威计数；SummonDirector 在此之上执行
+      // min(summonCap, normalCap) 上限，森林召唤/猎犬补充都绝不无限生成。
+      normalCount: () => manager.normalCount,
+      spawnHound: (defId, at) => { manager.spawn(defId, { position: at }); },
+      spawnMinion: (defId, at) => { manager.spawn(defId, { position: at }); },
+    },
+  });
+
+  // UI 血条直接读 BossAgent 权威 HP / 阶段（不再读集成层伪造的固定血条）。
+  deps.uiBridge?.attach(combat, () => bossTargetRef, () => ({
+    hp: bossBridge.agent.hp,
+    maxHp: bossBridge.agent.maxHpValue,
+    phase: bossBridge.agent.phase,
+    active: bossBridge.agent.state === 'active',
+  }));
+
+  // 预警贴花：程序化几何，shape 与 pointInTelegraph 判定同源（美术圣经 §4.3 红线）。
+  const bossTelegraph = new BossTelegraphView(scene, () => ({
+    currentTelegraph: bossBridge.agent.currentTelegraph,
+    activeZones: bossBridge.agent.activeZones,
+  }));
+
+  // 玩家攻击命中 Boss：CombatResolver 已按 boss 档位结算一次（破甲含在内），
+  // 这里把 registry 的扣血转交 BossAgent.receiveHit —— HP 权威回到 agent，破甲不双计。
+  const applyDamageNormal = combat.registry.applyDamage.bind(combat.registry);
+  combat.registry.applyDamage = (entityId, dealt, _atSec) => {
+    if (entityId === BOSS_BRIDGE_ENTITY_ID && bossBridge.agent.state === 'active') {
+      bossBridge.applyResolvedDamage(dealt, combat.weapons.current);
+      // 击杀/奖励已由 BossAgent.defeat → VictorySettler 处理，不再广播 enemy.killed。
+      return null;
+    }
+    return applyDamageNormal(entityId, dealt, _atSec);
+  };
+
   // 刷怪事件 → combat.registry 镜像目标 + Mesh。
   // 用 registry.add（不广播）而不是 spawn，避免与 manager 的 enemy.spawned 形成事件回环。
   // 镜像目标的 entityId 与 AI 实体一致，HP/半径/经验由 makeEnemyTarget 从 config 派生。
@@ -308,47 +371,39 @@ export function createBootstrapScene(deps: BootstrapSceneDeps): BootstrapSceneRe
     if (p.to === 'defeat') publishSettlement(false);
     else if (p.to === 'victory') publishSettlement(true);
   });
-  const offBossKilled = combat.bus.subscribe('enemy.killed', (p) => {
-    if (p.defId !== 'riftWarden' || settled) return;
-    combat.bus.publish('boss.defeated', { atSec: combat.progression.clock.elapsedSec });
-    combat.progression.setPhase('victory');
-  });
+  // Boss 胜利链路由 BossAgent.defeat → VictorySettler 发 boss.defeated（一次性），
+  // BossCombatBridge 订阅它并把 run.phaseChanged 推到 'victory' → 上面的 offPhase 发结算屏。
 
   // ── 时间轴事件 + Boss 实体 ────────────────────────────────────
-  let warnedPublished = false;
-  let spawnedPublished = false;
+  // boss.warning_started / boss.spawned 由 BossAgent.syncFromClock 统一发（各一次），
+  // 集成层只监听 boss.spawned 建 registry 镜像目标 + Mesh，不再自己发第二遍。
   const spawnBoss = (): void => {
     if (bossTargetRef) return;
-    // ⚠ 集成层演示桩：Boss 目前是静止靶子，TASK-06 bossAgent 的攻击/阶段 AI 未桥接。
-    //    HP / 半径 / 经验 / 血线全部从 config 读，不硬编码。
-    const radiusM = enemyConfig.boss.radiusM;
-    const pos: Vec3 = { x: 0, y: 0, z: -BOSS_STANDOFF_M };
+    const agent = bossBridge.agent;
+    const radiusM = enemyConfig.boss.radiusM; // 半径仍从冻结 config 读
+    const pos = agent.position; // 逻辑位置权威在 BossAgent
     const target: EnemyTarget = {
-      entityId: BOSS_ENTITY_ID,
+      entityId: BOSS_BRIDGE_ENTITY_ID,
       defId: 'riftWarden',
       tier: 'boss',
       radiusM,
       xpValue: enemyConfig.boss.xpValue,
-      hp: enemyConfig.boss.baseHp,
-      maxHp: enemyConfig.boss.baseHp,
+      hp: agent.hp, // HP 权威在 BossAgent，镜像而非另造 6000
+      maxHp: agent.maxHpValue,
       position: { ...pos },
       alive: true,
     };
     combat.registry.add(target);
     bossTargetRef = target;
-    enemyMeshes.set(BOSS_ENTITY_ID, createEnemyMesh('riftWarden', pos, radiusM));
+    bossBridge.attachTarget(target);
+    enemyMeshes.set(BOSS_BRIDGE_ENTITY_ID, createEnemyMesh('riftWarden', pos, radiusM));
+    // ⚠ 测试用调试开关：只在显式查询参数下削血 / 击杀，正常游戏不触发。
+    if (debugKillBoss) bossBridge.debugSetHp(0);
+    else if (debugBossHp !== null) bossBridge.debugSetHp(debugBossHp);
   };
+  const offBossSpawned = combat.bus.subscribe('boss.spawned', () => spawnBoss());
   const syncTimeline = (): void => {
-    const clk = combat.progression.clock;
-    if (clk.bossWarningStarted && !warnedPublished) {
-      warnedPublished = true;
-      combat.bus.publish('boss.warning_started', { atSec: clk.elapsedSec });
-    }
-    if (clk.bossSpawned && !spawnedPublished) {
-      spawnedPublished = true;
-      combat.bus.publish('boss.spawned', { atSec: clk.elapsedSec });
-      spawnBoss();
-    }
+    bossBridge.syncClock();
   };
 
   // ── 旧 TASK-02 静止木桩（默认关闭，仅 ?demo=1 用于对照） ────────
@@ -445,6 +500,7 @@ export function createBootstrapScene(deps: BootstrapSceneDeps): BootstrapSceneRe
 
     const p = combat.player.runtime.transform.position;
     const running = combat.progression.phase === 'running';
+    let bossDamageThisFrame = 0;
 
     syncTimeline();
 
@@ -459,6 +515,10 @@ export function createBootstrapScene(deps: BootstrapSceneDeps): BootstrapSceneRe
       playerSnapshot.hp = combat.player.hp;
       playerSnapshot.maxHp = combat.player.maxHp;
       manager.tick(tickCtx, dt);
+      // 2.5) TASK-06 BossAgent 真 AI：三阶段 / 六攻击 / 预警 / 召唤 / 核心暴露。
+      //      Boss 对玩家的伤害仍并入唯一受击出口 combat.step（保留无敌帧与减伤）。
+      bossDamageThisFrame = bossBridge.step(dt);
+      pendingDamage += bossDamageThisFrame;
       // 3) 逻辑坐标同步：AI 位置 → registry 镜像目标（命中判定读的是 registry）
       for (const e of manager.aliveEnemies) {
         const t = combat.registry.get(e.entityId);
@@ -479,7 +539,13 @@ export function createBootstrapScene(deps: BootstrapSceneDeps): BootstrapSceneRe
       switchWeapon: switchKey || uiSwitch,
       selectCardId,
       incomingDamage: pendingDamage > 0 ? pendingDamage : undefined,
+      incomingSource: bossDamageThisFrame > 0 ? 'boss' : undefined,
     });
+
+    // 4.5) Boss HP 权威镜像 → registry（血条 UI 与命中几何都读这份镜像，不另造血量）
+    bossBridge.syncTarget();
+    // 4.6) 预警贴花：与 pointInTelegraph 判定同源的程序化几何（美术圣经 §4.3）
+    bossTelegraph.update();
 
     // 5) 击杀清理：registry 判定死亡的镜像目标 → Mesh 消失 + AI 实体回收。
     //    XP / 升级已由 CombatRuntime 在 step 内走完（真模块逻辑），此处不再补发。
@@ -489,7 +555,7 @@ export function createBootstrapScene(deps: BootstrapSceneDeps): BootstrapSceneRe
         mesh.dispose();
         enemyMeshes.delete(id);
         manager.despawn(id); // Boss id 不在 manager 内，despawn 会安全空转
-        if (id === BOSS_ENTITY_ID) bossTargetRef = null;
+        if (id === BOSS_BRIDGE_ENTITY_ID) bossTargetRef = null;
       }
     }
 
@@ -503,6 +569,13 @@ export function createBootstrapScene(deps: BootstrapSceneDeps): BootstrapSceneRe
         mesh.position.x = e.position.x;
         mesh.position.z = e.position.z;
       }
+    }
+    // Boss 逻辑位置同样由 BossAgent 权威驱动（当前实现站桩，但同步链路已接通）
+    const bossMesh = enemyMeshes.get(BOSS_BRIDGE_ENTITY_ID);
+    if (bossMesh) {
+      const bp = bossBridge.agent.position;
+      bossMesh.position.x = bp.x;
+      bossMesh.position.z = bp.z;
     }
 
     // 7) 冲刺 / 攻击材质反馈
@@ -560,15 +633,22 @@ export function createBootstrapScene(deps: BootstrapSceneDeps): BootstrapSceneRe
       bossHpPct: bossTargetRef && bossTargetRef.maxHp > 0
         ? bossTargetRef.hp / bossTargetRef.maxHp
         : null,
+      bossState: bossBridge.agent.state,
+      bossPhase: bossBridge.agent.state === 'dormant' ? null : bossBridge.agent.phase,
+      bossTelegraph: bossBridge.agent.currentTelegraph?.attack ?? null,
+      bossHp: bossBridge.agent.hp,
+      bossDamageDealt: bossBridge.playerDamageDealt,
       choices: combat.progression.choices.map((c) => c.id),
     }),
     dispose: () => {
       // 战斗 / 场景 / boss / UI 事件订阅逐层退订
       offSpawned();
       offPhase();
-      offBossKilled();
+      offBossSpawned();
       offOffered();
       offKilled?.();
+      bossBridge.dispose();
+      bossTelegraph.dispose();
       window.removeEventListener('keydown', onSelectKey);
       canvas.removeEventListener('pointermove', onPointerMove);
       ui.dispose();

@@ -23,6 +23,7 @@ import {
   bossPhaseAtHp,
 } from '../domain/index.ts';
 import type {
+  BossPhase,
   EventBusApi,
   RunSnapshot,
   UpgradeId,
@@ -33,6 +34,14 @@ import type { EnemyTarget } from '../combat/TargetRegistry.ts';
 import type { UiDataSources } from '../ui/dataSources.ts';
 import type { UiCommandSink } from '../ui/commands.ts';
 import { playerConfig } from '../config/playerConfig.ts';
+
+/** Boss 血条权威展示数据（直接来自 BossAgent 的只读 getter，不是集成层伪造的固定血条）。 */
+export interface BossHudSource {
+  readonly hp: number;
+  readonly maxHp: number;
+  readonly phase: BossPhase;
+  readonly active: boolean;
+}
 
 /** 冷却就绪比例：0 = 刚开火，1 = 就绪。间隔基准来自 config（宿主端口，UI 不推算）。 */
 function readyPct(cooldownSec: number, intervalSec: number): number {
@@ -48,6 +57,8 @@ export class CombatUiBridge {
   private readonly snap: RunSnapshot = createRunSnapshot();
   private combat: CombatRuntime | null = null;
   private bossProvider: () => EnemyTarget | null = () => null;
+  /** TASK-06 接线后优先读 BossAgent 权威值；未接线时为 null，退回 registry 镜像。 */
+  private bossAgentSource: (() => BossHudSource | null) | null = null;
 
   private pendingCard: UpgradeId | null = null;
   private pendingSwitchTo: WeaponId | null = null;
@@ -117,9 +128,14 @@ export class CombatUiBridge {
   };
 
   /** 由 BootstrapScene 在 CombatRuntime 创建后注入（combat 在场景内组合，宿主拿不到构造期引用）。 */
-  attach(combat: CombatRuntime, bossProvider: () => EnemyTarget | null): void {
+  attach(
+    combat: CombatRuntime,
+    bossProvider: () => EnemyTarget | null,
+    bossAgentSource?: () => BossHudSource | null,
+  ): void {
     this.combat = combat;
     this.bossProvider = bossProvider;
+    this.bossAgentSource = bossAgentSource ?? null;
   }
 
   /** 消费一帧的 UI 选卡意图。 */
@@ -142,15 +158,24 @@ export class CombatUiBridge {
     if (!c) return this.snap;
     // 1:1 复制 combat 的权威快照
     updateRunSnapshot(this.snap, c.snapshot);
-    // adapter 补齐：combat.refreshSnapshot 不维护 bossHpPct / bossPhase
-    const boss = this.bossProvider();
-    if (boss && boss.alive && boss.maxHp > 0) {
-      const pct = Math.max(0, Math.min(1, boss.hp / boss.maxHp));
+    // adapter 补齐：combat.refreshSnapshot 不维护 bossHpPct / bossPhase。
+    // TASK-06 接线后优先读 BossAgent 权威 HP/阶段（含换阶段事件同源）；
+    // 未接线时退回 registry 镜像（按血线反推阶段，保持旧行为兼容）。
+    const agent = this.bossAgentSource?.();
+    if (agent && agent.active && agent.maxHp > 0) {
+      const pct = Math.max(0, Math.min(1, agent.hp / agent.maxHp));
       this.snap.bossHpPct = pct;
-      this.snap.bossPhase = bossPhaseAtHp(pct);
+      this.snap.bossPhase = agent.phase;
     } else {
-      this.snap.bossHpPct = null;
-      this.snap.bossPhase = null;
+      const boss = this.bossProvider();
+      if (boss && boss.alive && boss.maxHp > 0) {
+        const pct = Math.max(0, Math.min(1, boss.hp / boss.maxHp));
+        this.snap.bossHpPct = pct;
+        this.snap.bossPhase = bossPhaseAtHp(pct);
+      } else {
+        this.snap.bossHpPct = null;
+        this.snap.bossPhase = null;
+      }
     }
     return this.snap;
   }
