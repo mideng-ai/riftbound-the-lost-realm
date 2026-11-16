@@ -39,6 +39,7 @@ const {
   EconomySystem,
   InMemoryEconomyStore,
   SavePortV3Bridge,
+  V3_STASH_KEY,
   rollLoot,
   metaGrowthCostOfLevel,
   metaGrowthTotalInvestment,
@@ -525,7 +526,7 @@ test('AC-8c | boot 全链路：V2 存档经系统加载后 gold 保留并可继�
   assert.equal(sys.gold, 500 - metaGrowthCostOfLevel(1));
 });
 
-test('AC-8d | SavePortV3Bridge：V3 经 V2 抽象存取、V2 原样交 migrateSave（不决定后端）', async () => {
+test('AC-8d | SavePortV3Bridge：V3 直传、历史 stash 套壳兼容、纯 V2 交 migrateSave', async () => {
   const port = {
     data: null,
     async load() { return this.data; },
@@ -538,7 +539,18 @@ test('AC-8d | SavePortV3Bridge：V3 经 V2 抽象存取、V2 原样交 migrateSa
   const loaded = await bridge.load();
   assert.equal(loaded.schemaVersion, 3);
   assert.equal(loaded.currencies.gold, 321);
-  assert.equal(port.data.schemaVersion, 2, '外壳仍是 V2 形状');
+  assert.equal(port.data.schemaVersion, 3, 'ADR-TD-009：SavePort 直接承载 V3，不再套 V2 外壳');
+
+  // 历史 Mock 阶段套壳档仍可读，不因接口升级丢档
+  port.data = {
+    schemaVersion: 2, savedAt: '2026-01-01T00:00:00.000Z',
+    profile: { gold: 0, unlocks: [] }, inventory: [],
+    stash: [{ [V3_STASH_KEY]: v3 }],
+    settings: { sfx: true, music: true },
+  };
+  const legacy = await bridge.load();
+  assert.equal(legacy.schemaVersion, 3);
+  assert.equal(legacy.currencies.gold, 321);
 
   port.data = {
     schemaVersion: 2, savedAt: '2026-01-01T00:00:00.000Z',

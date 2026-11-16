@@ -66,12 +66,20 @@ export class EconomySystem {
   private dropSeq = 0;
   private runSeq = 0;
   private bossDefeatedThisRun = false;
+  /** DEF-006：本局 Boss 掉落是否已直接入账（每局一次，beginRun 重置） */
+  private bossDropsCredited = false;
 
   constructor(store: EconomyStore, bus: EventBusApi, rng: Rng) {
     this.store = store;
     this.bus = bus;
     this.rng = rng;
     this.ledger = new RunLedger(bus);
+    // DEF-006：EconomySystem 在场景层构造最早（BootstrapScene.ts econ 实例早于
+    // BossCombatBridge），故本订阅先于「boss.defeated→setPhase('victory')→settleRun 快照」
+    // 注册。EventBus 按插入顺序同步分发，保证 Boss 掉落入账发生在结算快照之前。
+    // 注意：真实胜利链由 BossAgent/VictorySettler 在 combat.bus 上发 boss.defeated；
+    // 本系统经 economyBus.subscribe 透传注册到同一条 combat.bus，顺序由构造先后保证。
+    this.bus.subscribe('boss.defeated', () => this.creditBossDrops());
   }
 
   // ── 启动 ────────────────────────────────────────────────
@@ -109,6 +117,7 @@ export class EconomySystem {
     this.ledger = new RunLedger(this.bus);
     this.dropSeq = 0;
     this.bossDefeatedThisRun = false;
+    this.bossDropsCredited = false;
     this.runSeq += 1;
   }
 
@@ -147,16 +156,48 @@ export class EconomySystem {
     return true;
   }
 
+  /**
+   * DEF-006：Boss 击杀掉落直接入账（每局一次）。
+   *
+   * 由构造时的 boss.defeated 订阅触发，且订阅顺序早于「bossBridge → setPhase('victory')
+   * → settleRun 快照」。因此 Boss 掉落在结算快照之前就已计入本局账本。
+   *
+   * 为何直接入账而非铺地面：Boss 死亡发生在战斗结算帧，玩家无机会走到 z=-8 拾取
+   * （拾取半径 2.1m）；沿用地面拾取只会让奖励永久丢弃。Boss 奖励改为即时结算入账是
+   * 可接受的语义偏离，已在回报中诚实标注。普通击杀的地面拾取链完全不受影响。
+   *
+   * 防重：bossDropsCredited 保证本局只入账一次；ledger.pickup 内部 pickedIds 再兜底；
+   * 摇取仍走冻结 config 的 boss 档掉落表（数值零硬编码）。不入 registry（避免结算
+   * discarded 报告把它当「地面未拾取」重复列出），不单独发 resource.dropped。
+   */
+  private creditBossDrops(): void {
+    if (this.bossDropsCredited) return;
+    this.bossDropsCredited = true;
+    const { drops } = rollLoot(
+      { tier: 'boss', defId: 'riftWarden' },
+      this.rng,
+      { nextDropId: () => this.nextDropId(), nextInstanceId: () => this.nextInstanceId() },
+    );
+    for (const drop of drops) this.ledger.pickup(drop);
+  }
+
   // ── 结算 ────────────────────────────────────────────────
 
   /**
    * 结束一局（victory / defeat 同规则保留已拾取资源）。
    * 森林核心只由 Boss 胜利奖励（总纲 §6.5），失败结算不给 core、不加 bossKills。
+   *
+   * Boss 击败进度取「入参 bossDefeated ∪ 内部 onBossDefeated 标志」：
+   * 入参是主表达（调用方显式声明本局结果），内部标志保留给既有调用点与测试，
+   * 二者任一为真即 credited，credited 本身是布尔量，故一局最多记 1 次 bossKills。
+   *
+   * 落盘失败（配额 / 存储异常）不向外抛：adapter 已保证主档完好，
+   * 这里吞掉异常、以 persisted:false 回报，避免 unhandled rejection 与「假成功」。
    */
   async settleRun(input: SettleRunInput): Promise<SettlementReport> {
     const credited = this.ledger.buildRunLoot();
     const discarded = this.registry.discardedSummary;
-    const bossCredited = input.victory && this.bossDefeatedThisRun;
+    const bossCredited = input.victory && (input.bossDefeated === true || this.bossDefeatedThisRun);
     const forestCoreCredited = bossCredited ? enemyConfig.bossReward.forestCore : 0;
     const bossKillsCredited = bossCredited ? 1 : 0;
 
@@ -192,9 +233,17 @@ export class EconomySystem {
       },
     };
 
-    const committed = await this.commit(next);
+    let committed = false;
+    try {
+      committed = await this.commit(next);
+    } catch (err) {
+      // DEF-002：真 localStorage 配额写失败时 adapter 已保住主档；此处只登记失败，
+      // 不 rethrow（调用方用 void 调用，rethrow 会变成 unhandled rejection）。
+      console.error('[economy] settleRun 落盘失败（存储配额/写入错误），本局结算未入账：', err);
+    }
     const report: SettlementReport = {
       victory: input.victory,
+      persisted: committed,
       credited,
       discarded,
       forestCoreCredited: committed ? forestCoreCredited : 0,

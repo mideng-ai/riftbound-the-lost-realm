@@ -1,0 +1,2766 @@
+===== D-207 DEF-006 四门禁证据 =====
+日期: 2026-11-16T13:13:18Z
+分支: main
+
+===== GATE: 1) npx tsc --noEmit =====
+$ npx tsc --noEmit
+
+EXIT_CODE=0
+
+===== GATE: 2) npm run test:save =====
+$ npm run test:save
+
+> riftbound-the-lost-realm@0.1.0 test:save
+> node --experimental-strip-types --no-warnings --test tests/save-backend.test.mjs
+
+TAP version 13
+# Subtest: A1 首次加载返回默认档（schemaVersion=3，全字段为初始状态）
+ok 1 - A1 首次加载返回默认档（schemaVersion=3，全字段为初始状态）
+  ---
+  duration_ms: 3.161433
+  ...
+# Subtest: A2 写入后重载：gold/gem/weapon/meta/stats/settings 全字段一致
+ok 2 - A2 写入后重载：gold/gem/weapon/meta/stats/settings 全字段一致
+  ---
+  duration_ms: 1.634503
+  ...
+# Subtest: B1 v2 旧档迁移：profile.gold → currencies.gold，且不覆盖原档
+ok 3 - B1 v2 旧档迁移：profile.gold → currencies.gold，且不覆盖原档
+  ---
+  duration_ms: 0.496063
+  ...
+# Subtest: B2 v3 直通：不经过迁移，字段原样返回
+ok 4 - B2 v3 直通：不经过迁移，字段原样返回
+  ---
+  duration_ms: 0.668852
+  ...
+# Subtest: C1 损坏 JSON：隔离备份 + 默认档 + 不抛错 + 原档不被覆盖
+ok 5 - C1 损坏 JSON：隔离备份 + 默认档 + 不抛错 + 原档不被覆盖
+  ---
+  duration_ms: 0.732051
+  ...
+# Subtest: C2 结构畸形 v3（非 JSON 语法错误）：同样隔离并回默认档
+ok 6 - C2 结构畸形 v3（非 JSON 语法错误）：同样隔离并回默认档
+  ---
+  duration_ms: 0.43418
+  ...
+# Subtest: D1 save_next 有效：优先恢复并提交主档、清理临时键
+ok 7 - D1 save_next 有效：优先恢复并提交主档、清理临时键
+  ---
+  duration_ms: 0.641806
+  ...
+# Subtest: D2 save_next 损坏：回退 save_main，坏临时键被隔离且主档不动
+ok 8 - D2 save_next 损坏：回退 save_main，坏临时键被隔离且主档不动
+  ---
+  duration_ms: 0.54509
+  ...
+# Subtest: D3 正常写入路径：save_next 写完即校验、覆盖主档后清理
+ok 9 - D3 正常写入路径：save_next 写完即校验、覆盖主档后清理
+  ---
+  duration_ms: 0.936205
+  ...
+# Subtest: E1 配额写失败（QuotaExceededError）：主档完好、无临时键残留
+ok 10 - E1 配额写失败（QuotaExceededError）：主档完好、无临时键残留
+  ---
+  duration_ms: 1.442891
+  ...
+# Subtest: E2 validateSaveV3 拒绝畸形档：不落盘、不产生临时键
+ok 11 - E2 validateSaveV3 拒绝畸形档：不落盘、不产生临时键
+  ---
+  duration_ms: 0.696931
+  ...
+# Subtest: F1 SavePort v3 接口：load/save 走 V3，loadSync 可选，mock 与真后端同签名
+ok 12 - F1 SavePort v3 接口：load/save 走 V3，loadSync 可选，mock 与真后端同签名
+  ---
+  duration_ms: 0.730494
+  ...
+# Subtest: F2 EconomySystem + localStorage 真后端：结算落盘，重载后统计一致
+ok 13 - F2 EconomySystem + localStorage 真后端：结算落盘，重载后统计一致
+  ---
+  duration_ms: 2.222438
+  ...
+# Subtest: G1 击杀→掉落→拾取→结算落盘端到端：结算屏 4 类货币与宝石非零，重载一致
+ok 14 - G1 击杀→掉落→拾取→结算落盘端到端：结算屏 4 类货币与宝石非零，重载一致
+  ---
+  duration_ms: 1.943334
+  ...
+# Subtest: G2 重复拾取只入账一次（dropId 唯一锚点 + picked 防重入）
+ok 15 - G2 重复拾取只入账一次（dropId 唯一锚点 + picked 防重入）
+  ---
+  duration_ms: 1.559084
+  ...
+# Subtest: G3 bossDefeated 入参生效：无需 onBossDefeated 绕过，且 victory/false 不重复入账
+ok 16 - G3 bossDefeated 入参生效：无需 onBossDefeated 绕过，且 victory/false 不重复入账
+  ---
+  duration_ms: 1.049088
+  ...
+# Subtest: G4 settleRun 配额写失败：不 reject、不 unhandled、主档完好且有 console.error 留痕
+ok 17 - G4 settleRun 配额写失败：不 reject、不 unhandled、主档完好且有 console.error 留痕
+  ---
+  duration_ms: 0.821082
+  ...
+# Subtest: H1 事件顺序：boss.defeated 的 Boss 掉落入账先于结算快照（回归 DEF-006）
+ok 18 - H1 事件顺序：boss.defeated 的 Boss 掉落入账先于结算快照（回归 DEF-006）
+  ---
+  duration_ms: 0.750489
+  ...
+# Subtest: H2 Boss 掉落进本局结算与存档：四类货币非零，重载一致
+ok 19 - H2 Boss 掉落进本局结算与存档：四类货币非零，重载一致
+  ---
+  duration_ms: 0.744437
+  ...
+# Subtest: H3 防重：多次 boss.defeated 只入账一次 Boss 掉落
+ok 20 - H3 防重：多次 boss.defeated 只入账一次 Boss 掉落
+  ---
+  duration_ms: 0.455933
+  ...
+1..20
+# tests 20
+# suites 0
+# pass 20
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 315.255061
+EXIT_CODE=0
+
+===== GATE: 3) npm test (全量13套件) =====
+$ npm test
+
+> riftbound-the-lost-realm@0.1.0 test
+> npm run test:domain && npm run test:input && npm run test:task02 && npm run test:gems && npm run test:economy && npm run test:task05 && npm run test:boss && npm run test:boss-integration && npm run test:qa && npm run test:ui && npm run test:text && npm run test:audio && npm run test:save
+
+
+> riftbound-the-lost-realm@0.1.0 test:domain
+> tsc -p tsconfig.test.json && node tests/prepare.cjs && node --test tests/domain-contract.test.mjs
+
+TAP version 13
+# [domain/save] 无法识别的存档版本 999，已回退为默认存档
+# [EventBus] handler 抛错（事件 boss.defeated），已隔离以免中断其余监听: Error: boom
+#     at file:///workspace/riftbound-the-lost-realm/tests/domain-contract.test.mjs:473:13
+#     at EventBus.publish (/workspace/riftbound-the-lost-realm/.testbuild/domain/events.js:31:17)
+#     at file:///workspace/riftbound-the-lost-realm/tests/domain-contract.test.mjs:476:35
+#     at getActual (node:assert:805:5)
+#     at Function.doesNotThrow (node:assert:971:32)
+#     at TestContext.<anonymous> (file:///workspace/riftbound-the-lost-realm/tests/domain-contract.test.mjs:476:12)
+#     at Test.runInAsyncScope (node:async_hooks:211:14)
+#     at Test.run (node:internal/test_runner/test:931:25)
+#     at Suite.processPendingSubtests (node:internal/test_runner/test:629:18)
+#     at Test.postRun (node:internal/test_runner/test:1042:19)
+# Subtest: AC-1 基准算例：三层乘区锚点 24.2659 / DPS 48.53
+    # Subtest: A×B×C 与配置表自洽，单发 = 24.2659
+    ok 1 - A×B×C 与配置表自洽，单发 = 24.2659
+      ---
+      duration_ms: 1.428454
+      ...
+    # Subtest: 法杖 DPS = 48.53（单发 ÷ 0.5s 间隔）
+    ok 2 - 法杖 DPS = 48.53（单发 ÷ 0.5s 间隔）
+      ---
+      duration_ms: 0.225616
+      ...
+    1..2
+ok 1 - AC-1 基准算例：三层乘区锚点 24.2659 / DPS 48.53
+  ---
+  duration_ms: 3.889726
+  type: 'suite'
+  ...
+# Subtest: AC-2 强化表等差性：相邻差恒为 0.08
+    # Subtest: weaponUpgradePctByLevel 逐级差 = 0.08
+    ok 1 - weaponUpgradePctByLevel 逐级差 = 0.08
+      ---
+      duration_ms: 0.288099
+      ...
+    1..1
+ok 2 - AC-2 强化表等差性：相邻差恒为 0.08
+  ---
+  duration_ms: 0.449797
+  type: 'suite'
+  ...
+# Subtest: AC-3 熟练 Lv10 = 25%
+    # Subtest: masteryPctOfLevel(10) === 0.25（含里程碑 +5%）
+    ok 1 - masteryPctOfLevel(10) === 0.25（含里程碑 +5%）
+      ---
+      duration_ms: 0.238483
+      ...
+    1..1
+ok 3 - AC-3 熟练 Lv10 = 25%
+  ---
+  duration_ms: 0.367588
+  type: 'suite'
+  ...
+# Subtest: AC-4 熟练 Lv9 / Lv10 断层
+    # Subtest: Lv9 = 0.18，Lv10 = 0.25，差 0.07
+    ok 1 - Lv9 = 0.18，Lv10 = 0.25，差 0.07
+      ---
+      duration_ms: 0.344668
+      ...
+    1..1
+ok 4 - AC-4 熟练 Lv9 / Lv10 断层
+  ---
+  duration_ms: 0.66211
+  type: 'suite'
+  ...
+# Subtest: AC-5 A 区满配 = 1.57
+    # Subtest: 1 + 0.32 + 0.25 = 1.57
+    ok 1 - 1 + 0.32 + 0.25 = 1.57
+      ---
+      duration_ms: 0.315951
+      ...
+    1..1
+ok 5 - AC-5 A 区满配 = 1.57
+  ---
+  duration_ms: 0.582147
+  type: 'suite'
+  ...
+# Subtest: AC-6 Boss TTK（×0.7 口径）落在 2–3 分钟
+    # Subtest: 6000 / (48.5318 × 0.7) ≈ 176.6s
+    ok 1 - 6000 / (48.5318 × 0.7) ≈ 176.6s
+      ---
+      duration_ms: 0.343718
+      ...
+    1..1
+ok 6 - AC-6 Boss TTK（×0.7 口径）落在 2–3 分钟
+  ---
+  duration_ms: 0.445186
+  type: 'suite'
+  ...
+# Subtest: AC-7 破甲不被双计
+    # Subtest: Boss 满破甲：单发 = A×B×C × 1.5（不是 ×1.5×1.5）
+    ok 1 - Boss 满破甲：单发 = A×B×C × 1.5（不是 ×1.5×1.5）
+      ---
+      duration_ms: 0.371787
+      ...
+    # Subtest: 普通怪不吃破甲
+    ok 2 - 普通怪不吃破甲
+      ---
+      duration_ms: 0.22138
+      ...
+    1..2
+ok 7 - AC-7 破甲不被双计
+  ---
+  duration_ms: 0.885029
+  type: 'suite'
+  ...
+# Subtest: AC-8 C_ZONE_DERIVED_CATEGORIES === ["damage"]
+    # Subtest: 常量仍是单元素 damage，armorBreak 未被加入
+    ok 1 - 常量仍是单元素 damage，armorBreak 未被加入
+      ---
+      duration_ms: 0.896286
+      ...
+    1..1
+ok 8 - AC-8 C_ZONE_DERIVED_CATEGORIES === ["damage"]
+  ---
+  duration_ms: 0.991524
+  type: 'suite'
+  ...
+# Subtest: AC-9 totalOverflowPct 恒为 0（总上限不可达被固化）
+    # Subtest: 合法与超限输入下 totalOverflowPct 恒 = 0
+    ok 1 - 合法与超限输入下 totalOverflowPct 恒 = 0
+      ---
+      duration_ms: 0.64928
+      ...
+    # Subtest: damage 单类上限 +100% 真实生效（超限部分进 damageOverflowPct）
+    ok 2 - damage 单类上限 +100% 真实生效（超限部分进 damageOverflowPct）
+      ---
+      duration_ms: 0.185846
+      ...
+    1..2
+ok 9 - AC-9 totalOverflowPct 恒为 0（总上限不可达被固化）
+  ---
+  duration_ms: 0.970901
+  type: 'suite'
+  ...
+# Subtest: AC-10 强化 Lv5 = 32%（规划书算例 / 总纲表 / playerConfig 三处一致）
+    # Subtest: weaponUpgradePctByLevel[4] === 0.32
+    ok 1 - weaponUpgradePctByLevel[4] === 0.32
+      ---
+      duration_ms: 0.19492
+      ...
+    1..1
+ok 10 - AC-10 强化 Lv5 = 32%（规划书算例 / 总纲表 / playerConfig 三处一致）
+  ---
+  duration_ms: 0.345023
+  type: 'suite'
+  ...
+# Subtest: Boss 阶段：8 个血线点（100/70/65/50/30/29/10/0%）
+    # Subtest: 边界语义：65% 归 corruption、30% 归 coreFrenzy（右开）
+    ok 1 - 边界语义：65% 归 corruption、30% 归 coreFrenzy（右开）
+      ---
+      duration_ms: 0.399839
+      ...
+    1..1
+ok 11 - Boss 阶段：8 个血线点（100/70/65/50/30/29/10/0%）
+  ---
+  duration_ms: 0.480728
+  type: 'suite'
+  ...
+# Subtest: 精英窗口 [360, 509]
+    # Subtest: eliteAllowedAt 六个边界点
+    ok 1 - eliteAllowedAt 六个边界点
+      ---
+      duration_ms: 0.318232
+      ...
+    1..1
+ok 12 - 精英窗口 [360, 509]
+  ---
+  duration_ms: 0.389331
+  type: 'suite'
+  ...
+# Subtest: 穿透不污染吸血（lifesteal = 0）
+    # Subtest: pierce 类 buff 进快照后 lifestealPctMaxHp 仍为 0
+    ok 1 - pierce 类 buff 进快照后 lifestealPctMaxHp 仍为 0
+      ---
+      duration_ms: 0.387166
+      ...
+    # Subtest: 吸血只认 vampiricBlade 白名单
+    ok 2 - 吸血只认 vampiricBlade 白名单
+      ---
+      duration_ms: 0.206822
+      ...
+    1..2
+ok 13 - 穿透不污染吸血（lifesteal = 0）
+  ---
+  duration_ms: 0.724438
+  type: 'suite'
+  ...
+# Subtest: 选卡：恒 3 张 / 不重复 / scope 过滤 / 满级过滤
+    # Subtest: 空 buff + staff：恒 3 张、无重复、全部为 staff 或 generic
+    ok 1 - 空 buff + staff：恒 3 张、无重复、全部为 staff 或 generic
+      ---
+      duration_ms: 0.993394
+      ...
+    # Subtest: sword 局不出现 staff 专属卡
+    ok 2 - sword 局不出现 staff 专属卡
+      ---
+      duration_ms: 0.333201
+      ...
+    # Subtest: 满级卡（heavyShot ×3）被过滤
+    ok 3 - 满级卡（heavyShot ×3）被过滤
+      ---
+      duration_ms: 0.288334
+      ...
+    # Subtest: 同 seed 选卡序列可复现
+    ok 4 - 同 seed 选卡序列可复现
+      ---
+      duration_ms: 0.315908
+      ...
+    1..4
+ok 14 - 选卡：恒 3 张 / 不重复 / scope 过滤 / 满级过滤
+  ---
+  duration_ms: 2.223506
+  type: 'suite'
+  ...
+# Subtest: Rng：同 seed 一致、不同 seed 不同
+    # Subtest: createMulberry32 确定性
+    ok 1 - createMulberry32 确定性
+      ---
+      duration_ms: 0.311657
+      ...
+    # Subtest: snapshot / restore 可复现中间状态
+    ok 2 - snapshot / restore 可复现中间状态
+      ---
+      duration_ms: 0.184336
+      ...
+    1..2
+ok 15 - Rng：同 seed 一致、不同 seed 不同
+  ---
+  duration_ms: 0.670226
+  type: 'suite'
+  ...
+# Subtest: 存档：v3 schema / socket = itemInstanceId / v2→v3 迁移
+    # Subtest: SAVE_SCHEMA_VERSION === 3，默认存档自洽
+    ok 1 - SAVE_SCHEMA_VERSION === 3，默认存档自洽
+      ---
+      duration_ms: 1.182224
+      ...
+    # Subtest: socket 存 itemInstanceId，引用完整则校验通过
+    ok 2 - socket 存 itemInstanceId，引用完整则校验通过
+      ---
+      duration_ms: 0.261216
+      ...
+    # Subtest: 悬空 socket ID 被校验拦截（Q6 的直接后果）
+    ok 3 - 悬空 socket ID 被校验拦截（Q6 的直接后果）
+      ---
+      duration_ms: 0.461311
+      ...
+    # Subtest: v2→v3 迁移：只迁移 gold，音量重置为默认 1
+    ok 4 - v2→v3 迁移：只迁移 gold，音量重置为默认 1
+      ---
+      duration_ms: 0.333465
+      ...
+    # Subtest: migrateSave：v2 直通 / null 兜底 / 未知版本回退默认
+    ok 5 - migrateSave：v2 直通 / null 兜底 / 未知版本回退默认
+      ---
+      duration_ms: 1.123008
+      ...
+    1..5
+ok 16 - 存档：v3 schema / socket = itemInstanceId / v2→v3 迁移
+  ---
+  duration_ms: 3.711682
+  type: 'suite'
+  ...
+# Subtest: RunClock：freeze 不累计、resume 恢复
+    # Subtest: 冻结期间 advance 无效，resume 后继续累计
+    ok 1 - 冻结期间 advance 无效，resume 后继续累计
+      ---
+      duration_ms: 0.407858
+      ...
+    # Subtest: reset 清零并解除冻结；Boss 阈值边沿标记 510/600
+    ok 2 - reset 清零并解除冻结；Boss 阈值边沿标记 510/600
+      ---
+      duration_ms: 0.205974
+      ...
+    1..2
+ok 17 - RunClock：freeze 不累计、resume 恢复
+  ---
+  duration_ms: 0.802987
+  type: 'suite'
+  ...
+# Subtest: EventBus：退订 / clearAll / 异常隔离
+    # Subtest: 退订后不再收到事件（幂等退订）
+    ok 1 - 退订后不再收到事件（幂等退订）
+      ---
+      duration_ms: 0.462069
+      ...
+    # Subtest: clearAll 清空全部监听器
+    ok 2 - clearAll 清空全部监听器
+      ---
+      duration_ms: 0.199617
+      ...
+    # Subtest: 单个 handler 抛错不中断其余监听
+    ok 3 - 单个 handler 抛错不中断其余监听
+      ---
+      duration_ms: 0.955341
+      ...
+    1..3
+ok 18 - EventBus：退订 / clearAll / 异常隔离
+  ---
+  duration_ms: 1.8726
+  type: 'suite'
+  ...
+# Subtest: 森林生存 Lv10 = 15%（不是 14%）
+    # Subtest: Lv9 = 9%，Lv10 = 10% + 5% 里程碑 = 15%
+    ok 1 - Lv9 = 9%，Lv10 = 10% + 5% 里程碑 = 15%
+      ---
+      duration_ms: 0.307898
+      ...
+    1..1
+ok 19 - 森林生存 Lv10 = 15%（不是 14%）
+  ---
+  duration_ms: 0.448243
+  type: 'suite'
+  ...
+# Subtest: C_ZONE_DERIVED_CATEGORIES 仍为 ["damage"]（AC-8 的固化副本）
+    # Subtest: 与 ADR-TD-007 一致：armorBreak 不在 C 区总量表内
+    ok 1 - 与 ADR-TD-007 一致：armorBreak 不在 C 区总量表内
+      ---
+      duration_ms: 0.252879
+      ...
+    1..1
+ok 20 - C_ZONE_DERIVED_CATEGORIES 仍为 ["damage"]（AC-8 的固化副本）
+  ---
+  duration_ms: 0.381181
+  type: 'suite'
+  ...
+# Subtest: caps 单一来源与 XP 曲线
+    # Subtest: damageConfig.caps 与 DAMAGE_CAPS_CONST / upgradePoolConfig.caps 三处同源
+    ok 1 - damageConfig.caps 与 DAMAGE_CAPS_CONST / upgradePoolConfig.caps 三处同源
+      ---
+      duration_ms: 0.271709
+      ...
+    # Subtest: 选卡数量契约 choicesPerLevel = 3；15 张卡齐全
+    ok 2 - 选卡数量契约 choicesPerLevel = 3；15 张卡齐全
+      ---
+      duration_ms: 0.157487
+      ...
+    # Subtest: XP 曲线按公式 round(40 × L^1.35)
+    ok 3 - XP 曲线按公式 round(40 × L^1.35)
+      ---
+      duration_ms: 0.222372
+      ...
+    1..3
+ok 21 - caps 单一来源与 XP 曲线
+  ---
+  duration_ms: 0.877079
+  type: 'suite'
+  ...
+# Subtest: AC-Q1 P1 面板 / 阶段 1 / 猎犬：2 发、1.00s
+    # Subtest: 单发 11.4862、发数 2、TTK 1.00s ± 0.01
+    ok 1 - 单发 11.4862、发数 2、TTK 1.00s ± 0.01
+      ---
+      duration_ms: 0.569049
+      ...
+    1..1
+ok 22 - AC-Q1 P1 面板 / 阶段 1 / 猎犬：2 发、1.00s
+  ---
+  duration_ms: 0.71437
+  type: 'suite'
+  ...
+# Subtest: AC-Q2 P1 面板 6 阶段 × 4 怪 15 格：发数逐格写死 ∈ [2,5]
+    # Subtest: 15 格全部 assertEquals 到 §3.4 中位矩阵，且落在 [2,5]
+    ok 1 - 15 格全部 assertEquals 到 §3.4 中位矩阵，且落在 [2,5]
+      ---
+      duration_ms: 0.695762
+      ...
+    1..1
+ok 23 - AC-Q2 P1 面板 6 阶段 × 4 怪 15 格：发数逐格写死 ∈ [2,5]
+  ---
+  duration_ms: 0.831266
+  type: 'suite'
+  ...
+# Subtest: AC-Q3 P2 面板 15 格：发数 ∈ [2,3]
+    # Subtest: 满配不发一击必杀（≥2），且不超过 3 发
+    ok 1 - 满配不发一击必杀（≥2），且不超过 3 发
+      ---
+      duration_ms: 1.715711
+      ...
+    1..1
+ok 24 - AC-Q3 P2 面板 15 格：发数 ∈ [2,3]
+  ---
+  duration_ms: 1.856443
+  type: 'suite'
+  ...
+# Subtest: AC-Q4 P0 面板（C 恒 1.00）阶段 1–3：发数 ≤ 6，其中阶段 1–2 的 3 格 ≤ 4
+    # Subtest: 新档前 7:30 必须活得下去（阶段 1–3 共 6 格）
+    ok 1 - 新档前 7:30 必须活得下去（阶段 1–3 共 6 格）
+      ---
+      duration_ms: 0.346993
+      ...
+    1..1
+ok 25 - AC-Q4 P0 面板（C 恒 1.00）阶段 1–3：发数 ≤ 6，其中阶段 1–2 的 3 格 ≤ 4
+  ---
+  duration_ms: 0.430127
+  type: 'suite'
+  ...
+# Subtest: AC-Q5（反向断言）P0 面板阶段 4–5 共 8 格：发数 = 表列值
+    # Subtest: 影跃者 8 发 / 滋养体 9 发 / 猎犬 6 发 / 投射者 5 发
+    ok 1 - 影跃者 8 发 / 滋养体 9 发 / 猎犬 6 发 / 投射者 5 发
+      ---
+      duration_ms: 0.193732
+      ...
+    1..1
+ok 26 - AC-Q5（反向断言）P0 面板阶段 4–5 共 8 格：发数 = 表列值
+  ---
+  duration_ms: 0.262746
+  type: 'suite'
+  ...
+# Subtest: AC-Q6 P1 猎犬连续 TTK 漂移 P4 ÷ P1 = 1.556
+    # Subtest: 漂移 1.556 ± 0.02，∈ [1.2, 1.6]
+    ok 1 - 漂移 1.556 ± 0.02，∈ [1.2, 1.6]
+      ---
+      duration_ms: 0.229197
+      ...
+    1..1
+ok 27 - AC-Q6 P1 猎犬连续 TTK 漂移 P4 ÷ P1 = 1.556
+  ---
+  duration_ms: 0.297028
+  type: 'suite'
+  ...
+# Subtest: AC-Q6s P1 全阶段漂移快照：1.00 / 1.30 / 1.66 / 1.55 / 1.21 / 1.21，最大 ≤ 2.0
+    # Subtest: DPS 倍率 = (C_阶段 ÷ C_1) × (intMul_1 ÷ intMul_阶段)
+    ok 1 - DPS 倍率 = (C_阶段 ÷ C_1) × (intMul_1 ÷ intMul_阶段)
+      ---
+      duration_ms: 0.284833
+      ...
+    1..1
+ok 28 - AC-Q6s P1 全阶段漂移快照：1.00 / 1.30 / 1.66 / 1.55 / 1.21 / 1.21，最大 ≤ 2.0
+  ---
+  duration_ms: 0.352237
+  type: 'suite'
+  ...
+# Subtest: AC-Q7 P1 阶段 4：KPS 2.56、CT 7.81s ≤ 12s
+    # Subtest: 吞吐 135.2 ÷ 加权 HP 52.8 = 2.56；20 ÷ 2.56 = 7.81s
+    ok 1 - 吞吐 135.2 ÷ 加权 HP 52.8 = 2.56；20 ÷ 2.56 = 7.81s
+      ---
+      duration_ms: 0.27029
+      ...
+    1..1
+ok 29 - AC-Q7 P1 阶段 4：KPS 2.56、CT 7.81s ≤ 12s
+  ---
+  duration_ms: 0.341827
+  type: 'suite'
+  ...
+# Subtest: AC-Q7s（反向断言）P0 阶段 4：CT > 12s
+    # Subtest: 吞吐 66.3 = 法杖 17.4 + 剑 48.9 → KPS 1.26 → CT 15.93s > 12s
+    ok 1 - 吞吐 66.3 = 法杖 17.4 + 剑 48.9 → KPS 1.26 → CT 15.93s > 12s
+      ---
+      duration_ms: 0.214002
+      ...
+    1..1
+ok 30 - AC-Q7s（反向断言）P0 阶段 4：CT > 12s
+  ---
+  duration_ms: 0.280042
+  type: 'suite'
+  ...
+# Subtest: AC-Q8 阶段 4 满编 20 只同时攻击 + 0.5s 无敌帧 → TTD 3.85s ≥ 3.0s
+    # Subtest: TDD = 100 ÷ (最大单击 13.0 ÷ 0.5) = 3.85s
+    ok 1 - TDD = 100 ÷ (最大单击 13.0 ÷ 0.5) = 3.85s
+      ---
+      duration_ms: 0.17643
+      ...
+    1..1
+ok 31 - AC-Q8 阶段 4 满编 20 只同时攻击 + 0.5s 无敌帧 → TTD 3.85s ≥ 3.0s
+  ---
+  duration_ms: 0.262065
+  type: 'suite'
+  ...
+# Subtest: AC-Q9（反向断言）关闭无敌帧：Σ DPS 破线、TTD 0.72s
+    # Subtest: 等权口径 Σ DPS 188.5、TTD 0.53s，必须远破 3s 红线
+    ok 1 - 等权口径 Σ DPS 188.5、TTD 0.53s，必须远破 3s 红线
+      ---
+      duration_ms: 0.205986
+      ...
+    1..1
+ok 32 - AC-Q9（反向断言）关闭无敌帧：Σ DPS 破线、TTD 0.72s
+  ---
+  duration_ms: 0.273987
+  type: 'suite'
+  ...
+# Subtest: AC-Q10 P1 M2s 余量 R 与占用率 O 快照（监控，非 pass/fail）
+    # Subtest: R = 43.8/26.9/15.1/8.5/12.1/81.6；O = 6.6%/7.7%/8.1%/8.6%/12.5%/5.8%
+    ok 1 - R = 43.8/26.9/15.1/8.5/12.1/81.6；O = 6.6%/7.7%/8.1%/8.6%/12.5%/5.8%
+      ---
+      duration_ms: 0.361797
+      ...
+    1..1
+ok 33 - AC-Q10 P1 M2s 余量 R 与占用率 O 快照（监控，非 pass/fail）
+  ---
+  duration_ms: 0.462634
+  type: 'suite'
+  ...
+# Subtest: AC-Q11 满配锚点 × 0.7 → Boss TTK 176.6s ∈ [120,180]（= 既有 AC-6）
+    # Subtest: 6000 ÷ (48.5318 × 0.7) = 176.6s
+    ok 1 - 6000 ÷ (48.5318 × 0.7) = 176.6s
+      ---
+      duration_ms: 0.247592
+      ...
+    1..1
+ok 34 - AC-Q11 满配锚点 × 0.7 → Boss TTK 176.6s ∈ [120,180]（= 既有 AC-6）
+  ---
+  duration_ms: 0.347718
+  type: 'suite'
+  ...
+# Subtest: AC-Q12 xpCurve 累计 Lv6/Lv7/Lv8 + 2420 XP → Lv8、7 张卡
+    # Subtest: 累计 Lv6=929 / Lv7=1379 / Lv8=1932；111×20 + 2×100 = 2420 → Lv8、7 张
+    ok 1 - 累计 Lv6=929 / Lv7=1379 / Lv8=1932；111×20 + 2×100 = 2420 → Lv8、7 张
+      ---
+      duration_ms: 0.353419
+      ...
+    1..1
+ok 35 - AC-Q12 xpCurve 累计 Lv6/Lv7/Lv8 + 2420 XP → Lv8、7 张卡
+  ---
+  duration_ms: 0.431611
+  type: 'suite'
+  ...
+# Subtest: AC-Q13（安全阀）C ≤ 1.72 时满配 Boss TTK ≥ 120s；C = 2.00 时 = 103s < 120s
+    # Subtest: damage 单类上限（C=2.00）与 Boss 2 分钟下界不能共存（供 Q-NEW-4 引用）
+    ok 1 - damage 单类上限（C=2.00）与 Boss 2 分钟下界不能共存（供 Q-NEW-4 引用）
+      ---
+      duration_ms: 0.349887
+      ...
+    1..1
+ok 36 - AC-Q13（安全阀）C ≤ 1.72 时满配 Boss TTK ≥ 120s；C = 2.00 时 = 103s < 120s
+  ---
+  duration_ms: 0.443007
+  type: 'suite'
+  ...
+1..36
+# tests 53
+# suites 36
+# pass 53
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 164.023059
+
+> riftbound-the-lost-realm@0.1.0 test:input
+> tsc -p tsconfig.test.json && node tests/prepare.cjs && node tests/input-regression.cjs
+
+PASS R2-1 mousedown on bound button produces one dash intent — intent consumed
+PASS R2-1b intent not duplicated — second poll returns false
+PASS R2-2 touchstart on bound button produces one dash intent — intent consumed
+PASS R2-3 normalAttack press emits held=true — held state true
+PASS R2-4 dispose cancels pending hold-release timer — held events delta=1 (expected 1 = the press only)
+PASS R2-5 disposed instance receives no button intents — consumeIntent=false
+PASS R2-6 disposed instance records no events — events=0
+PASS R2-7 re-attached instance gets exactly one intent — count=1
+PASS R2-8 re-attached instance consumes the intent — consumed
+PASS R3-1 blur sets suspended=true — suspended=true
+PASS R3-2 blur → touchcancel keeps suspended=true — touchcancel must not resume
+PASS R3-3 visibility resume clears suspension — suspended=false
+PASS R3-4 blur → focus clears suspension — suspended=false
+PASS R3-5 hidden sets suspended=true — suspended=true
+PASS R3-6 hidden → touchcancel keeps suspended=true — still suspended
+PASS R3-7 visibility recovery after touchcancel resumes — suspended=false
+PASS R3-8 touchcancel alone does not suspend — suspended stays false
+PASS R3-9 touchcancel still releases joystick movement — moved=(1.00,0.00) → released=(0,0)
+
+summary: 18 passed, 0 failed, 18 checks
+
+> riftbound-the-lost-realm@0.1.0 test:task02
+> tsc -p tsconfig.test.json && node tests/prepare.cjs && node --test tests/task02-combat.test.mjs
+
+TAP version 13
+# Subtest: TASK-02 / A1 三层乘区锚点 24.26592 / DPS 48.53184
+    # Subtest: CombatResolver.rebuild 得到 A=1.57 / B=1.288 / C=1.5
+    ok 1 - CombatResolver.rebuild 得到 A=1.57 / B=1.288 / C=1.5
+      ---
+      duration_ms: 2.583896
+      ...
+    # Subtest: 法杖单发 = 24.26592，DPS = 48.53184（÷ 0.5s）
+    ok 2 - 法杖单发 = 24.26592，DPS = 48.53184（÷ 0.5s）
+      ---
+      duration_ms: 0.314336
+      ...
+    # Subtest: 唯一出口：resolveHit 对普通怪结算 24.26592，totalHits 递增
+    ok 3 - 唯一出口：resolveHit 对普通怪结算 24.26592，totalHits 递增
+      ---
+      duration_ms: 0.386469
+      ...
+    # Subtest: armorBreak 不进 C 区（R-01）；破甲只对 elite / boss 生效
+    ok 4 - armorBreak 不进 C 区（R-01）；破甲只对 elite / boss 生效
+      ---
+      duration_ms: 0.450096
+      ...
+    # Subtest: 分裂弹 ×0.6^extra 摊薄 + 穿透 ×0.7^depth
+    ok 5 - 分裂弹 ×0.6^extra 摊薄 + 穿透 ×0.7^depth
+      ---
+      duration_ms: 0.259334
+      ...
+    1..5
+ok 1 - TASK-02 / A1 三层乘区锚点 24.26592 / DPS 48.53184
+  ---
+  duration_ms: 5.40319
+  type: 'suite'
+  ...
+# Subtest: TASK-02 / A2 玩家实体
+    # Subtest: maxHp 由 deriveMaxHp 派生；森林生存 Lv10 = 115（D-08 里程碑 15%）
+    ok 1 - maxHp 由 deriveMaxHp 派生；森林生存 Lv10 = 115（D-08 里程碑 15%）
+      ---
+      duration_ms: 0.555112
+      ...
+    # Subtest: 受击扣血并广播 player.damaged；0.5s 无敌帧内二次受击为 0
+    ok 2 - 受击扣血并广播 player.damaged；0.5s 无敌帧内二次受击为 0
+      ---
+      duration_ms: 0.674163
+      ...
+    # Subtest: 石肤 \#12：damageTakenMul 生效（10 点原始伤害只扣 8）
+    ok 3 - 石肤 \#12：damageTakenMul 生效（10 点原始伤害只扣 8）
+      ---
+      duration_ms: 0.446946
+      ...
+    # Subtest: 死亡广播 player.died 且后续受击/回血无效
+    ok 4 - 死亡广播 player.died 且后续受击/回血无效
+      ---
+      duration_ms: 0.432266
+      ...
+    # Subtest: Dash：3.5m / 0.15s / CD 1.5s，冲刺期间不无敌
+    ok 5 - Dash：3.5m / 0.15s / CD 1.5s，冲刺期间不无敌
+      ---
+      duration_ms: 0.628062
+      ...
+    # Subtest: Dash 速度 = distanceM / durationSec（domain.dashSpeedMps）
+    ok 6 - Dash 速度 = distanceM / durationSec（domain.dashSpeedMps）
+      ---
+      duration_ms: 0.134053
+      ...
+    # Subtest: 移动按 moveSpeedMul 派生；斜向不超速；状态槽计时到期清层
+    ok 7 - 移动按 moveSpeedMul 派生；斜向不超速；状态槽计时到期清层
+      ---
+      duration_ms: 0.277893
+      ...
+    # Subtest: normalizeDeg 归一化到 [0,360)
+    ok 8 - normalizeDeg 归一化到 [0,360)
+      ---
+      duration_ms: 0.094966
+      ...
+    1..8
+ok 2 - TASK-02 / A2 玩家实体
+  ---
+  duration_ms: 3.737121
+  type: 'suite'
+  ...
+# Subtest: TASK-02 / A3 扇形与扫掠判定
+    # Subtest: 魔法剑形状 CONFIRMED：120° / 2.5m 来自 config，未被改写
+    ok 1 - 魔法剑形状 CONFIRMED：120° / 2.5m 来自 config，未被改写
+      ---
+      duration_ms: 0.293342
+      ...
+    # Subtest: 正前方命中；正 60° 边界命中；61° 不命中
+    ok 2 - 正前方命中；正 60° 边界命中；61° 不命中
+      ---
+      duration_ms: 0.25237
+      ...
+    # Subtest: 2.5m 整命中，超过则不命中；目标半径补偿贴边怪
+    ok 3 - 2.5m 整命中，超过则不命中；目标半径补偿贴边怪
+      ---
+      duration_ms: 0.179351
+      ...
+    # Subtest: arcExtend \#10 派生：base 120 + buff，最终 cap 240 生效
+    ok 4 - arcExtend \#10 派生：base 120 + buff，最终 cap 240 生效
+      ---
+      duration_ms: 0.14025
+      ...
+    # Subtest: 最短角差与线段扫掠（防止高速弹穿模）
+    ok 5 - 最短角差与线段扫掠（防止高速弹穿模）
+      ---
+      duration_ms: 0.231275
+      ...
+    1..5
+ok 3 - TASK-02 / A3 扇形与扫掠判定
+  ---
+  duration_ms: 1.30358
+  type: 'suite'
+  ...
+# Subtest: TASK-02 / A4 双武器独立状态
+    # Subtest: 两把武器 Lv 互不覆盖；A 区强化加成按表取该级总值
+    ok 1 - 两把武器 Lv 互不覆盖；A 区强化加成按表取该级总值
+      ---
+      duration_ms: 0.388076
+      ...
+    # Subtest: 两把武器 CD 完全独立：切换不重置、不互相清零
+    ok 2 - 两把武器 CD 完全独立：切换不重置、不互相清零
+      ---
+      duration_ms: 0.539307
+      ...
+    # Subtest: 快速切换广播 weapon.switched {from,to}，且即时可来回切
+    ok 3 - 快速切换广播 weapon.switched {from,to}，且即时可来回切
+      ---
+      duration_ms: 0.890901
+      ...
+    # Subtest: 攻击间隔走 domain.weaponIntervalSec（含 intervalMul 夹取）
+    ok 4 - 攻击间隔走 domain.weaponIntervalSec（含 intervalMul 夹取）
+      ---
+      duration_ms: 0.246046
+      ...
+    # Subtest: 强化消费通过 Economy 接口；未批准不得白嫖；批准只升指定武器
+    ok 5 - 强化消费通过 Economy 接口；未批准不得白嫖；批准只升指定武器
+      ---
+      duration_ms: 0.431992
+      ...
+    # Subtest: Lv5 封顶：满级后 requestUpgrade 返回 false 且不调用 Economy
+    ok 6 - Lv5 封顶：满级后 requestUpgrade 返回 false 且不调用 Economy
+      ---
+      duration_ms: 0.167027
+      ...
+    # Subtest: 法杖：弹速 14、分裂弹数来自 layers、穿透数来自 pierce buff
+    ok 7 - 法杖：弹速 14、分裂弹数来自 layers、穿透数来自 pierce buff
+      ---
+      duration_ms: 0.251983
+      ...
+    1..7
+ok 4 - TASK-02 / A4 双武器独立状态
+  ---
+  duration_ms: 3.21372
+  type: 'suite'
+  ...
+# Subtest: TASK-02 / A5 目标与投射物
+    # Subtest: 普通怪 HP/半径/经验从 config 派生（Q-NEW-3：xpValue=20）
+    ok 1 - 普通怪 HP/半径/经验从 config 派生（Q-NEW-3：xpValue=20）
+      ---
+      duration_ms: 0.56632
+      ...
+    # Subtest: Boss 经验 500 / HP 6000，档位 boss
+    ok 2 - Boss 经验 500 / HP 6000，档位 boss
+      ---
+      duration_ms: 0.353679
+      ...
+    # Subtest: 击杀：applyDamage 致死返回击杀信息并广播 enemy.killed（drops 形状完整）
+    ok 3 - 击杀：applyDamage 致死返回击杀信息并广播 enemy.killed（drops 形状完整）
+      ---
+      duration_ms: 0.373411
+      ...
+    # Subtest: 投射物扫掠命中 + 穿透计数 + 每穿衰减 depth
+    ok 4 - 投射物扫掠命中 + 穿透计数 + 每穿衰减 depth
+      ---
+      duration_ms: 0.47231
+      ...
+    1..4
+ok 5 - TASK-02 / A5 目标与投射物
+  ---
+  duration_ms: 2.051504
+  type: 'suite'
+  ...
+# Subtest: TASK-02 / A6 局内升级
+    # Subtest: XP 曲线以公式为准：L1–L10 = [40,102,176,260,351,449,553,663,777,895]
+    ok 1 - XP 曲线以公式为准：L1–L10 = [40,102,176,260,351,449,553,663,777,895]
+      ---
+      duration_ms: 0.416151
+      ...
+    # Subtest: 3 选 1 恒 3 张、不重复、scope 按当前武器过滤
+    ok 2 - 3 选 1 恒 3 张、不重复、scope 按当前武器过滤
+      ---
+      duration_ms: 1.238555
+      ...
+    # Subtest: 升级 → running→upgradePick → 时钟冻结（含 Boss 预警）+ offered 广播
+    ok 3 - 升级 → running→upgradePick → 时钟冻结（含 Boss 预警）+ offered 广播
+      ---
+      duration_ms: 0.878529
+      ...
+    # Subtest: 选卡写 buff、触发 rebuild、恢复 running 并解冻；时之沙提升 xpGainMul
+    ok 4 - 选卡写 buff、触发 rebuild、恢复 running 并解冻；时之沙提升 xpGainMul
+      ---
+      duration_ms: 0.469926
+      ...
+    # Subtest: takenTierCount 与 domain 语义一致；同一张卡 tier 递增
+    ok 5 - takenTierCount 与 domain 语义一致；同一张卡 tier 递增
+      ---
+      duration_ms: 0.176964
+      ...
+    # Subtest: xpGainMul（时之沙 \#15）在 gainXp 中生效
+    ok 6 - xpGainMul（时之沙 \#15）在 gainXp 中生效
+      ---
+      duration_ms: 0.181438
+      ...
+    # Subtest: 连升多级：pendingChoiceCount 累积，逐轮开卡，全部选完才恢复
+    ok 7 - 连升多级：pendingChoiceCount 累积，逐轮开卡，全部选完才恢复
+      ---
+      duration_ms: 0.278667
+      ...
+    # Subtest: 满级与封顶过滤：池子抽干时不卡死，自动恢复 running
+    ok 8 - 满级与封顶过滤：池子抽干时不卡死，自动恢复 running
+      ---
+      duration_ms: 0.404713
+      ...
+    # Subtest: RunPhase 合法迁移表（升级冻结/胜负/暂停）
+    ok 9 - RunPhase 合法迁移表（升级冻结/胜负/暂停）
+      ---
+      duration_ms: 0.140014
+      ...
+    1..9
+ok 6 - TASK-02 / A6 局内升级
+  ---
+  duration_ms: 4.59063
+  type: 'suite'
+  ...
+# Subtest: TASK-02 / A7 CombatRuntime 端到端
+    # Subtest: 法杖攻击 → 投射物飞行 → 命中扣血（唯一出口 totalHits 增长）
+    ok 1 - 法杖攻击 → 投射物飞行 → 命中扣血（唯一出口 totalHits 增长）
+      ---
+      duration_ms: 2.439577
+      ...
+    # Subtest: 剑扇形即时命中：扇形内扣血、扇形外不受伤
+    ok 2 - 剑扇形即时命中：扇形内扣血、扇形外不受伤
+      ---
+      duration_ms: 0.509337
+      ...
+    # Subtest: 击杀 → 获得经验 → 升级 → 冻结时钟（含 Boss 预警）→ 选卡恢复
+    ok 3 - 击杀 → 获得经验 → 升级 → 冻结时钟（含 Boss 预警）→ 选卡恢复
+      ---
+      duration_ms: 2.314924
+      ...
+    # Subtest: 切换武器后 A 区按当前武器重算（强化/熟练互不覆盖）
+    ok 4 - 切换武器后 A 区按当前武器重算（强化/熟练互不覆盖）
+      ---
+      duration_ms: 0.500859
+      ...
+    # Subtest: debugView 暴露 HP/双 CD/双 Lv/ABC/弹道/扇形/敌人数，供调试可视化
+    ok 5 - debugView 暴露 HP/双 CD/双 Lv/ABC/弹道/扇形/敌人数，供调试可视化
+      ---
+      duration_ms: 0.480724
+      ...
+    # Subtest: RunSnapshot 轮询：phase / hp / level / xp / aliveEnemyCount 随帧更新
+    ok 6 - RunSnapshot 轮询：phase / hp / level / xp / aliveEnemyCount 随帧更新
+      ---
+      duration_ms: 0.283736
+      ...
+    # Subtest: 玩家受击 → 死亡 → phase 迁移到 defeat
+    ok 7 - 玩家受击 → 死亡 → phase 迁移到 defeat
+      ---
+      duration_ms: 0.266219
+      ...
+    1..7
+ok 7 - TASK-02 / A7 CombatRuntime 端到端
+  ---
+  duration_ms: 7.114739
+  type: 'suite'
+  ...
+1..7
+# tests 45
+# suites 7
+# pass 45
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 142.91825
+
+> riftbound-the-lost-realm@0.1.0 test:gems
+> tsc -p tsconfig.test.json && node tests/prepare.cjs && node --test tests/gems.test.mjs
+
+TAP version 13
+# Subtest: TASK-03 合成（三合一）
+    # Subtest: 三颗同种同品质 → 升一级（确定性，不随机不失败；81 颗普通 → 1 颗传说）
+    ok 1 - 三颗同种同品质 → 升一级（确定性，不随机不失败；81 颗普通 → 1 颗传说）
+      ---
+      duration_ms: 16.48183
+      ...
+    # Subtest: 传说不可继续合成；拒绝时库存零变化
+    ok 2 - 传说不可继续合成；拒绝时库存零变化
+      ---
+      duration_ms: 0.415368
+      ...
+    # Subtest: 拒绝：颗数不足 / 混品质 / 混种类 / 含镶嵌中材料
+    ok 3 - 拒绝：颗数不足 / 混品质 / 混种类 / 含镶嵌中材料
+      ---
+      duration_ms: 0.595829
+      ...
+    # Subtest: canMerge 只读判定与 mergeGems 一致（UI 置灰用）
+    ok 4 - canMerge 只读判定与 mergeGems 一致（UI 置灰用）
+      ---
+      duration_ms: 0.357431
+      ...
+    1..4
+ok 1 - TASK-03 合成（三合一）
+  ---
+  duration_ms: 20.399865
+  type: 'suite'
+  ...
+# Subtest: TASK-03 镶嵌 / 拆卸
+    # Subtest: 槽位保存 itemInstanceId——同种不同品质必须可区分
+    ok 1 - 槽位保存 itemInstanceId——同种不同品质必须可区分
+      ---
+      duration_ms: 1.252697
+      ...
+    # Subtest: 局内不被意外替换：占用槽拒绝隐式顶替
+    ok 2 - 局内不被意外替换：占用槽拒绝隐式顶替
+      ---
+      duration_ms: 0.295322
+      ...
+    # Subtest: 同一实例不可同时进两个槽（含跨武器）；拆卸后可重镶
+    ok 3 - 同一实例不可同时进两个槽（含跨武器）；拆卸后可重镶
+      ---
+      duration_ms: 0.555346
+      ...
+    # Subtest: 重复镶嵌：同种三颗占满 3 槽合法
+    ok 4 - 重复镶嵌：同种三颗占满 3 槽合法
+      ---
+      duration_ms: 0.560606
+      ...
+    # Subtest: 镶嵌中的宝石不可从库存移除（防悬空引用）
+    ok 5 - 镶嵌中的宝石不可从库存移除（防悬空引用）
+      ---
+      duration_ms: 0.571833
+      ...
+    # Subtest: 事件 payload 与 domain 事件表形状一致（gem.socketed / unsocketed / merged）
+    ok 6 - 事件 payload 与 domain 事件表形状一致（gem.socketed / unsocketed / merged）
+      ---
+      duration_ms: 0.724062
+      ...
+    1..6
+ok 2 - TASK-03 镶嵌 / 拆卸
+  ---
+  duration_ms: 4.649042
+  type: 'suite'
+  ...
+# Subtest: TASK-03 重复倍率与触发概率上限
+    # Subtest: Q4-B 公式：概率 = base + 品质步数×2% + (颗数−1)×2%，全部来自 config
+    ok 1 - Q4-B 公式：概率 = base + 品质步数×2% + (颗数−1)×2%，全部来自 config
+      ---
+      duration_ms: 3.586093
+      ...
+    # Subtest: 触发概率总上限 50%（procChanceAbs）不被突破：传说 3 颗雷 raw=0.12+0.08+0.04=0.24 → 未及上限；极端加成口径下仍封顶
+    ok 2 - 触发概率总上限 50%（procChanceAbs）不被突破：传说 3 颗雷 raw=0.12+0.08+0.04=0.24 → 未及上限；极端加成口径下仍封顶
+      ---
+      duration_ms: 0.292092
+      ...
+    # Subtest: 重复倍率表 1.0/1.5/2.0 进入属性宝石效果（power/haste/vitality）
+    ok 3 - 重复倍率表 1.0/1.5/2.0 进入属性宝石效果（power/haste/vitality）
+      ---
+      duration_ms: 0.544649
+      ...
+    # Subtest: 品质倍率表（1.00/1.25/1.55/1.95/2.40）进入属性效果
+    ok 4 - 品质倍率表（1.00/1.25/1.55/1.95/2.40）进入属性效果
+      ---
+      duration_ms: 0.480781
+      ...
+    # Subtest: 同种不同品质：取最高品质结算，重复颗数全计入
+    ok 5 - 同种不同品质：取最高品质结算，重复颗数全计入
+      ---
+      duration_ms: 0.254117
+      ...
+    # Subtest: vitality 全局生效：两把武器分别镶嵌则相加
+    ok 6 - vitality 全局生效：两把武器分别镶嵌则相加
+      ---
+      duration_ms: 0.233973
+      ...
+    1..6
+ok 3 - TASK-03 重复倍率与触发概率上限
+  ---
+  duration_ms: 5.853269
+  type: 'suite'
+  ...
+# Subtest: TASK-03 元素效果：从正确武器命中事件触发
+    # Subtest: 武器错配零触发：法杖宝石不吃剑的命中
+    ok 1 - 武器错配零触发：法杖宝石不吃剑的命中
+      ---
+      duration_ms: 1.649577
+      ...
+    # Subtest: 正确武器 + 必触发（rng 注入恒 0 的 stub）→ 产出事件 payload 与控制上限
+    ok 2 - 正确武器 + 必触发（rng 注入恒 0 的 stub）→ 产出事件 payload 与控制上限
+      ---
+      duration_ms: 0.369403
+      ...
+    # Subtest: 控制上限按敌档区分（normal/elite/boss 三行全查）
+    ok 3 - 控制上限按敌档区分（normal/elite/boss 三行全查）
+      ---
+      duration_ms: 0.628054
+      ...
+    # Subtest: 暗影吸血：命中伤害 5%，受每秒 ≤5% 最大生命约束；吸血量不受品质放大
+    ok 4 - 暗影吸血：命中伤害 5%，受每秒 ≤5% 最大生命约束；吸血量不受品质放大
+      ---
+      duration_ms: 0.322861
+      ...
+    # Subtest: rng 未命中则不触发（seed 固定可复现）
+    ok 5 - rng 未命中则不触发（seed 固定可复现）
+      ---
+      duration_ms: 18.936365
+      ...
+    1..5
+ok 4 - TASK-03 元素效果：从正确武器命中事件触发
+  ---
+  duration_ms: 22.190141
+  type: 'suite'
+  ...
+# Subtest: TASK-03 存档一致性
+    # Subtest: 完整流程后 validateSaveV3 通过（无悬空引用）
+    ok 1 - 完整流程后 validateSaveV3 通过（无悬空引用）
+      ---
+      duration_ms: 0.546965
+      ...
+    # Subtest: 悬空 itemInstanceId 被 validateSaveV3 拦截
+    ok 2 - 悬空 itemInstanceId 被 validateSaveV3 拦截
+      ---
+      duration_ms: 0.221433
+      ...
+    # Subtest: 实例 ID 生成不回退、不碰撞；非法 gemId/quality 被拒
+    ok 3 - 实例 ID 生成不回退、不碰撞；非法 gemId/quality 被拒
+      ---
+      duration_ms: 0.185992
+      ...
+    1..3
+ok 5 - TASK-03 存档一致性
+  ---
+  duration_ms: 1.130825
+  type: 'suite'
+  ...
+1..5
+# tests 24
+# suites 5
+# pass 24
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 164.899296
+
+> riftbound-the-lost-realm@0.1.0 test:economy
+> tsc -p tsconfig.test.json && node tests/prepare.cjs && node --test tests/economy.test.mjs
+
+TAP version 13
+# [domain/save] 无法识别的存档版本 undefined，已回退为默认存档
+# [domain/save] 无法识别的存档版本 undefined，已回退为默认存档
+# [domain/save] 无法识别的存档版本 9，已回退为默认存档
+# [domain/save] 无法识别的存档版本 undefined，已回退为默认存档
+# [domain/save] 无法识别的存档版本 undefined，已回退为默认存档
+# [domain/save] 无法识别的存档版本 9，已回退为默认存档
+# Subtest: AC-1a | 掉落产出由冻结 config 掉落表逐规则推导（数量区间与概率）
+ok 1 - AC-1a | 掉落产出由冻结 config 掉落表逐规则推导（数量区间与概率）
+  ---
+  duration_ms: 10.22338
+  ...
+# Subtest: AC-1b | 改 config（damageConfig.loot）即生效 —— 数据驱动
+ok 2 - AC-1b | 改 config（damageConfig.loot）即生效 —— 数据驱动
+  ---
+  duration_ms: 0.32037
+  ...
+# Subtest: AC-1c | 元素维度决定碎片种类；Boss 宝石品质取 enemyConfig.bossReward.minGemQuality
+ok 3 - AC-1c | 元素维度决定碎片种类；Boss 宝石品质取 enemyConfig.bossReward.minGemQuality
+  ---
+  duration_ms: 0.604146
+  ...
+# Subtest: AC-1d | Rng 同 seed 产出完全一致的掉落序列（可复现）
+ok 4 - AC-1d | Rng 同 seed 产出完全一致的掉落序列（可复现）
+  ---
+  duration_ms: 0.89078
+  ...
+# Subtest: AC-2a | 同一 dropId 拾取两次只入账一次
+ok 5 - AC-2a | 同一 dropId 拾取两次只入账一次
+  ---
+  duration_ms: 1.783747
+  ...
+# Subtest: AC-2b | 未知 dropId 拒绝且零副作用
+ok 6 - AC-2b | 未知 dropId 拒绝且零副作用
+  ---
+  duration_ms: 0.31588
+  ...
+# Subtest: AC-2c | 拾取宝石实例只入库存一次
+ok 7 - AC-2c | 拾取宝石实例只入库存一次
+  ---
+  duration_ms: 0.449452
+  ...
+# Subtest: AC-3 | 死亡（victory=false）结算保留已拾取资源与宝石
+ok 8 - AC-3 | 死亡（victory=false）结算保留已拾取资源与宝石
+  ---
+  duration_ms: 1.276972
+  ...
+# Subtest: AC-4 | 地面未拾取物不结算
+ok 9 - AC-4 | 地面未拾取物不结算
+  ---
+  duration_ms: 1.064355
+  ...
+# Subtest: AC-5 | 本局经验不误存为永久经验（结构 + 行为双断言）
+ok 10 - AC-5 | 本局经验不误存为永久经验（结构 + 行为双断言）
+  ---
+  duration_ms: 0.814611
+  ...
+# Subtest: 结算 | run.settled 事件 payload 为 {victory, pickedResources: SaveRunLoot}
+ok 11 - 结算 | run.settled 事件 payload 为 {victory, pickedResources: SaveRunLoot}
+  ---
+  duration_ms: 0.447485
+  ...
+# Subtest: Boss 规则 | 森林核心与击败进度只在 victory && bossDefeated 入账
+ok 12 - Boss 规则 | 森林核心与击败进度只在 victory && bossDefeated 入账
+  ---
+  duration_ms: 0.511561
+  ...
+# Subtest: AC-6a | 成本 C(L) = base + step×(L−1)，取自冻结 getter；单线总投入 3250
+ok 13 - AC-6a | 成本 C(L) = base + step×(L−1)，取自冻结 getter；单线总投入 3250
+  ---
+  duration_ms: 0.214457
+  ...
+# Subtest: AC-6b | 熟练度 Lv10 = 25%（2%×10 + 里程碑 5%）；Lv9 = 18%
+ok 14 - AC-6b | 熟练度 Lv10 = 25%（2%×10 + 里程碑 5%）；Lv9 = 18%
+  ---
+  duration_ms: 0.252775
+  ...
+# Subtest: AC-6c | 森林生存 Lv10 = 15% 而非 14%（里程碑陷阱）；MaxHp = 115
+ok 15 - AC-6c | 森林生存 Lv10 = 15% 而非 14%（里程碑陷阱）；MaxHp = 115
+  ---
+  duration_ms: 0.169177
+  ...
+# Subtest: AC-6d | 等级边界夹取（负数 / NaN / 10.9 / 100）
+ok 16 - AC-6d | 等级边界夹取（负数 / NaN / 10.9 / 100）
+  ---
+  duration_ms: 0.1084
+  ...
+# Subtest: AC-6e | 购买成长端到端：三条线买满恰花 3250×3，金币归零，Lv10 封顶
+ok 17 - AC-6e | 购买成长端到端：三条线买满恰花 3250×3，金币归零，Lv10 封顶
+  ---
+  duration_ms: 1.847902
+  ...
+# Subtest: AC-6f | 余额不足拒绝且零副作用
+ok 18 - AC-6f | 余额不足拒绝且零副作用
+  ---
+  duration_ms: 0.288706
+  ...
+# Subtest: AC-7a | 武器强化成本序列与总量（10/20/35/55、单武器 120、双武器 240）
+ok 19 - AC-7a | 武器强化成本序列与总量（10/20/35/55、单武器 120、双武器 240）
+  ---
+  duration_ms: 0.789157
+  ...
+# Subtest: AC-7b | 材料不足拒绝且零副作用；weapon.upgraded 事件形状正确
+ok 20 - AC-7b | 材料不足拒绝且零副作用；weapon.upgraded 事件形状正确
+  ---
+  duration_ms: 0.440586
+  ...
+# Subtest: AC-7c | 制作配方数值来自 gemConfig.craft（8 碎片 + 5 材料 → common 元素宝石）
+ok 21 - AC-7c | 制作配方数值来自 gemConfig.craft（8 碎片 + 5 材料 → common 元素宝石）
+  ---
+  duration_ms: 0.563633
+  ...
+# Subtest: AC-7d | 存档落盘 schemaVersion=3；socket 字段为 itemInstanceId（非模板 gemId）
+ok 22 - AC-7d | 存档落盘 schemaVersion=3；socket 字段为 itemInstanceId（非模板 gemId）
+  ---
+  duration_ms: 0.408412
+  ...
+# Subtest: AC-8a | v2→v3 迁移：profile.gold 正确保留到 currencies.gold
+ok 23 - AC-8a | v2→v3 迁移：profile.gold 正确保留到 currencies.gold
+  ---
+  duration_ms: 0.204159
+  ...
+# Subtest: AC-8b | 畸形存档（migrateSave / boot）均不抛错
+ok 24 - AC-8b | 畸形存档（migrateSave / boot）均不抛错
+  ---
+  duration_ms: 1.905983
+  ...
+# Subtest: AC-8c | boot 全链路：V2 存档经系统加载后 gold 保留并可继续游玩
+ok 25 - AC-8c | boot 全链路：V2 存档经系统加载后 gold 保留并可继续游玩
+  ---
+  duration_ms: 0.3654
+  ...
+# Subtest: AC-8d | SavePortV3Bridge：V3 直传、历史 stash 套壳兼容、纯 V2 交 migrateSave
+ok 26 - AC-8d | SavePortV3Bridge：V3 直传、历史 stash 套壳兼容、纯 V2 交 migrateSave
+  ---
+  duration_ms: 0.491443
+  ...
+# Subtest: AC-8e | 温和畸形 V3 修复后 gold 保留；重度畸形兜底默认档
+ok 27 - AC-8e | 温和畸形 V3 修复后 gold 保留；重度畸形兜底默认档
+  ---
+  duration_ms: 0.402975
+  ...
+# Subtest: REG-1 | 连续局：beginRun 重置地面/账本/Boss 登记
+ok 28 - REG-1 | 连续局：beginRun 重置地面/账本/Boss 登记
+  ---
+  duration_ms: 0.351744
+  ...
+# Subtest: REG-2 | 冻结契约纪律：经济模块只读 config，业务数值全部来自配置
+ok 29 - REG-2 | 冻结契约纪律：经济模块只读 config，业务数值全部来自配置
+  ---
+  duration_ms: 0.12798
+  ...
+1..29
+# tests 29
+# suites 0
+# pass 29
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 133.428926
+
+> riftbound-the-lost-realm@0.1.0 test:task05
+> tsc -p tsconfig.test.json && node tests/prepare.cjs && node --experimental-strip-types --no-warnings --test tests/task05.test.mjs
+
+TAP version 13
+# Subtest: TASK-05 A. 冻结契约只读引用（数值全部来自 config）
+    # Subtest: 六阶段波次表与精英窗口边界：359.9 禁 / 360 准 / 509 准 / 510 禁 / 600 禁
+    ok 1 - 六阶段波次表与精英窗口边界：359.9 禁 / 360 准 / 509 准 / 510 禁 / 600 禁
+      ---
+      duration_ms: 1.938435
+      ...
+    # Subtest: 事件时间轴与 Boss 期硬规则全部来自 config
+    ok 2 - 事件时间轴与 Boss 期硬规则全部来自 config
+      ---
+      duration_ms: 0.428513
+      ...
+    # Subtest: 精英数值由 eliteStats 派生（Q2 猎犬基底 × 倍率），状态上限按档位查表
+    ok 3 - 精英数值由 eliteStats 派生（Q2 猎犬基底 × 倍率），状态上限按档位查表
+      ---
+      duration_ms: 0.458533
+      ...
+    # Subtest: 敌人受击只走 resolveDamageHit（含精英破甲、过量夹取）
+    ok 4 - 敌人受击只走 resolveDamageHit（含精英破甲、过量夹取）
+      ---
+      duration_ms: 0.313968
+      ...
+    1..4
+ok 1 - TASK-05 A. 冻结契约只读引用（数值全部来自 config）
+  ---
+  duration_ms: 4.474724
+  type: 'suite'
+  ...
+# Subtest: TASK-05 B. 场地与四类普通怪行为
+    # Subtest: 失落森林固定地图：边界/障碍/合法生成点，单张地图无区域概念
+    ok 1 - 失落森林固定地图：边界/障碍/合法生成点，单张地图无区域概念
+      ---
+      duration_ms: 2.49831
+      ...
+    # Subtest: 猎犬：径向追击 + 左右包抄侧由注入 Rng 分配（可辨识）
+    ok 2 - 猎犬：径向追击 + 左右包抄侧由注入 Rng 分配（可辨识）
+      ---
+      duration_ms: 5.986482
+      ...
+    # Subtest: 投射者：8m 射程内开火且弹道命中经 damagePlayer 端口
+    ok 3 - 投射者：8m 射程内开火且弹道命中经 damagePlayer 端口
+      ---
+      duration_ms: 1.736682
+      ...
+    # Subtest: 影跃者：可闪避蓄力窗口 + 跃进伤害 + 4s CD
+    ok 4 - 影跃者：可闪避蓄力窗口 + 跃进伤害 + 4s CD
+      ---
+      duration_ms: 0.977412
+      ...
+    # Subtest: 滋养体：6m 光环 +20% 友军移速，死亡分裂 2 只幼体（HP5 / 伤4）
+    ok 5 - 滋养体：6m 光环 +20% 友军移速，死亡分裂 2 只幼体（HP5 / 伤4）
+      ---
+      duration_ms: 2.219676
+      ...
+    # Subtest: 状态槽：燃焰/减速/中毒按档位夹取，DoT 经 resolveDamageHit 结算
+    ok 6 - 状态槽：燃焰/减速/中毒按档位夹取，DoT 经 resolveDamageHit 结算
+      ---
+      duration_ms: 0.71626
+      ...
+    1..6
+ok 2 - TASK-05 B. 场地与四类普通怪行为
+  ---
+  duration_ms: 14.841882
+  type: 'suite'
+  ...
+# Subtest: TASK-05 C. 精英系统
+    # Subtest: 六词缀池来自 config，2000 组组合零禁止对、零重复
+    ok 1 - 六词缀池来自 config，2000 组组合零禁止对、零重复
+      ---
+      duration_ms: 7.848904
+      ...
+    # Subtest: 精英词缀数值来自 config：护盾/吸血/狂暴/词缀数
+    ok 2 - 精英词缀数值来自 config：护盾/吸血/狂暴/词缀数
+      ---
+      duration_ms: 1.284569
+      ...
+    # Subtest: 精英窗口精确 [360, 509]：首只 360.0 / 第二只 450.0，359.9 前零精英
+    ok 3 - 精英窗口精确 [360, 509]：首只 360.0 / 第二只 450.0，359.9 前零精英
+      ---
+      duration_ms: 339.26958
+      ...
+    # Subtest: 同屏精英 ≤2、领主 ≤1；满员按 30s × 3 推迟后放弃
+    ok 4 - 同屏精英 ≤2、领主 ≤1；满员按 30s × 3 推迟后放弃
+      ---
+      duration_ms: 64.716637
+      ...
+    1..4
+ok 3 - TASK-05 C. 精英系统
+  ---
+  duration_ms: 413.537012
+  type: 'suite'
+  ...
+# Subtest: TASK-05 D. Spawn Director（时间驱动怪物潮）
+    # Subtest: 波次数值来自阶段表：hpScale / maxOnScreen / 怪种权重
+    ok 1 - 波次数值来自阶段表：hpScale / maxOnScreen / 怪种权重
+      ---
+      duration_ms: 8.656729
+      ...
+    # Subtest: 安全生成：director 波次生成瞬间玩家 12m 内不得刷怪；数量有界
+    ok 2 - 安全生成：director 波次生成瞬间玩家 12m 内不得刷怪；数量有界
+      ---
+      duration_ms: 54.457917
+      ...
+    # Subtest: Boss 期：普通怪上限 4、每 45s 补 2 只猎犬、精英全禁
+    ok 3 - Boss 期：普通怪上限 4、每 45s 补 2 只猎犬、精英全禁
+      ---
+      duration_ms: 38.798707
+      ...
+    # Subtest: 同 seed 两次 700s 全程逐字段一致（seed 可复现）
+    ok 4 - 同 seed 两次 700s 全程逐字段一致（seed 可复现）
+      ---
+      duration_ms: 103.834264
+      ...
+    1..4
+ok 4 - TASK-05 D. Spawn Director（时间驱动怪物潮）
+  ---
+  duration_ms: 206.108686
+  type: 'suite'
+  ...
+# Subtest: TASK-05 E. 五种世界事件
+    # Subtest: 调度器：首场 [120,210]、间隔 108、单并发、同种不连续、510s 后停刷
+    ok 1 - 调度器：首场 [120,210]、间隔 108、单并发、同种不连续、510s 后停刷
+      ---
+      duration_ms: 132.088147
+      ...
+    # Subtest: 遗落宝箱：靠近 openSec 完成 + 掉落；远离超时 expired
+    ok 2 - 遗落宝箱：靠近 openSec 完成 + 掉落；远离超时 expired
+      ---
+      duration_ms: 1.607265
+      ...
+    # Subtest: 元素祭坛：站圈 5s 完成 +15%/90s；离圈 2× 衰减
+    ok 3 - 元素祭坛：站圈 5s 完成 +15%/90s；离圈 2× 衰减
+      ---
+      duration_ms: 0.68808
+      ...
+    # Subtest: 怪物巢穴：摧毁 → completed；超时 → expired 且清理余怪（无泄漏）
+    ok 4 - 怪物巢穴：摧毁 → completed；超时 → expired 且清理余怪（无泄漏）
+      ---
+      duration_ms: 1.143569
+      ...
+    # Subtest: 古老祭坛：站圈 8s 完成，生命/金币双献祭全部来自 config
+    ok 5 - 古老祭坛：站圈 8s 完成，生命/金币双献祭全部来自 config
+      ---
+      duration_ms: 0.482731
+      ...
+    # Subtest: 精英入侵：窗口内关联双词缀真精英，击败 → completed；窗口外降级狼群
+    ok 6 - 精英入侵：窗口内关联双词缀真精英，击败 → completed；窗口外降级狼群
+      ---
+      duration_ms: 21.721304
+      ...
+    1..6
+ok 5 - TASK-05 E. 五种世界事件
+  ---
+  duration_ms: 158.215082
+  type: 'suite'
+  ...
+# Subtest: TASK-05 F. 红线与生命周期
+    # Subtest: 新增源码零 Math.random（seed 可复现）
+    ok 1 - 新增源码零 Math.random（seed 可复现）
+      ---
+      duration_ms: 2.145695
+      ...
+    # Subtest: 700s 全程容器有界（enemies / projectiles / clouds），无对象泄漏
+    ok 2 - 700s 全程容器有界（enemies / projectiles / clouds），无对象泄漏
+      ---
+      duration_ms: 37.596575
+      ...
+    # Subtest: 手动注入端口生效（TASK-02/04 集成点）
+    ok 3 - 手动注入端口生效（TASK-02/04 集成点）
+      ---
+      duration_ms: 0.529582
+      ...
+    1..3
+ok 6 - TASK-05 F. 红线与生命周期
+  ---
+  duration_ms: 40.503062
+  type: 'suite'
+  ...
+1..6
+# tests 27
+# suites 6
+# pass 27
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1065.774395
+
+> riftbound-the-lost-realm@0.1.0 test:boss
+> tsc -p tsconfig.test.json && node tests/prepare.cjs && node --test tests/boss.test.mjs
+
+TAP version 13
+# Subtest: 契约数值：全部只读引用 src/config（禁止 REBUILD / 硬编码）
+    # Subtest: Boss HP / 六攻击 / summonCap / 阶段阈值 与 enemyConfig 逐项一致
+    ok 1 - Boss HP / 六攻击 / summonCap / 阶段阈值 与 enemyConfig 逐项一致
+      ---
+      duration_ms: 2.852704
+      ...
+    # Subtest: 时间轴常量 510/600 与三点音效从 config 读取
+    ok 2 - 时间轴常量 510/600 与三点音效从 config 读取
+      ---
+      duration_ms: 0.206231
+      ...
+    # Subtest: 阶段攻击池按设计总纲 §7.3 从 config 切片（3 / 5 / 6 招）
+    ok 3 - 阶段攻击池按设计总纲 §7.3 从 config 切片（3 / 5 / 6 招）
+      ---
+      duration_ms: 0.433317
+      ...
+    # Subtest: 六攻击行为分派穷尽（契约新增第七招会编译期拦截）
+    ok 4 - 六攻击行为分派穷尽（契约新增第七招会编译期拦截）
+      ---
+      duration_ms: 0.24703
+      ...
+    1..4
+ok 1 - 契约数值：全部只读引用 src/config（禁止 REBUILD / 硬编码）
+  ---
+  duration_ms: 4.965669
+  type: 'suite'
+  ...
+# Subtest: 时间轴：510s 预警 / 600s 登场，实测误差 ≤ 1 帧
+    # Subtest: RunClock 边沿翻牌 + syncFromClock 幂等 + 契约事件各一次
+    ok 1 - RunClock 边沿翻牌 + syncFromClock 幂等 + 契约事件各一次
+      ---
+      duration_ms: 10.127104
+      ...
+    # Subtest: 600s 之前不登场；预警事件先于登场事件
+    ok 2 - 600s 之前不登场；预警事件先于登场事件
+      ---
+      duration_ms: 7.704527
+      ...
+    # Subtest: freeze 冻结 + 非法 dt 忽略（真实 RunClock 契约）
+    ok 3 - freeze 冻结 + 非法 dt 忽略（真实 RunClock 契约）
+      ---
+      duration_ms: 0.518151
+      ...
+    1..3
+ok 2 - 时间轴：510s 预警 / 600s 登场，实测误差 ≤ 1 帧
+  ---
+  duration_ms: 18.929868
+  type: 'suite'
+  ...
+# Subtest: 三阶段：65% / 30% 阈值 + 满血回归
+    # Subtest: bossPhaseAtHp 满血 = guardian（历史 bug 回归）
+    ok 1 - bossPhaseAtHp 满血 = guardian（历史 bug 回归）
+      ---
+      duration_ms: 0.860432
+      ...
+    # Subtest: 边界归下段：0.65 → corruption、0.30 → coreFrenzy
+    ok 2 - 边界归下段：0.65 → corruption、0.30 → coreFrenzy
+      ---
+      duration_ms: 0.493951
+      ...
+    # Subtest: 101 点扫描单调不回退
+    ok 3 - 101 点扫描单调不回退
+      ---
+      duration_ms: 0.590003
+      ...
+    # Subtest: Agent 阶段推进：只进不退 + boss.phase_changed 事件顺序
+    ok 4 - Agent 阶段推进：只进不退 + boss.phase_changed 事件顺序
+      ---
+      duration_ms: 1.273162
+      ...
+    1..4
+ok 3 - 三阶段：65% / 30% 阈值 + 满血回归
+  ---
+  duration_ms: 3.643629
+  type: 'suite'
+  ...
+# Subtest: 六攻击[rootSpike]：可触发 + 预警时长 = config.telegraphSec + 形状锁定
+ok 4 - 六攻击[rootSpike]：可触发 + 预警时长 = config.telegraphSec + 形状锁定
+  ---
+  duration_ms: 1.916494
+  ...
+# Subtest: 六攻击[rootSpike]：预警期跑出形状 → 零伤害（可躲避）
+ok 5 - 六攻击[rootSpike]：预警期跑出形状 → 零伤害（可躲避）
+  ---
+  duration_ms: 1.132088
+  ...
+# Subtest: 六攻击[sweepSwipe]：可触发 + 预警时长 = config.telegraphSec + 形状锁定
+ok 6 - 六攻击[sweepSwipe]：可触发 + 预警时长 = config.telegraphSec + 形状锁定
+  ---
+  duration_ms: 1.790063
+  ...
+# Subtest: 六攻击[sweepSwipe]：预警期跑出形状 → 零伤害（可躲避）
+ok 7 - 六攻击[sweepSwipe]：预警期跑出形状 → 零伤害（可躲避）
+  ---
+  duration_ms: 0.571916
+  ...
+# Subtest: 六攻击[groundSlam]：可触发 + 预警时长 = config.telegraphSec + 形状锁定
+ok 8 - 六攻击[groundSlam]：可触发 + 预警时长 = config.telegraphSec + 形状锁定
+  ---
+  duration_ms: 0.622805
+  ...
+# Subtest: 六攻击[groundSlam]：预警期跑出形状 → 零伤害（可躲避）
+ok 9 - 六攻击[groundSlam]：预警期跑出形状 → 零伤害（可躲避）
+  ---
+  duration_ms: 2.867482
+  ...
+# Subtest: 六攻击[corruptVines]：可触发 + 预警时长 = config.telegraphSec + 形状锁定
+ok 10 - 六攻击[corruptVines]：可触发 + 预警时长 = config.telegraphSec + 形状锁定
+  ---
+  duration_ms: 1.5129
+  ...
+# Subtest: 六攻击[corruptVines]：预警期跑出形状 → 零伤害（可躲避）
+ok 11 - 六攻击[corruptVines]：预警期跑出形状 → 零伤害（可躲避）
+  ---
+  duration_ms: 0.775501
+  ...
+# Subtest: 六攻击[coreBurst]：可触发 + 预警时长 = config.telegraphSec + 形状锁定
+ok 12 - 六攻击[coreBurst]：可触发 + 预警时长 = config.telegraphSec + 形状锁定
+  ---
+  duration_ms: 1.461429
+  ...
+# Subtest: 六攻击[coreBurst]：预警期跑出形状 → 零伤害（可躲避）
+ok 13 - 六攻击[coreBurst]：预警期跑出形状 → 零伤害（可躲避）
+  ---
+  duration_ms: 1.973749
+  ...
+# Subtest: 六攻击[rootSpike]：站形状内 → 按 config.damage 结算一次
+ok 14 - 六攻击[rootSpike]：站形状内 → 按 config.damage 结算一次
+  ---
+  duration_ms: 0.940721
+  ...
+# Subtest: 六攻击[sweepSwipe]：站形状内 → 按 config.damage 结算一次
+ok 15 - 六攻击[sweepSwipe]：站形状内 → 按 config.damage 结算一次
+  ---
+  duration_ms: 0.270256
+  ...
+# Subtest: 六攻击[groundSlam]：站形状内 → 按 config.damage 结算一次
+ok 16 - 六攻击[groundSlam]：站形状内 → 按 config.damage 结算一次
+  ---
+  duration_ms: 0.449746
+  ...
+# Subtest: 六攻击[coreBurst]：站形状内 → 按 config.damage 结算一次
+ok 17 - 六攻击[coreBurst]：站形状内 → 按 config.damage 结算一次
+  ---
+  duration_ms: 2.730486
+  ...
+# Subtest: 六攻击[corruptVines]：持续区每秒 config.damage、持续 config 时长、跑出即停
+ok 18 - 六攻击[corruptVines]：持续区每秒 config.damage、持续 config 时长、跑出即停
+  ---
+  duration_ms: 0.764197
+  ...
+# Subtest: 六攻击[forestSummon]：无预警、无伤害、召唤数受上限
+ok 19 - 六攻击[forestSummon]：无预警、无伤害、召唤数受上限
+  ---
+  duration_ms: 1.47732
+  ...
+# Subtest: 六攻击[groundSlam]：环形内圈贴身可躲避（形状与判定同源）
+ok 20 - 六攻击[groundSlam]：环形内圈贴身可躲避（形状与判定同源）
+  ---
+  duration_ms: 0.539597
+  ...
+# Subtest: 预警形状与碰撞判定同源：pointInTelegraph 是唯一入口
+ok 21 - 预警形状与碰撞判定同源：pointInTelegraph 是唯一入口
+  ---
+  duration_ms: 0.302301
+  ...
+# Subtest: Boss 不免疫任一武器或元素（2 武器 × 4 元素 + null，伤害均 > 0）
+ok 22 - Boss 不免疫任一武器或元素（2 武器 × 4 元素 + null，伤害均 > 0）
+  ---
+  duration_ms: 0.341614
+  ...
+# Subtest: 三阶段预警总时长 < 攻击间隔（冻结契约派生的硬约束）
+ok 23 - 三阶段预警总时长 < 攻击间隔（冻结契约派生的硬约束）
+  ---
+  duration_ms: 0.320141
+  ...
+# Subtest: 单攻击槽：预警窗口严格闭合后才开下一个（核心暴走长模拟）
+ok 24 - 单攻击槽：预警窗口严格闭合后才开下一个（核心暴走长模拟）
+  ---
+  duration_ms: 5.94368
+  ...
+# Subtest: 破甲：单发 = 面板 × 1.5（非 ×1.5×1.5）
+    # Subtest: 锚点：面板 24.26592 → 结算 36.39888（真实 resolveDamageHit）
+    ok 1 - 锚点：面板 24.26592 → 结算 36.39888（真实 resolveDamageHit）
+      ---
+      duration_ms: 0.2934
+      ...
+    # Subtest: armorBreak 不入 C 区（R-01 红线）
+    ok 2 - armorBreak 不入 C 区（R-01 红线）
+      ---
+      duration_ms: 0.188876
+      ...
+    # Subtest: Agent 受击路径与 resolveDamageHit 完全一致（结构性单点结算）
+    ok 3 - Agent 受击路径与 resolveDamageHit 完全一致（结构性单点结算）
+      ---
+      duration_ms: 0.232406
+      ...
+    1..3
+ok 25 - 破甲：单发 = 面板 × 1.5（非 ×1.5×1.5）
+  ---
+  duration_ms: 0.886497
+  type: 'suite'
+  ...
+# Subtest: 击败只触发一次胜利结算
+    # Subtest: 事件 + Reward 端口各一次；超杀帧不再结算
+    ok 1 - 事件 + Reward 端口各一次；超杀帧不再结算
+      ---
+      duration_ms: 0.377834
+      ...
+    # Subtest: 同帧双致命也只结算一次
+    ok 2 - 同帧双致命也只结算一次
+      ---
+      duration_ms: 0.137206
+      ...
+    # Subtest: 登场前（dormant）受击无效
+    ok 3 - 登场前（dormant）受击无效
+      ---
+      duration_ms: 0.10718
+      ...
+    1..3
+ok 26 - 击败只触发一次胜利结算
+  ---
+  duration_ms: 0.769301
+  type: 'suite'
+  ...
+# Subtest: Boss 期硬规则（冻结契约 bossPeriodRule）
+    # Subtest: 契约值：不清场 / 停刷 / ≤4 / 45s×2 猎犬 / 精英全禁
+    ok 1 - 契约值：不清场 / 停刷 / ≤4 / 45s×2 猎犬 / 精英全禁
+      ---
+      duration_ms: 0.206237
+      ...
+    # Subtest: 不清场：登场不触碰场上已有的怪
+    ok 2 - 不清场：登场不触碰场上已有的怪
+      ---
+      duration_ms: 0.154726
+      ...
+    # Subtest: 45s 猎犬补充：每 45s 补 2，同屏 4 封顶
+    ok 3 - 45s 猎犬补充：每 45s 补 2，同屏 4 封顶
+      ---
+      duration_ms: 4.222085
+      ...
+    1..3
+ok 27 - Boss 期硬规则（冻结契约 bossPeriodRule）
+  ---
+  duration_ms: 4.73953
+  type: 'suite'
+  ...
+# Subtest: 森林召唤上限：normalCount=2 时 summon(3) 只生成 1（有效上限 = min(summonCap, normalCap)）
+ok 28 - 森林召唤上限：normalCount=2 时 summon(3) 只生成 1（有效上限 = min(summonCap, normalCap)）
+  ---
+  duration_ms: 0.283066
+  ...
+# Subtest: 两条上限互相独立：summonCap 只卡森林召唤，normalCap 只卡猎犬补充
+ok 29 - 两条上限互相独立：summonCap 只卡森林召唤，normalCap 只卡猎犬补充
+  ---
+  duration_ms: 0.322793
+  ...
+# Subtest: 长模拟：普通怪峰值 ≤ normalCap，且森林召唤在 summonCap 内发生
+ok 30 - 长模拟：普通怪峰值 ≤ normalCap，且森林召唤在 summonCap 内发生
+  ---
+  duration_ms: 5.423764
+  ...
+# Subtest: 核心爆发 → 暴露 recoveryWindowSec(2s)：窗口内停手、窗口后恢复
+ok 31 - 核心爆发 → 暴露 recoveryWindowSec(2s)：窗口内停手、窗口后恢复
+  ---
+  duration_ms: 1.590464
+  ...
+# Subtest: 玩家死亡后攻击照常结算但不再对尸体造成伤害
+ok 32 - 玩家死亡后攻击照常结算但不再对尸体造成伤害
+  ---
+  duration_ms: 0.520717
+  ...
+1..32
+# tests 46
+# suites 6
+# pass 46
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 196.719341
+
+> riftbound-the-lost-realm@0.1.0 test:boss-integration
+> tsc -p tsconfig.test.json && node tests/prepare.cjs && node --test tests/boss-integration.test.mjs
+
+TAP version 13
+# Subtest: Boss 接线端到端（TASK-06 integration）
+    # Subtest: 三阶段判定：满血 guardian，65% corruption，30% coreFrenzy；不误判第三阶段
+    ok 1 - 三阶段判定：满血 guardian，65% corruption，30% coreFrenzy；不误判第三阶段
+      ---
+      duration_ms: 4.167372
+      ...
+    # Subtest: 六攻击可触发：第三阶段全池跑够时长收齐六种 attack id
+    ok 2 - 六攻击可触发：第三阶段全池跑够时长收齐六种 attack id
+      ---
+      duration_ms: 10.386642
+      ...
+    # Subtest: 预警命中：站在形状内结算掉血；躲开：站远不掉血
+    ok 3 - 预警命中：站在形状内结算掉血；躲开：站远不掉血
+      ---
+      duration_ms: 1.250801
+      ...
+    # Subtest: 胜利只结算一次：boss.defeated 恰好一次，重复命中不重发
+    ok 4 - 胜利只结算一次：boss.defeated 恰好一次，重复命中不重发
+      ---
+      duration_ms: 0.823204
+      ...
+    # Subtest: HP 权威归 BossAgent：applyResolvedDamage 后 agent 与镜像同步
+    ok 5 - HP 权威归 BossAgent：applyResolvedDamage 后 agent 与镜像同步
+      ---
+      duration_ms: 0.479214
+      ...
+    # Subtest: 召唤上限：SummonDirector 经适配层受 summonCap / normalCap 双重约束
+    ok 6 - 召唤上限：SummonDirector 经适配层受 summonCap / normalCap 双重约束
+      ---
+      duration_ms: 4.87396
+      ...
+    1..6
+ok 1 - Boss 接线端到端（TASK-06 integration）
+  ---
+  duration_ms: 24.168902
+  type: 'suite'
+  ...
+1..1
+# tests 6
+# suites 1
+# pass 6
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 117.687951
+
+> riftbound-the-lost-realm@0.1.0 test:qa
+> tsc -p tsconfig.test.json && node tests/prepare.cjs && node --test tests/qa-regression.test.mjs
+
+TAP version 13
+# [EventBus] handler 抛错（事件 player.leveledUp），已隔离以免中断其余监听: Error: x
+#     at file:///workspace/riftbound-the-lost-realm/tests/qa-regression.test.mjs:188:87
+#     at EventBus.publish (/workspace/riftbound-the-lost-realm/.testbuild/domain/events.js:31:17)
+#     at file:///workspace/riftbound-the-lost-realm/tests/qa-regression.test.mjs:190:35
+#     at getActual (node:assert:805:5)
+#     at Function.doesNotThrow (node:assert:971:32)
+#     at TestContext.<anonymous> (file:///workspace/riftbound-the-lost-realm/tests/qa-regression.test.mjs:190:12)
+#     at Test.runInAsyncScope (node:async_hooks:211:14)
+#     at Test.run (node:internal/test_runner/test:931:25)
+#     at Suite.processPendingSubtests (node:internal/test_runner/test:629:18)
+#     at Test.postRun (node:internal/test_runner/test:1042:19)
+# [EventBus] handler 抛错（事件 player.leveledUp），已隔离以免中断其余监听: Error: x
+#     at file:///workspace/riftbound-the-lost-realm/tests/qa-regression.test.mjs:188:87
+#     at EventBus.publish (/workspace/riftbound-the-lost-realm/.testbuild/domain/events.js:31:17)
+#     at file:///workspace/riftbound-the-lost-realm/tests/qa-regression.test.mjs:190:35
+#     at getActual (node:assert:805:5)
+#     at Function.doesNotThrow (node:assert:971:32)
+#     at TestContext.<anonymous> (file:///workspace/riftbound-the-lost-realm/tests/qa-regression.test.mjs:190:12)
+#     at Test.runInAsyncScope (node:async_hooks:211:14)
+#     at Test.run (node:internal/test_runner/test:931:25)
+#     at Suite.processPendingSubtests (node:internal/test_runner/test:629:18)
+#     at Test.postRun (node:internal/test_runner/test:1042:19)
+# [EventBus] handler 抛错（事件 player.leveledUp），已隔离以免中断其余监听: Error: x
+#     at file:///workspace/riftbound-the-lost-realm/tests/qa-regression.test.mjs:188:87
+#     at EventBus.publish (/workspace/riftbound-the-lost-realm/.testbuild/domain/events.js:31:17)
+#     at file:///workspace/riftbound-the-lost-realm/tests/qa-regression.test.mjs:190:35
+#     at getActual (node:assert:805:5)
+#     at Function.doesNotThrow (node:assert:971:32)
+#     at TestContext.<anonymous> (file:///workspace/riftbound-the-lost-realm/tests/qa-regression.test.mjs:190:12)
+#     at Test.runInAsyncScope (node:async_hooks:211:14)
+#     at Test.run (node:internal/test_runner/test:931:25)
+#     at Suite.processPendingSubtests (node:internal/test_runner/test:629:18)
+#     at Test.postRun (node:internal/test_runner/test:1042:19)
+# [EventBus] handler 抛错（事件 player.leveledUp），已隔离以免中断其余监听: Error: x
+#     at file:///workspace/riftbound-the-lost-realm/tests/qa-regression.test.mjs:188:87
+#     at EventBus.publish (/workspace/riftbound-the-lost-realm/.testbuild/domain/events.js:31:17)
+#     at file:///workspace/riftbound-the-lost-realm/tests/qa-regression.test.mjs:190:35
+#     at getActual (node:assert:805:5)
+#     at Function.doesNotThrow (node:assert:971:32)
+#     at TestContext.<anonymous> (file:///workspace/riftbound-the-lost-realm/tests/qa-regression.test.mjs:190:12)
+#     at Test.runInAsyncScope (node:async_hooks:211:14)
+#     at Test.run (node:internal/test_runner/test:931:25)
+#     at Suite.processPendingSubtests (node:internal/test_runner/test:629:18)
+#     at Test.postRun (node:internal/test_runner/test:1042:19)
+# [EventBus] handler 抛错（事件 player.leveledUp），已隔离以免中断其余监听: Error: x
+#     at file:///workspace/riftbound-the-lost-realm/tests/qa-regression.test.mjs:188:87
+#     at EventBus.publish (/workspace/riftbound-the-lost-realm/.testbuild/domain/events.js:31:17)
+#     at file:///workspace/riftbound-the-lost-realm/tests/qa-regression.test.mjs:190:35
+#     at getActual (node:assert:805:5)
+#     at Function.doesNotThrow (node:assert:971:32)
+#     at TestContext.<anonymous> (file:///workspace/riftbound-the-lost-realm/tests/qa-regression.test.mjs:190:12)
+#     at Test.runInAsyncScope (node:async_hooks:211:14)
+#     at Test.run (node:internal/test_runner/test:931:25)
+#     at Suite.processPendingSubtests (node:internal/test_runner/test:629:18)
+#     at Test.postRun (node:internal/test_runner/test:1042:19)
+# [EventBus] handler 抛错（事件 player.leveledUp），已隔离以免中断其余监听: Error: x
+#     at file:///workspace/riftbound-the-lost-realm/tests/qa-regression.test.mjs:188:87
+#     at EventBus.publish (/workspace/riftbound-the-lost-realm/.testbuild/domain/events.js:31:17)
+#     at file:///workspace/riftbound-the-lost-realm/tests/qa-regression.test.mjs:190:35
+#     at getActual (node:assert:805:5)
+#     at Function.doesNotThrow (node:assert:971:32)
+#     at TestContext.<anonymous> (file:///workspace/riftbound-the-lost-realm/tests/qa-regression.test.mjs:190:12)
+#     at Test.runInAsyncScope (node:async_hooks:211:14)
+#     at Test.run (node:internal/test_runner/test:931:25)
+#     at Suite.processPendingSubtests (node:internal/test_runner/test:629:18)
+#     at Test.postRun (node:internal/test_runner/test:1042:19)
+# [EventBus] handler 抛错（事件 player.leveledUp），已隔离以免中断其余监听: Error: x
+#     at file:///workspace/riftbound-the-lost-realm/tests/qa-regression.test.mjs:188:87
+#     at EventBus.publish (/workspace/riftbound-the-lost-realm/.testbuild/domain/events.js:31:17)
+#     at file:///workspace/riftbound-the-lost-realm/tests/qa-regression.test.mjs:190:35
+#     at getActual (node:assert:805:5)
+#     at Function.doesNotThrow (node:assert:971:32)
+#     at TestContext.<anonymous> (file:///workspace/riftbound-the-lost-realm/tests/qa-regression.test.mjs:190:12)
+#     at Test.runInAsyncScope (node:async_hooks:211:14)
+#     at Test.run (node:internal/test_runner/test:931:25)
+#     at Suite.processPendingSubtests (node:internal/test_runner/test:629:18)
+#     at Test.postRun (node:internal/test_runner/test:1042:19)
+# [EventBus] handler 抛错（事件 player.leveledUp），已隔离以免中断其余监听: Error: x
+#     at file:///workspace/riftbound-the-lost-realm/tests/qa-regression.test.mjs:188:87
+#     at EventBus.publish (/workspace/riftbound-the-lost-realm/.testbuild/domain/events.js:31:17)
+#     at file:///workspace/riftbound-the-lost-realm/tests/qa-regression.test.mjs:190:35
+#     at getActual (node:assert:805:5)
+#     at Function.doesNotThrow (node:assert:971:32)
+#     at TestContext.<anonymous> (file:///workspace/riftbound-the-lost-realm/tests/qa-regression.test.mjs:190:12)
+#     at Test.runInAsyncScope (node:async_hooks:211:14)
+#     at Test.run (node:internal/test_runner/test:931:25)
+#     at Suite.processPendingSubtests (node:internal/test_runner/test:629:18)
+#     at Test.postRun (node:internal/test_runner/test:1042:19)
+# [EventBus] handler 抛错（事件 player.leveledUp），已隔离以免中断其余监听: Error: x
+#     at file:///workspace/riftbound-the-lost-realm/tests/qa-regression.test.mjs:188:87
+#     at EventBus.publish (/workspace/riftbound-the-lost-realm/.testbuild/domain/events.js:31:17)
+#     at file:///workspace/riftbound-the-lost-realm/tests/qa-regression.test.mjs:190:35
+#     at getActual (node:assert:805:5)
+#     at Function.doesNotThrow (node:assert:971:32)
+#     at TestContext.<anonymous> (file:///workspace/riftbound-the-lost-realm/tests/qa-regression.test.mjs:190:12)
+#     at Test.runInAsyncScope (node:async_hooks:211:14)
+#     at Test.run (node:internal/test_runner/test:931:25)
+#     at Suite.processPendingSubtests (node:internal/test_runner/test:629:18)
+#     at Test.postRun (node:internal/test_runner/test:1042:19)
+# [EventBus] handler 抛错（事件 player.leveledUp），已隔离以免中断其余监听: Error: x
+#     at file:///workspace/riftbound-the-lost-realm/tests/qa-regression.test.mjs:188:87
+#     at EventBus.publish (/workspace/riftbound-the-lost-realm/.testbuild/domain/events.js:31:17)
+#     at file:///workspace/riftbound-the-lost-realm/tests/qa-regression.test.mjs:190:35
+#     at getActual (node:assert:805:5)
+#     at Function.doesNotThrow (node:assert:971:32)
+#     at TestContext.<anonymous> (file:///workspace/riftbound-the-lost-realm/tests/qa-regression.test.mjs:190:12)
+#     at Test.runInAsyncScope (node:async_hooks:211:14)
+#     at Test.run (node:internal/test_runner/test:931:25)
+#     at Suite.processPendingSubtests (node:internal/test_runner/test:629:18)
+#     at Test.postRun (node:internal/test_runner/test:1042:19)
+# [domain/save] 无法识别的存档版本 99，已回退为默认存档
+#     [浸泡] 1200 帧 / 1200s 游戏时间 / 墙钟 2ms
+#     [帧预算] 选卡+10订阅事件 = 0.0022 ms/帧
+#     [内存] heap 增长 0.44 MB
+# Subtest: Q-A Boss 血线
+    # Subtest: 8 个血线点全表：100/70/65/50/30/29/10/0
+    ok 1 - 8 个血线点全表：100/70/65/50/30/29/10/0
+      ---
+      duration_ms: 1.079932
+      ...
+    # Subtest: 满血不得误判第三阶段（1.0 / 0.99 / 0.9001 全为 guardian）
+    ok 2 - 满血不得误判第三阶段（1.0 / 0.99 / 0.9001 全为 guardian）
+      ---
+      duration_ms: 0.259838
+      ...
+    # Subtest: 101 点扫描：血量升序 → 阶段序号非递增（无翻转）
+    ok 3 - 101 点扫描：血量升序 → 阶段序号非递增（无翻转）
+      ---
+      duration_ms: 0.33487
+      ...
+    # Subtest: 畸形输入：NaN/超界夹取，不抛错
+    ok 4 - 畸形输入：NaN/超界夹取，不抛错
+      ---
+      duration_ms: 0.360187
+      ...
+    1..4
+ok 1 - Q-A Boss 血线
+  ---
+  duration_ms: 3.194197
+  type: 'suite'
+  ...
+# Subtest: Q-B AC-9 fuzz
+    # Subtest: 50,000 组随机 buff 组合：overflow 恒 0、输出恒有限
+    ok 1 - 50,000 组随机 buff 组合：overflow 恒 0、输出恒有限
+      ---
+      duration_ms: 94.068562
+      ...
+    1..1
+ok 2 - Q-B AC-9 fuzz
+  ---
+  duration_ms: 94.270558
+  type: 'suite'
+  ...
+# Subtest: Q-C RunClock 横向
+    # Subtest: 60fps 逐帧推进：510 预警 / 600 登场，误差 ≤ 1 帧
+    ok 1 - 60fps 逐帧推进：510 预警 / 600 登场，误差 ≤ 1 帧
+      ---
+      duration_ms: 4.918681
+      ...
+    # Subtest: 非法 dt（NaN/负/Infinity）不推进、不抛错
+    ok 2 - 非法 dt（NaN/负/Infinity）不推进、不抛错
+      ---
+      duration_ms: 0.469978
+      ...
+    # Subtest: freeze 整帧跳过：冻结期间 advance 任何值都不推进
+    ok 3 - freeze 整帧跳过：冻结期间 advance 任何值都不推进
+      ---
+      duration_ms: 0.380048
+      ...
+    # Subtest: reset 后翻牌可重新触发（幂等重开）
+    ok 4 - reset 后翻牌可重新触发（幂等重开）
+      ---
+      duration_ms: 0.217869
+      ...
+    1..4
+ok 3 - Q-C RunClock 横向
+  ---
+  duration_ms: 6.64603
+  type: 'suite'
+  ...
+# Subtest: Q-D EventBus 压力
+    # Subtest: 10,000 轮订阅-退订：listenerCount 归零、无泄漏
+    ok 1 - 10,000 轮订阅-退订：listenerCount 归零、无泄漏
+      ---
+      duration_ms: 5.741581
+      ...
+    # Subtest: 退订幂等：重复退订不炸、不影响他人
+    ok 2 - 退订幂等：重复退订不炸、不影响他人
+      ---
+      duration_ms: 0.372537
+      ...
+    # Subtest: 异常混合：一半 handler 抛错，其余照常收齐
+    ok 3 - 异常混合：一半 handler 抛错，其余照常收齐
+      ---
+      duration_ms: 3.02262
+      ...
+    1..3
+ok 4 - Q-D EventBus 压力
+  ---
+  duration_ms: 9.355036
+  type: 'suite'
+  ...
+# Subtest: Q-E Rng 压力
+    # Subtest: 非法 seed（0/负/NaN/Infinity）不抛错且产出有限
+    ok 1 - 非法 seed（0/负/NaN/Infinity）不抛错且产出有限
+      ---
+      duration_ms: 0.267116
+      ...
+    # Subtest: 同 seed 5,000 次逐项一致
+    ok 2 - 同 seed 5,000 次逐项一致
+      ---
+      duration_ms: 1.28798
+      ...
+    # Subtest: snapshot/restore 循环 1,000 轮复现
+    ok 3 - snapshot/restore 循环 1,000 轮复现
+      ---
+      duration_ms: 0.367147
+      ...
+    1..3
+ok 5 - Q-E Rng 压力
+  ---
+  duration_ms: 2.163394
+  type: 'suite'
+  ...
+# Subtest: Q-F 存档畸形
+    # Subtest: migrateV2toV3 对 6 类畸形输入不抛错
+    ok 1 - migrateV2toV3 对 6 类畸形输入不抛错
+      ---
+      duration_ms: 0.865173
+      ...
+    # Subtest: migrateSave 对 null / 未知版本兜底
+    ok 2 - migrateSave 对 null / 未知版本兜底
+      ---
+      duration_ms: 0.33429
+      ...
+    1..2
+ok 6 - Q-F 存档畸形
+  ---
+  duration_ms: 1.322026
+  type: 'suite'
+  ...
+# Subtest: Q-G 浸泡与预算（逻辑层）
+    # Subtest: 浸泡 20 分钟（60× 加速）：监听器归零、Boss 翻牌到达、时钟精确
+    ok 1 - 浸泡 20 分钟（60× 加速）：监听器归零、Boss 翻牌到达、时钟精确
+      ---
+      duration_ms: 3.28893
+      ...
+    # Subtest: 最坏情况逻辑帧预算：选卡+发事件 ≤ 1ms/次（渲染预算 3.3ms 的 30%）
+    ok 2 - 最坏情况逻辑帧预算：选卡+发事件 ≤ 1ms/次（渲染预算 3.3ms 的 30%）
+      ---
+      duration_ms: 15.573647
+      ...
+    # Subtest: 内存浸泡：heap 增长 < 50MB
+    ok 3 - 内存浸泡：heap 增长 < 50MB
+      ---
+      duration_ms: 1.067705
+      ...
+    1..3
+ok 7 - Q-G 浸泡与预算（逻辑层）
+  ---
+  duration_ms: 20.158605
+  type: 'suite'
+  ...
+# Subtest: Q-H 精英窗口
+    # Subtest: 细粒度边界扫描：[360,509] 闭区间，两侧步进 1s 均为 false
+    ok 1 - 细粒度边界扫描：[360,509] 闭区间，两侧步进 1s 均为 false
+      ---
+      duration_ms: 0.548029
+      ...
+    1..1
+ok 8 - Q-H 精英窗口
+  ---
+  duration_ms: 0.650507
+  type: 'suite'
+  ...
+1..8
+# tests 21
+# suites 8
+# pass 21
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 242.974244
+
+> riftbound-the-lost-realm@0.1.0 test:ui
+> tsc -p tsconfig.test.json && node tests/prepare.cjs && node --experimental-strip-types --no-warnings --test tests/ui-contract.test.mjs
+
+TAP version 13
+# [EventBus] handler 抛错（事件 boss.phase_changed），已隔离以免中断其余监听: Error: isolated
+#     at file:///workspace/riftbound-the-lost-realm/tests/ui-contract.test.mjs:186:53
+#     at EventBus.publish (file:///workspace/riftbound-the-lost-realm/src/domain/events.ts:139:50)
+#     at TestContext.<anonymous> (file:///workspace/riftbound-the-lost-realm/tests/ui-contract.test.mjs:189:7)
+#     at Test.runInAsyncScope (node:async_hooks:211:14)
+#     at Test.run (node:internal/test_runner/test:931:25)
+#     at Test.processPendingSubtests (node:internal/test_runner/test:629:18)
+#     at Test.postRun (node:internal/test_runner/test:1042:19)
+#     at Test.run (node:internal/test_runner/test:970:12)
+#     at async Test.processPendingSubtests (node:internal/test_runner/test:629:7)
+# Subtest: AC-U01 formatTime / formatCount / formatPct 边界
+ok 1 - AC-U01 formatTime / formatCount / formatPct 边界
+  ---
+  duration_ms: 20.239105
+  ...
+# Subtest: AC-U02 六预警形状 / 六词缀形状互异
+ok 2 - AC-U02 六预警形状 / 六词缀形状互异
+  ---
+  duration_ms: 0.439317
+  ...
+# Subtest: AC-U03 Boss 三阶段 / 七宝石 / 五品质 / 七货币形状互异
+ok 3 - AC-U03 Boss 三阶段 / 七宝石 / 五品质 / 七货币形状互异
+  ---
+  duration_ms: 0.300552
+  ...
+# Subtest: AC-U04 文本端口：key 常量与解析器不伪造文案
+ok 4 - AC-U04 文本端口：key 常量与解析器不伪造文案
+  ---
+  duration_ms: 0.432719
+  ...
+# Subtest: AC-U05 快照 1:1 映射 + XP 需求取领域函数 xpToNextLevel
+ok 5 - AC-U05 快照 1:1 映射 + XP 需求取领域函数 xpToNextLevel
+  ---
+  duration_ms: 0.883233
+  ...
+# Subtest: AC-U06 改注入数值 → UI 跟随（验收：改 config 后 UI 跟着变）
+ok 6 - AC-U06 改注入数值 → UI 跟随（验收：改 config 后 UI 跟着变）
+  ---
+  duration_ms: 0.524146
+  ...
+# Subtest: AC-U07 低频端口注入 → 展示值来自宿主（UI 不推算）
+ok 7 - AC-U07 低频端口注入 → 展示值来自宿主（UI 不推算）
+  ---
+  duration_ms: 0.417455
+  ...
+# Subtest: AC-U08 Boss 阶段取快照 / 预警窗口与三点检查点
+ok 8 - AC-U08 Boss 阶段取快照 / 预警窗口与三点检查点
+  ---
+  duration_ms: 0.366743
+  ...
+# Subtest: AC-U09 终态隐藏 HUD / 升级选卡冻结标识
+ok 9 - AC-U09 终态隐藏 HUD / 升级选卡冻结标识
+  ---
+  duration_ms: 0.844681
+  ...
+# Subtest: AC-U10 subscribe 退订 / clearAll / 异常隔离
+ok 10 - AC-U10 subscribe 退订 / clearAll / 异常隔离
+  ---
+  duration_ms: 2.163575
+  ...
+# Subtest: AC-U11 src/domain/ 与 src/config/ 无本分支改动
+ok 11 - AC-U11 src/domain/ 与 src/config/ 无本分支改动
+  ---
+  duration_ms: 13.486903
+  ...
+# Subtest: AC-U12 UI 源码不写死时间轴 / XP 曲线 / 槽位数字面量
+ok 12 - AC-U12 UI 源码不写死时间轴 / XP 曲线 / 槽位数字面量
+  ---
+  duration_ms: 2.36137
+  ...
+1..12
+# tests 12
+# suites 0
+# pass 12
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 305.605406
+
+> riftbound-the-lost-realm@0.1.0 test:text
+> tsc -p tsconfig.test.json && node tests/prepare.cjs && node --experimental-strip-types --no-warnings --test tests/localization-table.test.mjs
+
+TAP version 13
+# Subtest: L10N-01 enTexts 覆盖全部 46 个 UI_TEXT_KEYS 且规模符合交付
+ok 1 - L10N-01 enTexts 覆盖全部 46 个 UI_TEXT_KEYS 且规模符合交付
+  ---
+  duration_ms: 1.758204
+  ...
+# Subtest: L10N-02 全部字符串值：非空英文、无中文、无占位符、无 key 残留
+ok 2 - L10N-02 全部字符串值：非空英文、无中文、无占位符、无 key 残留
+  ---
+  duration_ms: 1.269707
+  ...
+# Subtest: L10N-03 enResolver 命中真英文且未知 key 原样兜底
+ok 3 - L10N-03 enResolver 命中真英文且未知 key 原样兜底
+  ---
+  duration_ms: 0.265098
+  ...
+# Subtest: L10N-04 S3：结语句入表但 UI 不引用（等所有者拍板）
+ok 4 - L10N-04 S3：结语句入表但 UI 不引用（等所有者拍板）
+  ---
+  duration_ms: 1.736826
+  ...
+1..4
+# tests 4
+# suites 0
+# pass 4
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 167.910638
+
+> riftbound-the-lost-realm@0.1.0 test:audio
+> tsc -p tsconfig.test.json && node tests/prepare.cjs && node --experimental-strip-types --no-warnings --test tests/audio-contract.test.mjs
+
+TAP version 13
+# Subtest: A. 配方表 48 覆盖与结构合法性
+    # Subtest: A1 键集合 == 冻结契约展开的 48 个具体 ID，零缺口零越界
+    ok 1 - A1 键集合 == 冻结契约展开的 48 个具体 ID，零缺口零越界
+      ---
+      duration_ms: 1.745277
+      ...
+    # Subtest: A2 每条配方字段合法（ADSR/增益/扫频/优先级/时长）
+    ok 2 - A2 每条配方字段合法（ADSR/增益/扫频/优先级/时长）
+      ---
+      duration_ms: 1.089657
+      ...
+    # Subtest: A3 冻结契约里所有可达音效都有配方（动态映射全覆盖）
+    ok 3 - A3 冻结契约里所有可达音效都有配方（动态映射全覆盖）
+      ---
+      duration_ms: 0.560309
+      ...
+    # Subtest: A4 BGM 配方 = 4 曲目 + 2 环境层，转调半音 0/+2/+5
+    ok 4 - A4 BGM 配方 = 4 曲目 + 2 环境层，转调半音 0/+2/+5
+      ---
+      duration_ms: 0.270606
+      ...
+    1..4
+ok 1 - A. 配方表 48 覆盖与结构合法性
+  ---
+  duration_ms: 5.740734
+  type: 'suite'
+  ...
+# Subtest: B. 事件接线（含 proc / pickup / boss.phase 动态事件）
+    # Subtest: B1 静态映射事件逐一进入播放路径
+    ok 1 - B1 静态映射事件逐一进入播放路径
+      ---
+      duration_ms: 9.905906
+      ...
+    # Subtest: B2 动态事件由冻结解析函数决定，桥不复制映射逻辑
+    ok 2 - B2 动态事件由冻结解析函数决定，桥不复制映射逻辑
+      ---
+      duration_ms: 1.938582
+      ...
+    # Subtest: B3 空映射事件不产生音效，但 BGM 控制仍被消费
+    ok 3 - B3 空映射事件不产生音效，但 BGM 控制仍被消费
+      ---
+      duration_ms: 0.599723
+      ...
+    1..3
+ok 2 - B. 事件接线（含 proc / pickup / boss.phase 动态事件）
+  ---
+  duration_ms: 12.931397
+  type: 'suite'
+  ...
+# Subtest: C. 生命周期与退订归零
+    # Subtest: C1 dispose 后所有订阅 listenerCount=0，且从不调用 clearAll
+    ok 1 - C1 dispose 后所有订阅 listenerCount=0，且从不调用 clearAll
+      ---
+      duration_ms: 0.578166
+      ...
+    # Subtest: C2 start 幂等；dispose 后再 start 不重复订阅、ctx 关闭一次
+    ok 2 - C2 start 幂等；dispose 后再 start 不重复订阅、ctx 关闭一次
+      ---
+      duration_ms: 0.667903
+      ...
+    1..2
+ok 3 - C. 生命周期与退订归零
+  ---
+  duration_ms: 1.647244
+  type: 'suite'
+  ...
+# Subtest: D. 16 音源上限与优先级抢占
+    # Subtest: D1 连续 play 20 条 normal，活跃声部恒 <= 16
+    ok 1 - D1 连续 play 20 条 normal，活跃声部恒 <= 16
+      ---
+      duration_ms: 0.982632
+      ...
+    # Subtest: D2 池满后 bossWarn(40) 抢占 normal(10) 中最老的一个；同级不抢占
+    ok 2 - D2 池满后 bossWarn(40) 抢占 normal(10) 中最老的一个；同级不抢占
+      ---
+      duration_ms: 0.734684
+      ...
+    1..2
+ok 4 - D. 16 音源上限与优先级抢占
+  ---
+  duration_ms: 1.866098
+  type: 'suite'
+  ...
+# Subtest: E. 静音开关
+    # Subtest: E1 muted 时不建 ctx、不产生 voice；解除后恢复；再静音 master=0
+    ok 1 - E1 muted 时不建 ctx、不产生 voice；解除后恢复；再静音 master=0
+      ---
+      duration_ms: 0.681848
+      ...
+    1..1
+ok 5 - E. 静音开关
+  ---
+  duration_ms: 0.884649
+  type: 'suite'
+  ...
+# Subtest: F. BGM 选曲与 Boss 转调
+    # Subtest: F1 事件驱动选曲 + 转调半音 0/+2/+5，dispose 清定时器
+    ok 1 - F1 事件驱动选曲 + 转调半音 0/+2/+5，dispose 清定时器
+      ---
+      duration_ms: 1.387055
+      ...
+    # Subtest: F2 Bus 事件路径：boss.phase_changed 同时驱动 SFX 与 BGM 转调
+    ok 2 - F2 Bus 事件路径：boss.phase_changed 同时驱动 SFX 与 BGM 转调
+      ---
+      duration_ms: 0.607493
+      ...
+    1..2
+ok 6 - F. BGM 选曲与 Boss 转调
+  ---
+  duration_ms: 2.148197
+  type: 'suite'
+  ...
+# Subtest: G. AudioContext 解锁与可见性
+    # Subtest: G1 懒创建 + 首手势 resume + 移除手势监听 + 可见性挂起/恢复 + dispose
+    ok 1 - G1 懒创建 + 首手势 resume + 移除手势监听 + 可见性挂起/恢复 + dispose
+      ---
+      duration_ms: 0.413199
+      ...
+    # Subtest: G2 静音 buffer 只生成一次；ensure 幂等
+    ok 2 - G2 静音 buffer 只生成一次；ensure 幂等
+      ---
+      duration_ms: 0.149716
+      ...
+    1..2
+ok 7 - G. AudioContext 解锁与可见性
+  ---
+  duration_ms: 0.677596
+  type: 'suite'
+  ...
+# Subtest: H. 红线护栏
+    # Subtest: H1 合成层没有音色魔法数字常量表（数值都在 recipes）
+    ok 1 - H1 合成层没有音色魔法数字常量表（数值都在 recipes）
+      ---
+      duration_ms: 0.124999
+      ...
+    1..1
+ok 8 - H. 红线护栏
+  ---
+  duration_ms: 1.735026
+  type: 'suite'
+  ...
+1..8
+# tests 17
+# suites 8
+# pass 17
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 317.314196
+
+> riftbound-the-lost-realm@0.1.0 test:save
+> node --experimental-strip-types --no-warnings --test tests/save-backend.test.mjs
+
+TAP version 13
+# Subtest: A1 首次加载返回默认档（schemaVersion=3，全字段为初始状态）
+ok 1 - A1 首次加载返回默认档（schemaVersion=3，全字段为初始状态）
+  ---
+  duration_ms: 2.686478
+  ...
+# Subtest: A2 写入后重载：gold/gem/weapon/meta/stats/settings 全字段一致
+ok 2 - A2 写入后重载：gold/gem/weapon/meta/stats/settings 全字段一致
+  ---
+  duration_ms: 1.334424
+  ...
+# Subtest: B1 v2 旧档迁移：profile.gold → currencies.gold，且不覆盖原档
+ok 3 - B1 v2 旧档迁移：profile.gold → currencies.gold，且不覆盖原档
+  ---
+  duration_ms: 0.348492
+  ...
+# Subtest: B2 v3 直通：不经过迁移，字段原样返回
+ok 4 - B2 v3 直通：不经过迁移，字段原样返回
+  ---
+  duration_ms: 0.517007
+  ...
+# Subtest: C1 损坏 JSON：隔离备份 + 默认档 + 不抛错 + 原档不被覆盖
+ok 5 - C1 损坏 JSON：隔离备份 + 默认档 + 不抛错 + 原档不被覆盖
+  ---
+  duration_ms: 0.560289
+  ...
+# Subtest: C2 结构畸形 v3（非 JSON 语法错误）：同样隔离并回默认档
+ok 6 - C2 结构畸形 v3（非 JSON 语法错误）：同样隔离并回默认档
+  ---
+  duration_ms: 0.358515
+  ...
+# Subtest: D1 save_next 有效：优先恢复并提交主档、清理临时键
+ok 7 - D1 save_next 有效：优先恢复并提交主档、清理临时键
+  ---
+  duration_ms: 0.461796
+  ...
+# Subtest: D2 save_next 损坏：回退 save_main，坏临时键被隔离且主档不动
+ok 8 - D2 save_next 损坏：回退 save_main，坏临时键被隔离且主档不动
+  ---
+  duration_ms: 0.39581
+  ...
+# Subtest: D3 正常写入路径：save_next 写完即校验、覆盖主档后清理
+ok 9 - D3 正常写入路径：save_next 写完即校验、覆盖主档后清理
+  ---
+  duration_ms: 0.646825
+  ...
+# Subtest: E1 配额写失败（QuotaExceededError）：主档完好、无临时键残留
+ok 10 - E1 配额写失败（QuotaExceededError）：主档完好、无临时键残留
+  ---
+  duration_ms: 1.121323
+  ...
+# Subtest: E2 validateSaveV3 拒绝畸形档：不落盘、不产生临时键
+ok 11 - E2 validateSaveV3 拒绝畸形档：不落盘、不产生临时键
+  ---
+  duration_ms: 0.566705
+  ...
+# Subtest: F1 SavePort v3 接口：load/save 走 V3，loadSync 可选，mock 与真后端同签名
+ok 12 - F1 SavePort v3 接口：load/save 走 V3，loadSync 可选，mock 与真后端同签名
+  ---
+  duration_ms: 0.614345
+  ...
+# Subtest: F2 EconomySystem + localStorage 真后端：结算落盘，重载后统计一致
+ok 13 - F2 EconomySystem + localStorage 真后端：结算落盘，重载后统计一致
+  ---
+  duration_ms: 1.860745
+  ...
+# Subtest: G1 击杀→掉落→拾取→结算落盘端到端：结算屏 4 类货币与宝石非零，重载一致
+ok 14 - G1 击杀→掉落→拾取→结算落盘端到端：结算屏 4 类货币与宝石非零，重载一致
+  ---
+  duration_ms: 1.423732
+  ...
+# Subtest: G2 重复拾取只入账一次（dropId 唯一锚点 + picked 防重入）
+ok 15 - G2 重复拾取只入账一次（dropId 唯一锚点 + picked 防重入）
+  ---
+  duration_ms: 1.475114
+  ...
+# Subtest: G3 bossDefeated 入参生效：无需 onBossDefeated 绕过，且 victory/false 不重复入账
+ok 16 - G3 bossDefeated 入参生效：无需 onBossDefeated 绕过，且 victory/false 不重复入账
+  ---
+  duration_ms: 0.96741
+  ...
+# Subtest: G4 settleRun 配额写失败：不 reject、不 unhandled、主档完好且有 console.error 留痕
+ok 17 - G4 settleRun 配额写失败：不 reject、不 unhandled、主档完好且有 console.error 留痕
+  ---
+  duration_ms: 0.702644
+  ...
+# Subtest: H1 事件顺序：boss.defeated 的 Boss 掉落入账先于结算快照（回归 DEF-006）
+ok 18 - H1 事件顺序：boss.defeated 的 Boss 掉落入账先于结算快照（回归 DEF-006）
+  ---
+  duration_ms: 0.586677
+  ...
+# Subtest: H2 Boss 掉落进本局结算与存档：四类货币非零，重载一致
+ok 19 - H2 Boss 掉落进本局结算与存档：四类货币非零，重载一致
+  ---
+  duration_ms: 0.673027
+  ...
+# Subtest: H3 防重：多次 boss.defeated 只入账一次 Boss 掉落
+ok 20 - H3 防重：多次 boss.defeated 只入账一次 Boss 掉落
+  ---
+  duration_ms: 0.397496
+  ...
+1..20
+# tests 20
+# suites 0
+# pass 20
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 297.523047
+EXIT_CODE=0
+
+===== GATE: 4) npm run build =====
+$ npm run build
+
+> riftbound-the-lost-realm@0.1.0 build
+> tsc && vite build
+
+vite v8.3.8 building client environment for production...
+transforming...
+✓ 3257 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                                                     17.14 kB │ gzip:     3.56 kB
+dist/assets/index-pw9WDS6A.css                                      10.10 kB │ gzip:     2.61 kB
+dist/assets/abstractAudioBus-B03a1pOF.js                             0.11 kB │ gzip:     0.13 kB
+dist/assets/rolldown-runtime-DK3Fl9T5.js                             0.15 kB │ gzip:     0.15 kB
+dist/assets/kernelBlurVaryingDeclaration-DP2Wr9Oc.js                 0.21 kB │ gzip:     0.17 kB
+dist/assets/fogVertex-B90wzaBe.js                                    0.21 kB │ gzip:     0.18 kB
+dist/assets/fogVertexDeclaration-Bb9kDbrL.js                         0.22 kB │ gzip:     0.18 kB
+dist/assets/kernelBlurVaryingDeclaration-g2Ge9lzd.js                 0.22 kB │ gzip:     0.18 kB
+dist/assets/meshVertexDeclaration-CPlGPeEg.js                        0.22 kB │ gzip:     0.18 kB
+dist/assets/mainUVVaryingDeclaration-BBamQlxR.js                     0.22 kB │ gzip:     0.19 kB
+dist/assets/fogVertexDeclaration-CiHbVcSR.js                         0.23 kB │ gzip:     0.19 kB
+dist/assets/mainUVVaryingDeclaration-B_7d0nc3.js                     0.23 kB │ gzip:     0.19 kB
+dist/assets/pointCloudVertex-CmkEsLzf.js                             0.24 kB │ gzip:     0.20 kB
+dist/assets/subSurfaceScatteringFunctions-D1w5631e.js                0.26 kB │ gzip:     0.20 kB
+dist/assets/logDepthFragment-C5lxT4l1.js                             0.27 kB │ gzip:     0.22 kB
+dist/assets/subSurfaceScatteringFunctions-kzIx-1Od.js                0.27 kB │ gzip:     0.21 kB
+dist/assets/meshUboDeclaration-BATNZvmb.js                           0.27 kB │ gzip:     0.23 kB
+dist/assets/fogFragment-CKCGTcJi.js                                  0.29 kB │ gzip:     0.22 kB
+dist/assets/logDepthVertex-D5IUM6qd.js                               0.30 kB │ gzip:     0.24 kB
+dist/assets/logDepthFragment-CxtJswLx.js                             0.31 kB │ gzip:     0.24 kB
+dist/assets/tgaTextureLoader-CJQByjmC.js                             0.31 kB │ gzip:     0.25 kB
+dist/assets/fogFragment-C9E3EVJj.js                                  0.32 kB │ gzip:     0.25 kB
+dist/assets/sceneVertexDeclaration-CluTp-RC.js                       0.33 kB │ gzip:     0.22 kB
+dist/assets/fogVertex-D0bmc4KF.js                                    0.33 kB │ gzip:     0.23 kB
+dist/assets/morphTargetsVertexGlobal-CKIgoRtW.js                     0.34 kB │ gzip:     0.25 kB
+dist/assets/meshUboDeclaration-BmNu2KU_.js                           0.34 kB │ gzip:     0.25 kB
+dist/assets/logDepthDeclaration-DcRZd9JE.js                          0.35 kB │ gzip:     0.26 kB
+dist/assets/morphTargetsVertexGlobal-IS1MZ8yz.js                     0.36 kB │ gzip:     0.25 kB
+dist/assets/sceneFragmentDeclaration-ql3RpL9u.js                     0.36 kB │ gzip:     0.23 kB
+dist/assets/bumpVertexDeclaration-CP4xz8pV.js                        0.36 kB │ gzip:     0.25 kB
+dist/assets/engineStore-B_7KzytD.js                                  0.36 kB │ gzip:     0.22 kB
+dist/assets/sceneUboDeclaration-B5VhSG0v.js                          0.36 kB │ gzip:     0.26 kB
+dist/assets/logDepthDeclaration-FIwYr9tC.js                          0.36 kB │ gzip:     0.27 kB
+dist/assets/logDepthVertex-DSD5XdGw.js                               0.37 kB │ gzip:     0.26 kB
+dist/assets/oitFinalSimpleBlend.fragment-Q5Yng1yZ.js                 0.38 kB │ gzip:     0.25 kB
+dist/assets/decalFragment-DYiNNNYb.js                                0.39 kB │ gzip:     0.24 kB
+dist/assets/precisionDate-CfCevjl-.js                                0.39 kB │ gzip:     0.23 kB
+dist/assets/bumpVertexDeclaration-zEGdjOId.js                        0.41 kB │ gzip:     0.27 kB
+dist/assets/vertexColorMixing-DPW6Is9y.js                            0.43 kB │ gzip:     0.27 kB
+dist/assets/oitFinalSimpleBlend.fragment-nGYFumis.js                 0.45 kB │ gzip:     0.29 kB
+dist/assets/boundingBoxRendererUboDeclaration-p4IHL4lf.js            0.46 kB │ gzip:     0.28 kB
+dist/assets/shaderStore-D-XQlhUT.js                                  0.46 kB │ gzip:     0.17 kB
+dist/assets/fresnelFunction-B3UVg8Q-.js                              0.47 kB │ gzip:     0.32 kB
+dist/assets/decalFragment-CvBK6CMD.js                                0.48 kB │ gzip:     0.28 kB
+dist/assets/sceneUboDeclaration-D_dVU-T1.js                          0.49 kB │ gzip:     0.29 kB
+dist/assets/performanceConfigurator-UtxC_Odd.js                      0.50 kB │ gzip:     0.25 kB
+dist/assets/hdrTextureLoader-CigL29aB.js                             0.53 kB │ gzip:     0.38 kB
+dist/assets/bumpVertex-matgJiZ9.js                                   0.54 kB │ gzip:     0.33 kB
+dist/assets/objectIdFunctions-DbOLxRrm.js                            0.54 kB │ gzip:     0.36 kB
+dist/assets/vertexColorMixing-UCrnwszu.js                            0.56 kB │ gzip:     0.30 kB
+dist/assets/envTextureLoader-CR2elsOc.js                             0.56 kB │ gzip:     0.37 kB
+dist/assets/objectIdFunctions-yylhAVFR.js                            0.56 kB │ gzip:     0.36 kB
+dist/assets/clipPlaneFragmentDeclaration-DwyXN3A8.js                 0.60 kB │ gzip:     0.27 kB
+dist/assets/packingFunctions-BtK51k3Y.js                             0.60 kB │ gzip:     0.33 kB
+dist/assets/clipPlaneFragmentDeclaration-ByWuc2u-.js                 0.60 kB │ gzip:     0.28 kB
+dist/assets/iblVoxelOpacityAtomicMax-C9BLvW0W.js                     0.61 kB │ gzip:     0.35 kB
+dist/assets/packingFunctions-zMCp-5EJ.js                             0.64 kB │ gzip:     0.35 kB
+dist/assets/clipPlaneVertex-DPSs14UF.js                              0.64 kB │ gzip:     0.28 kB
+dist/assets/samplerFragmentDeclaration-3yaLawFX.js                   0.67 kB │ gzip:     0.29 kB
+dist/assets/backgroundUboDeclaration-CvL1rn_O.js                     0.69 kB │ gzip:     0.35 kB
+dist/assets/backgroundUboDeclaration-i4MsxPq1.js                     0.72 kB │ gzip:     0.38 kB
+dist/assets/bumpVertex-KprKHjtT.js                                   0.72 kB │ gzip:     0.38 kB
+dist/assets/samplerFragmentDeclaration-CEHqUfAO.js                   0.72 kB │ gzip:     0.32 kB
+dist/assets/morphTargetsVertexDeclaration-BoNQXQ5g.js                0.73 kB │ gzip:     0.36 kB
+dist/assets/clipPlaneVertexDeclaration-lbEIdyxE.js                   0.74 kB │ gzip:     0.30 kB
+dist/assets/volumetricLightingRenderVolume.vertex-BJ5ID1UJ.js        0.75 kB │ gzip:     0.39 kB
+dist/assets/volumetricLightingRenderVolume.vertex-CdmATQWr.js        0.76 kB │ gzip:     0.39 kB
+dist/assets/clusteredLightingFunctions-BFCOODPn.js                   0.76 kB │ gzip:     0.35 kB
+dist/assets/clipPlaneVertexDeclaration-_B10-M6A.js                   0.78 kB │ gzip:     0.31 kB
+dist/assets/morphTargetsVertexDeclaration-lzw20E7Y.js                0.78 kB │ gzip:     0.37 kB
+dist/assets/clusteredLightingFunctions-DNqaoQCj.js                   0.79 kB │ gzip:     0.35 kB
+dist/assets/clipPlaneVertex-BDcbHYFd.js                              0.79 kB │ gzip:     0.31 kB
+dist/assets/clipPlaneFragment-CiHPIb-X.js                            0.79 kB │ gzip:     0.31 kB
+dist/assets/volumetricLightingBlendVolume.fragment-Bz5yiNiY.js       0.81 kB │ gzip:     0.45 kB
+dist/assets/gsSortScanSums.compute-D6phtEU2.js                       0.82 kB │ gzip:     0.47 kB
+dist/assets/iblCopyVoxelBufferToGrid.compute-Dn5OuT-_.js             0.83 kB │ gzip:     0.50 kB
+dist/assets/bakedVertexAnimationDeclaration-C-g0vyVW.js              0.85 kB │ gzip:     0.44 kB
+dist/assets/instancesVertex-C-FoRQR1.js                              0.88 kB │ gzip:     0.32 kB
+dist/assets/clipPlaneFragment-CIXWtyW3.js                            0.90 kB │ gzip:     0.33 kB
+dist/assets/lod3D.fragment-Ci5mG9el.js                               0.90 kB │ gzip:     0.48 kB
+dist/assets/webAudioMainBus-B8Pcsr6J.js                              0.91 kB │ gzip:     0.41 kB
+dist/assets/gsSortOutput.compute-DCC_sFzk.js                         0.92 kB │ gzip:     0.50 kB
+dist/assets/fogFragmentDeclaration-DCUwnHxF.js                       0.93 kB │ gzip:     0.45 kB
+dist/assets/instancesDeclaration-CJBvtBV5.js                         0.93 kB │ gzip:     0.34 kB
+dist/assets/imageProcessingDeclaration-BrX2Kfu8.js                   0.96 kB │ gzip:     0.47 kB
+dist/assets/shadowsVertex-PTtZYBbI.js                                0.99 kB │ gzip:     0.43 kB
+dist/assets/gaussianPointSplattingScan-COj6jNKT.js                   1.00 kB │ gzip:     0.48 kB
+dist/assets/gsSortCount.compute-1a2MeKod.js                          1.01 kB │ gzip:     0.55 kB
+dist/assets/volumetricLightingBlendVolume.fragment-DIkNb-c4.js       1.01 kB │ gzip:     0.51 kB
+dist/assets/fogFragmentDeclaration-RaGxQRv_.js                       1.03 kB │ gzip:     0.49 kB
+dist/assets/instancesDeclaration-DsiFqYXH.js                         1.04 kB │ gzip:     0.36 kB
+dist/assets/imageProcessingDeclaration-DXUaJI_N.js                   1.07 kB │ gzip:     0.51 kB
+dist/assets/selection.fragment-C3BT1yGK.js                           1.11 kB │ gzip:     0.52 kB
+dist/assets/lod3D.fragment-Cp3Fn-i6.js                               1.11 kB │ gzip:     0.54 kB
+dist/assets/meshBlendTagFragmentOutput-BRH6s5gV.js                   1.13 kB │ gzip:     0.54 kB
+dist/assets/lightVxUboDeclaration-C0bL_Fd5.js                        1.16 kB │ gzip:     0.53 kB
+dist/assets/instancesVertex-Dty6qjVO.js                              1.17 kB │ gzip:     0.39 kB
+dist/assets/harmonicsFunctions-BVq19rUD.js                           1.20 kB │ gzip:     0.53 kB
+dist/assets/basisTextureLoader-DuaSSZqE.js                           1.21 kB │ gzip:     0.57 kB
+dist/assets/bonesDeclaration-C_GZ6k81.js                             1.22 kB │ gzip:     0.60 kB
+dist/assets/morphTargetsVertexGlobalDeclaration-LgRwWaoX.js          1.24 kB │ gzip:     0.49 kB
+dist/assets/noise.fragment-DEbzbasH.js                               1.24 kB │ gzip:     0.65 kB
+dist/assets/lightVxFragmentDeclaration-Bl0jzps7.js                   1.25 kB │ gzip:     0.51 kB
+dist/assets/gsSortScanLocal.compute-DRqv2agw.js                      1.25 kB │ gzip:     0.62 kB
+dist/assets/defaultUboDeclaration-C53xcSdv.js                        1.26 kB │ gzip:     0.55 kB
+dist/assets/ddsTextureLoader-iJMlnYQW.js                             1.27 kB │ gzip:     0.62 kB
+dist/assets/halfFloat-Ce77JD5z.js                                    1.29 kB │ gzip:     0.60 kB
+dist/assets/selection.fragment-hcV9e-ET.js                           1.33 kB │ gzip:     0.59 kB
+dist/assets/noise.fragment-LuZEVkT0.js                               1.40 kB │ gzip:     0.71 kB
+dist/assets/gaussianSplattingVoxel.fragment-DO9W3k2R.js              1.47 kB │ gzip:     0.69 kB
+dist/assets/abstractSoundSource-EXxOfp1e.js                          1.48 kB │ gzip:     0.48 kB
+dist/assets/harmonicsFunctions-Bny7AGgg.js                           1.50 kB │ gzip:     0.57 kB
+dist/assets/bonesDeclaration-3fzk1vv3.js                             1.57 kB │ gzip:     0.68 kB
+dist/assets/screenSpaceCurvature.fragment-DGKqBbuS.js                1.59 kB │ gzip:     0.65 kB
+dist/assets/preload-helper-7y9sWmk5.js                               1.61 kB │ gzip:     0.82 kB
+dist/assets/defaultUboDeclaration-Dm3rcdMO.js                        1.62 kB │ gzip:     0.53 kB
+dist/assets/volumetricLightingRenderVolume.fragment-CgrM513R.js      1.72 kB │ gzip:     0.81 kB
+dist/assets/lightVxUboDeclaration-CRTevJ7j.js                        1.72 kB │ gzip:     0.69 kB
+dist/assets/gaussianSplattingVoxel.fragment-B_Om6CDx.js              1.75 kB │ gzip:     0.59 kB
+dist/assets/morphTargetsVertexGlobalDeclaration-CAOQ2X8h.js          1.75 kB │ gzip:     0.55 kB
+dist/assets/pbrUboDeclaration-C6VSFqZI.js                            1.84 kB │ gzip:     0.68 kB
+dist/assets/gaussianSplattingVoxel.vertex-ClkFYMLB.js                1.88 kB │ gzip:     0.76 kB
+dist/assets/logger-CuBYPcDK.js                                       1.88 kB │ gzip:     0.82 kB
+dist/assets/spatialWebAudioUpdaterComponent-siREYp66.js              1.89 kB │ gzip:     0.67 kB
+dist/assets/volumetricLightingRenderVolume.fragment-BvTdywmE.js      1.95 kB │ gzip:     0.88 kB
+dist/assets/bumpFragmentFunctions-CCuM6cKQ.js                        2.03 kB │ gzip:     0.84 kB
+dist/assets/morphTargetsVertex-De98nBP1.js                           2.06 kB │ gzip:     0.60 kB
+dist/assets/math.scalar.functions-BMwEppRb.js                        2.09 kB │ gzip:     0.97 kB
+dist/assets/gsSortKeys.compute-CU5GQWDs.js                           2.15 kB │ gzip:     0.96 kB
+dist/assets/bonesVertex-C-6EIxbv.js                                  2.16 kB │ gzip:     0.50 kB
+dist/assets/bumpFragmentFunctions-BtqTG-Jp.js                        2.19 kB │ gzip:     0.88 kB
+dist/assets/webAudioBus-KEJ0ztR3.js                                  2.27 kB │ gzip:     0.74 kB
+dist/assets/gaussianSplattingShared-ByBJQ-9z.js                      2.41 kB │ gzip:     1.04 kB
+dist/assets/audioEngineV2-DVCbGoO_.js                                2.41 kB │ gzip:     0.82 kB
+dist/assets/bumpFragment-DBk_MN3g.js                                 2.44 kB │ gzip:     0.93 kB
+dist/assets/pbrUboDeclaration-aCN_FR-R.js                            2.46 kB │ gzip:     0.67 kB
+dist/assets/gsSortScatter.compute-l232PcU_.js                        2.52 kB │ gzip:     1.09 kB
+dist/assets/mrtFragmentDeclaration-BZpfWb0R.js                       2.59 kB │ gzip:     0.62 kB
+dist/assets/selection.vertex-Br5KBbpU.js                             2.63 kB │ gzip:     0.92 kB
+dist/assets/gaussianSplattingVoxel.vertex-Kc_hASC7.js                2.65 kB │ gzip:     0.94 kB
+dist/assets/geometryRenderingFragment-po9sGJ7r.js                    2.75 kB │ gzip:     0.84 kB
+dist/assets/bumpFragmentMainFunctions-DkgncWl2.js                    2.77 kB │ gzip:     1.23 kB
+dist/assets/bonesVertex-BGJW_9OC.js                                  2.81 kB │ gzip:     0.53 kB
+dist/assets/lightUboDeclaration-BGQye3zh.js                          2.82 kB │ gzip:     0.94 kB
+dist/assets/bakedVertexAnimation-CP3BNGXM.js                         2.82 kB │ gzip:     0.65 kB
+dist/assets/geometryRenderingFragment-DZg0Y277.js                    2.87 kB │ gzip:     0.78 kB
+dist/assets/shadowsVertex-BorYl7Jm.js                                2.91 kB │ gzip:     0.59 kB
+dist/assets/lightFragmentDeclaration-BQSeSN9D.js                     2.91 kB │ gzip:     0.93 kB
+dist/assets/webRequest-dqz0dHXK.js                                   2.94 kB │ gzip:     1.06 kB
+dist/assets/bumpFragmentMainFunctions-D0d3fcRr.js                    3.01 kB │ gzip:     1.25 kB
+dist/assets/selection.vertex-C2CxIab-.js                             3.03 kB │ gzip:     1.01 kB
+dist/assets/abstractSoundInstance-vDtCTfJr.js                        3.07 kB │ gzip:     0.89 kB
+dist/assets/gpuRenderParticles.fragment-CBDSfLxy.js                  3.15 kB │ gzip:     1.09 kB
+dist/assets/observable.pure-H-M_hi7F.js                              3.20 kB │ gzip:     1.10 kB
+dist/assets/bumpFragment-qvwADx5P.js                                 3.26 kB │ gzip:     1.03 kB
+dist/assets/prePassDeclaration-COP2lVSj.js                           3.29 kB │ gzip:     0.87 kB
+dist/assets/gaussianSplatting.fragment-D2NSROLX.js                   3.40 kB │ gzip:     1.09 kB
+dist/assets/bakedVertexAnimation-7XIMgH6x.js                         3.42 kB │ gzip:     0.93 kB
+dist/assets/gaussianSplatting.fragment-Dm5zcGrR.js                   3.54 kB │ gzip:     1.12 kB
+dist/assets/samplerVertexImplementation-DUwTGCgo.js                  3.85 kB │ gzip:     1.06 kB
+dist/assets/openpbrUboDeclaration-CbPGRvOI.js                        3.87 kB │ gzip:     1.03 kB
+dist/assets/decorators-BS-fGYfw.js                                   3.88 kB │ gzip:     1.58 kB
+dist/assets/lightUboDeclaration-CUIASsX5.js                          3.92 kB │ gzip:     1.13 kB
+dist/assets/abstractAudioNode-Ct5BhjKQ.js                            3.99 kB │ gzip:     1.68 kB
+dist/assets/imageProcessingFunctions-Ccn56Hme.js                     4.10 kB │ gzip:     1.62 kB
+dist/assets/reflectionFunction-UnxJdyP6.js                           4.13 kB │ gzip:     0.99 kB
+dist/assets/morphTargetsVertex-x5LmUlz0.js                           4.56 kB │ gzip:     0.82 kB
+dist/assets/reflectionFunction-B71fKnsF.js                           4.64 kB │ gzip:     1.05 kB
+dist/assets/pbrIBLFunctions-s_OLNRwF.js                              4.75 kB │ gzip:     1.44 kB
+dist/assets/imageProcessingFunctions-D0LsETkF.js                     4.92 kB │ gzip:     1.87 kB
+dist/assets/pbrIBLFunctions-CZOjFl72.js                              4.93 kB │ gzip:     1.50 kB
+dist/assets/selectionOutline.fragment-lN_28Eg-.js                    4.99 kB │ gzip:     1.04 kB
+dist/assets/openpbrUboDeclaration-Cg4zTwyX.js                        5.22 kB │ gzip:     1.05 kB
+dist/assets/gaussianPointSplatting-UwjdZPb8.js                       5.36 kB │ gzip:     2.27 kB
+dist/assets/subSurfaceScattering.fragment-Bjertfqz.js                5.48 kB │ gzip:     2.07 kB
+dist/assets/ltcHelperFunctions-DS3Utz6C.js                           6.04 kB │ gzip:     1.54 kB
+dist/assets/subSurfaceScattering.fragment-CAND6QXx.js                6.10 kB │ gzip:     2.17 kB
+dist/assets/selectionOutline.fragment-CwDO4qmT.js                    6.26 kB │ gzip:     1.16 kB
+dist/assets/samplerVertexImplementation-CbPW9xhO.js                  6.45 kB │ gzip:     1.50 kB
+dist/assets/ltcHelperFunctions-D8BySwCQ.js                           6.63 kB │ gzip:     1.84 kB
+dist/assets/helperFunctions-CPZVryR8.js                              6.65 kB │ gzip:     2.25 kB
+dist/assets/helperFunctions-DXiZRiWF.js                              7.00 kB │ gzip:     2.37 kB
+dist/assets/oitFragment-DbgsmPZH.js                                  7.09 kB │ gzip:     2.58 kB
+dist/assets/gaussianSplatting.vertex-CRbOoRw2.js                     7.26 kB │ gzip:     1.97 kB
+dist/assets/screenSpaceRayTrace-BZRnp6Bu.js                          7.87 kB │ gzip:     2.75 kB
+dist/assets/internalTexture-CIqq8xFB.js                              7.89 kB │ gzip:     2.05 kB
+dist/assets/lightsFragmentFunctions-CBON2Pju.js                      8.00 kB │ gzip:     1.83 kB
+dist/assets/oitFragment-BX3jW996.js                                  8.13 kB │ gzip:     2.65 kB
+dist/assets/screenSpaceRayTrace-Z74_Mvl0.js                          8.47 kB │ gzip:     2.92 kB
+dist/assets/webAudioBaseSubGraph-ahxe98Fe.js                         8.47 kB │ gzip:     2.10 kB
+dist/assets/gaussianSplatting.vertex-C4GG0bje.js                     8.61 kB │ gzip:     2.18 kB
+dist/assets/hdrFilteringFunctions-pzE3ktpd.js                        8.80 kB │ gzip:     2.60 kB
+dist/assets/hdrFilteringFunctions-DYXzZGFY.js                        8.81 kB │ gzip:     2.56 kB
+dist/assets/lightsFragmentFunctions-CQUWMvKD.js                      9.07 kB │ gzip:     2.01 kB
+dist/assets/cubemapToSphericalPolynomial-DhYXDSP5.js                 9.33 kB │ gzip:     2.81 kB
+dist/assets/gpuRenderParticles.vertex-BEWSxESb.js                   10.02 kB │ gzip:     2.19 kB
+dist/assets/vertexPullingDeclaration-bSzsf5ND.js                    11.57 kB │ gzip:     1.51 kB
+dist/assets/pbrBRDFFunctions-BCNINF-p.js                            11.93 kB │ gzip:     4.14 kB
+dist/assets/math.color.pure-ew2DbChK.js                             12.22 kB │ gzip:     2.81 kB
+dist/assets/pbrBRDFFunctions-DxfbxN23.js                            12.76 kB │ gzip:     4.32 kB
+dist/assets/spatialWebAudio-MLr5V4Gz.js                             14.17 kB │ gzip:     3.25 kB
+dist/assets/tools.functions-Bfpe10Z_.js                             14.75 kB │ gzip:     5.03 kB
+dist/assets/ktxTextureLoader-weiz2uO-.js                            16.18 kB │ gzip:     4.76 kB
+dist/assets/openpbrSubsurfaceLayerData-DZgp0Qa4.js                  17.05 kB │ gzip:     3.89 kB
+dist/assets/openpbrSubsurfaceLayerData-DpsV2wgM.js                  18.46 kB │ gzip:     4.15 kB
+dist/assets/lightFragment-BGrbNx2s.js                               19.60 kB │ gzip:     3.11 kB
+dist/assets/baseTexture.pure-wB7kFf1x.js                            20.60 kB │ gzip:     5.68 kB
+dist/assets/lightFragment-x1Dngszw.js                               25.27 kB │ gzip:     3.40 kB
+dist/assets/shadowsFragmentFunctions-B2pdv0XY.js                    25.98 kB │ gzip:     4.00 kB
+dist/assets/shadowsFragmentFunctions-BEUrtVDp.js                    28.51 kB │ gzip:     3.96 kB
+dist/assets/pbrDebug-BqaGz1G1.js                                    29.29 kB │ gzip:     6.26 kB
+dist/assets/tools.pure-C-kwhIo1.js                                  31.11 kB │ gzip:    10.14 kB
+dist/assets/pbrDebug-CEvFDHdf.js                                    36.55 kB │ gzip:     7.86 kB
+dist/assets/meshBlending.fragment-DzK0T9dh.js                       39.46 kB │ gzip:     8.28 kB
+dist/assets/meshBlending.fragment-BS074wkT.js                       42.58 kB │ gzip:     8.62 kB
+dist/assets/math.vector.pure-Bs5Q3Ca3.js                            64.07 kB │ gzip:    15.69 kB
+dist/assets/thinEngine.pure-DMI5U1G4.js                            129.97 kB │ gzip:    31.59 kB
+dist/assets/index-BOcx-XP-.js                                    6,495.17 kB │ gzip: 1,446.83 kB
+
+[plugin builtin:vite-reporter] 
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 2.68s
+EXIT_CODE=0
+

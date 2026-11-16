@@ -1,0 +1,77 @@
+{
+  "probe.economy": {
+    "gold": 999,
+    "forestMaterial": 55,
+    "gems": 1,
+    "runsPlayed": 11,
+    "bossKills": 4
+  },
+  "runsPlayed": 11,
+  "bossKills": 4,
+  "savedAfter": {
+    "schemaVersion": 3,
+    "savedAt": "2026-11-16T12:28:38.640Z",
+    "weapons": {
+      "staff": {
+        "level": 4,
+        "sockets": [
+          null,
+          null,
+          null
+        ]
+      },
+      "sword": {
+        "level": 3,
+        "sockets": [
+          null,
+          null,
+          null
+        ]
+      }
+    },
+    "gemInventory": [
+      {
+        "itemInstanceId": "seed-gem-1",
+        "gemId": "fire",
+        "quality": "rare"
+      }
+    ],
+    "currencies": {
+      "gold": 999,
+      "forestMaterial": 55,
+      "elementalShards": {
+        "fire": 7,
+        "ice": 8,
+        "lightning": 9,
+        "shadow": 10
+      },
+      "forestCore": 3
+    },
+    "metaProgress": {
+      "staffMastery": 5,
+      "swordMastery": 4,
+      "forestSurvival": 3
+    },
+    "settings": {
+      "volumes": {
+        "sfx": 1,
+        "music": 1
+      },
+      "quality": "high",
+      "colorblind": false,
+      "language": "en"
+    },
+    "stats": {
+      "runsPlayed": 11,
+      "bossKills": 4,
+      "bestTimeSec": 400
+    }
+  },
+  "logs": [
+    "[console:log] BJS - [20:28:36]: Babylon.js v9.36.0 - WebGL2",
+    "[console:log] [s2g] real UI data source wired: combat.snapshot + combat.bus + UI command sink",
+    "[console:log] BJS - [20:28:38]: Babylon.js v9.36.0 - WebGL2",
+    "[console:log] [s2g] real UI data source wired: combat.snapshot + combat.bus + UI command sink",
+    "[console:warning] The AudioContext was not allowed to start. It must be resumed (or created) after a user gesture on the page. https://developer.chrome.com/blog/autoplay/#web_audio"
+  ]
+}

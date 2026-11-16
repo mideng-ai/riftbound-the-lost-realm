@@ -1,0 +1,141 @@
+{
+  "probe": {
+    "phase": "defeat",
+    "elapsedSec": 13.921200001716581,
+    "hp": 0,
+    "maxHp": 100,
+    "level": 1,
+    "xp": 0,
+    "aliveEnemies": 3,
+    "player": {
+      "x": 0.06699999809265145,
+      "z": 1.9975000000000005
+    },
+    "enemies": [
+      {
+        "id": 1,
+        "defId": "riftHound",
+        "x": 0.8609465964982113,
+        "z": 4.504069201270029
+      },
+      {
+        "id": 2,
+        "defId": "riftHound",
+        "x": 0.9417008892340674,
+        "z": 2.377482539689917
+      },
+      {
+        "id": 3,
+        "defId": "riftHound",
+        "x": 0.9417009031890926,
+        "z": 2.3774825563647974
+      }
+    ],
+    "bossHpPct": null,
+    "bossState": "dormant",
+    "bossPhase": null,
+    "bossTelegraph": null,
+    "bossHp": 6000,
+    "bossDamageDealt": 0,
+    "choices": [],
+    "economy": {
+      "gold": 0,
+      "forestMaterial": 0,
+      "gems": 0,
+      "runsPlayed": 1,
+      "bossKills": 0
+    }
+  },
+  "settlement": {
+    "visible": true,
+    "rows": [
+      [
+        "Gold",
+        "0"
+      ],
+      [
+        "Wildwood",
+        "0"
+      ],
+      [
+        "Fire Shard",
+        "0"
+      ],
+      [
+        "Frost Shard",
+        "0"
+      ],
+      [
+        "Storm Shard",
+        "0"
+      ],
+      [
+        "Shadow Shard",
+        "0"
+      ],
+      [
+        "Gems",
+        "0"
+      ]
+    ]
+  },
+  "saved": {
+    "schemaVersion": 3,
+    "savedAt": "2026-11-16T12:30:27.132Z",
+    "weapons": {
+      "staff": {
+        "level": 1,
+        "sockets": [
+          null,
+          null,
+          null
+        ]
+      },
+      "sword": {
+        "level": 1,
+        "sockets": [
+          null,
+          null,
+          null
+        ]
+      }
+    },
+    "gemInventory": [],
+    "currencies": {
+      "gold": 0,
+      "forestMaterial": 0,
+      "elementalShards": {
+        "fire": 0,
+        "ice": 0,
+        "lightning": 0,
+        "shadow": 0
+      },
+      "forestCore": 0
+    },
+    "metaProgress": {
+      "staffMastery": 0,
+      "swordMastery": 0,
+      "forestSurvival": 0
+    },
+    "settings": {
+      "volumes": {
+        "sfx": 1,
+        "music": 1
+      },
+      "quality": "high",
+      "colorblind": false,
+      "language": "zh-CN"
+    },
+    "stats": {
+      "runsPlayed": 1,
+      "bossKills": 0,
+      "bestTimeSec": null
+    }
+  },
+  "logs": [
+    "[log] BJS - [20:30:06]: Babylon.js v9.36.0 - WebGL2",
+    "[log] [s2g] real UI data source wired: combat.snapshot + combat.bus + UI command sink",
+    "[log] BJS - [20:30:08]: Babylon.js v9.36.0 - WebGL2",
+    "[log] [s2g] real UI data source wired: combat.snapshot + combat.bus + UI command sink"
+  ]
+}

@@ -1,0 +1,86 @@
+{
+  "probe": {
+    "phase": "victory",
+    "elapsedSec": 600,
+    "hp": 100,
+    "maxHp": 100,
+    "level": 1,
+    "xp": 0,
+    "aliveEnemies": 2,
+    "player": {
+      "x": 0,
+      "z": 0
+    },
+    "enemies": [
+      {
+        "id": 1,
+        "defId": "riftHound",
+        "x": 6.5,
+        "z": 26.5
+      },
+      {
+        "id": 2,
+        "defId": "riftHound",
+        "x": 1.5,
+        "z": -23.5
+      }
+    ],
+    "bossHpPct": null,
+    "bossState": "defeated",
+    "bossPhase": "guardian",
+    "bossTelegraph": null,
+    "bossHp": 0,
+    "bossDamageDealt": 0,
+    "choices": [],
+    "economy": {
+      "gold": 0,
+      "forestMaterial": 0,
+      "gems": 0,
+      "runsPlayed": 1,
+      "bossKills": 1
+    }
+  },
+  "settlement": {
+    "visible": true,
+    "title": "Victory",
+    "sub": "Survived 10:00",
+    "rows": [
+      {
+        "name": "Gold",
+        "value": "0"
+      },
+      {
+        "name": "Wildwood",
+        "value": "0"
+      },
+      {
+        "name": "Fire Shard",
+        "value": "0"
+      },
+      {
+        "name": "Frost Shard",
+        "value": "0"
+      },
+      {
+        "name": "Storm Shard",
+        "value": "0"
+      },
+      {
+        "name": "Shadow Shard",
+        "value": "0"
+      },
+      {
+        "name": "Gems",
+        "value": "0"
+      }
+    ]
+  },
+  "localStorage": {
+    "main": "{\"schemaVersion\":3,\"savedAt\":\"2026-11-16T12:27:02.278Z\",\"weapons\":{\"staff\":{\"level\":1,\"sockets\":[null,null,null]},\"sword\":{\"level\":1,\"sockets\":[null,null,null]}},\"gemInventory\":[],\"currencies\":{\"gold\":0,\"forestMaterial\":0,\"elementalShards\":{\"fire\":0,\"ice\":0,\"lightning\":0,\"shadow\":0},\"forestCore\":1},\"metaProgress\":{\"staffMastery\":0,\"swordMastery\":0,\"forestSurvival\":0},\"settings\":{\"volumes\":{\"sfx\":1,\"music\":1},\"quality\":\"high\",\"colorblind\":false,\"language\":\"zh-CN\"},\"stats\":{\"runsPlayed\":1,\"bossKills\":1,\"bestTimeSec\":600}}"
+  },
+  "logs": [
+    "[console:log] BJS - [20:27:02]: Babylon.js v9.36.0 - WebGL2",
+    "[console:log] [s2g] real UI data source wired: combat.snapshot + combat.bus + UI command sink",
+    "[console:warning] The AudioContext was not allowed to start. It must be resumed (or created) after a user gesture on the page. https://developer.chrome.com/blog/autoplay/#web_audio"
+  ]
+}

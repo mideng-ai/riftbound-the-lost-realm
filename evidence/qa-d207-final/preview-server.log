@@ -1,0 +1,6 @@
+
+> riftbound-the-lost-realm@0.1.0 preview
+> vite preview --port 4170 --strictPort
+
+  ➜  Local:   http://localhost:4170/
+  ➜  Network: use --host to expose

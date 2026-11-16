@@ -1,21 +1,19 @@
 /**
- * src/economy/saveBridge.ts — SavePort（V2 抽象）→ SaveDataV3 持久化桥
+ * src/economy/saveBridge.ts — SavePort(V3) → EconomyStore 直传适配
  *
- * D-207 仍 OPEN：后端（localStorage / IndexedDB）**未决定**。
- * 现有 src/save/SavePort.ts 接口只接受 SaveDataV2，因此本桥把 V3 存档
- * 原样装进 V2 的 stash（Array<Record<string, unknown>>）中并加标记键；
- * load 时优先解出 V3，否则把 V2 原样交给 domain/save.ts 的 migrateSave
- * （profile.gold → currencies.gold 迁移）。
+ * ADR-TD-009 / D-207 关闭后，SavePort 已直接承载 SaveDataV3，
+ * 本桥从「V3 塞进 V2.stash 的绕行方案」退化为直传适配：
+ *   - save：原样交给 port.save(V3)，不再构造 V2 外壳；
+ *   - load：直传 V3；若读到 Mock 阶段历史套壳档（V2.stash 含 V3_STASH_KEY），
+ *     仍解出 V3，保证旧存档不丢；纯 V2 原样交 domain/save.ts 的 migrateSave。
  *
- * 这样：① 不修改冻结契约与 SavePort.ts；② 不决定任何存储后端；
- *       ③ 业务层只依赖 EconomyStore 抽象（测试用内存实现）。
+ * 这样业务层只依赖 EconomyStore 抽象，测试用 InMemoryEconomyStore，不碰后端。
  */
-
 import type { SaveDataV3 } from '../domain/index.ts';
-import type { SaveDataV2, SavePort } from '../save/SavePort.ts';
+import type { SavePort } from '../save/SavePort.ts';
 import type { EconomyStore } from './types.ts';
 
-/** V3 存档在 V2.stash 中的标记键 */
+/** 历史套壳档的标记键（仅用于兼容读取，新的写入不再产生此形状）。 */
 export const V3_STASH_KEY = '__riftboundSaveV3';
 
 export class SavePortV3Bridge implements EconomyStore {
@@ -26,30 +24,22 @@ export class SavePortV3Bridge implements EconomyStore {
   }
 
   async load(): Promise<unknown> {
-    const raw = await this.port.load();
-    if (raw === null || typeof raw !== 'object') return null;
-    const stash = (raw as SaveDataV2).stash;
-    if (Array.isArray(stash)) {
-      for (const entry of stash) {
-        if (entry && typeof entry === 'object' && V3_STASH_KEY in entry) {
-          return (entry as Record<string, unknown>)[V3_STASH_KEY];
+    const raw: unknown = await this.port.load();
+    if (isRecord(raw)) {
+      const stash = raw.stash;
+      if (Array.isArray(stash)) {
+        for (const entry of stash) {
+          if (isRecord(entry) && V3_STASH_KEY in entry) {
+            return entry[V3_STASH_KEY];
+          }
         }
       }
     }
-    return raw; // 纯 V2 → migrateSave 处理 gold 迁移
+    return raw; // V3 直传 / 纯 V2 交 migrateSave / 畸形交 boot 兜底
   }
 
   async save(data: SaveDataV3): Promise<void> {
-    const shell: SaveDataV2 = {
-      schemaVersion: 2,
-      savedAt: new Date().toISOString(),
-      // 冗余保留 gold 便于旧读取路径；权威值仍在 V3 data.currencies.gold
-      profile: { gold: data.currencies.gold, unlocks: [] },
-      inventory: [],
-      stash: [{ [V3_STASH_KEY]: data as unknown as Record<string, unknown> }],
-      settings: { sfx: true, music: true },
-    };
-    await this.port.save(shell);
+    await this.port.save(data);
   }
 }
 
@@ -74,4 +64,8 @@ export class InMemoryEconomyStore implements EconomyStore {
   get writeCount(): number {
     return this.writes;
   }
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
 }

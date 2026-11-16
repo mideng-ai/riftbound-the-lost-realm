@@ -1,0 +1,100 @@
+
+> riftbound-the-lost-realm@0.1.0 test:save
+> node --experimental-strip-types --no-warnings --test tests/save-backend.test.mjs
+
+TAP version 13
+# Subtest: A1 首次加载返回默认档（schemaVersion=3，全字段为初始状态）
+ok 1 - A1 首次加载返回默认档（schemaVersion=3，全字段为初始状态）
+  ---
+  duration_ms: 2.702009
+  ...
+# Subtest: A2 写入后重载：gold/gem/weapon/meta/stats/settings 全字段一致
+ok 2 - A2 写入后重载：gold/gem/weapon/meta/stats/settings 全字段一致
+  ---
+  duration_ms: 1.310919
+  ...
+# Subtest: B1 v2 旧档迁移：profile.gold → currencies.gold，且不覆盖原档
+ok 3 - B1 v2 旧档迁移：profile.gold → currencies.gold，且不覆盖原档
+  ---
+  duration_ms: 0.336725
+  ...
+# Subtest: B2 v3 直通：不经过迁移，字段原样返回
+ok 4 - B2 v3 直通：不经过迁移，字段原样返回
+  ---
+  duration_ms: 0.500079
+  ...
+# Subtest: C1 损坏 JSON：隔离备份 + 默认档 + 不抛错 + 原档不被覆盖
+ok 5 - C1 损坏 JSON：隔离备份 + 默认档 + 不抛错 + 原档不被覆盖
+  ---
+  duration_ms: 0.614244
+  ...
+# Subtest: C2 结构畸形 v3（非 JSON 语法错误）：同样隔离并回默认档
+ok 6 - C2 结构畸形 v3（非 JSON 语法错误）：同样隔离并回默认档
+  ---
+  duration_ms: 0.360359
+  ...
+# Subtest: D1 save_next 有效：优先恢复并提交主档、清理临时键
+ok 7 - D1 save_next 有效：优先恢复并提交主档、清理临时键
+  ---
+  duration_ms: 0.469232
+  ...
+# Subtest: D2 save_next 损坏：回退 save_main，坏临时键被隔离且主档不动
+ok 8 - D2 save_next 损坏：回退 save_main，坏临时键被隔离且主档不动
+  ---
+  duration_ms: 0.375197
+  ...
+# Subtest: D3 正常写入路径：save_next 写完即校验、覆盖主档后清理
+ok 9 - D3 正常写入路径：save_next 写完即校验、覆盖主档后清理
+  ---
+  duration_ms: 0.652865
+  ...
+# Subtest: E1 配额写失败（QuotaExceededError）：主档完好、无临时键残留
+ok 10 - E1 配额写失败（QuotaExceededError）：主档完好、无临时键残留
+  ---
+  duration_ms: 1.17145
+  ...
+# Subtest: E2 validateSaveV3 拒绝畸形档：不落盘、不产生临时键
+ok 11 - E2 validateSaveV3 拒绝畸形档：不落盘、不产生临时键
+  ---
+  duration_ms: 0.614493
+  ...
+# Subtest: F1 SavePort v3 接口：load/save 走 V3，loadSync 可选，mock 与真后端同签名
+ok 12 - F1 SavePort v3 接口：load/save 走 V3，loadSync 可选，mock 与真后端同签名
+  ---
+  duration_ms: 0.688177
+  ...
+# Subtest: F2 EconomySystem + localStorage 真后端：结算落盘，重载后统计一致
+ok 13 - F2 EconomySystem + localStorage 真后端：结算落盘，重载后统计一致
+  ---
+  duration_ms: 62.594994
+  ...
+# Subtest: G1 击杀→掉落→拾取→结算落盘端到端：结算屏 4 类货币与宝石非零，重载一致
+ok 14 - G1 击杀→掉落→拾取→结算落盘端到端：结算屏 4 类货币与宝石非零，重载一致
+  ---
+  duration_ms: 2.599622
+  ...
+# Subtest: G2 重复拾取只入账一次（dropId 唯一锚点 + picked 防重入）
+ok 15 - G2 重复拾取只入账一次（dropId 唯一锚点 + picked 防重入）
+  ---
+  duration_ms: 0.736585
+  ...
+# Subtest: G3 bossDefeated 入参生效：无需 onBossDefeated 绕过，且 victory/false 不重复入账
+ok 16 - G3 bossDefeated 入参生效：无需 onBossDefeated 绕过，且 victory/false 不重复入账
+  ---
+  duration_ms: 1.816939
+  ...
+# Subtest: G4 settleRun 配额写失败：不 reject、不 unhandled、主档完好且有 console.error 留痕
+ok 17 - G4 settleRun 配额写失败：不 reject、不 unhandled、主档完好且有 console.error 留痕
+  ---
+  duration_ms: 0.918786
+  ...
+1..17
+# tests 17
+# suites 0
+# pass 17
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 595.574312
+EXIT_CODE=

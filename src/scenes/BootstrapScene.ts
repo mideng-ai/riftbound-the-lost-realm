@@ -54,11 +54,23 @@ import {
 } from './forestEnvironment.ts';
 import { InputSystem } from '../input/InputSystem';
 import { ProjectileSystem } from '../vfx/Projectile';
-import type { SavePort } from '../save/SavePort';
-import { defaultSave } from '../save/SavePort';
+import type { SavePort } from '../save/SavePort.ts';
 // ── TASK-02 战斗运行时 ──
-import { defaultSaveV3 } from '../domain/index.ts';
-import type { UpgradeId, EnemyId, EntityId, Vec3, SaveRunLoot } from '../domain/index.ts';
+import {
+  defaultSaveV3,
+  type EventBusApi,
+  type GameEventMap,
+  type GameEventType,
+  type UpgradeId,
+  type EnemyId,
+  type EntityId,
+  type Vec3,
+  type SaveDataV3,
+} from '../domain/index.ts';
+// ── TASK-04 经济系统：ADR-TD-009 / D-207 运行时接线 ──
+import { EconomySystem } from '../economy/system.ts';
+import { SavePortV3Bridge } from '../economy/saveBridge.ts';
+import type { DropInstance, LootTier } from '../economy/types.ts';
 import { CombatRuntime } from '../combat/CombatRuntime.ts';
 import { makeEnemyTarget } from '../combat/TargetRegistry.ts';
 import type { EnemyTarget } from '../combat/TargetRegistry.ts';
@@ -143,7 +155,17 @@ export interface BootstrapSceneResult {
     /** 只读取证：Boss 累计对玩家造成的原始伤害（证明预警判定真的生效）。 */
     bossDamageDealt: number;
     choices: readonly UpgradeId[];
+    /** DEF-004：economyView() 的只读取证消费者——QA 可在运行时读到真实落盘经济状态。 */
+    economy: {
+      gold: number;
+      forestMaterial: number;
+      gems: number;
+      runsPlayed: number;
+      bossKills: number;
+    };
   };
+  /** TASK-04 经济系统只读视图（ADR-TD-009：UI / 重开的数据源之一） */
+  economyView(): Readonly<SaveDataV3>;
   dispose(): void;
 }
 
@@ -292,12 +314,84 @@ export function createBootstrapScene(deps: BootstrapSceneDeps): BootstrapSceneRe
 
   // 共享领域总线：deps.ui.bus 必须与 CombatRuntime.bus 是同一条实例。
   const sharedBus = deps.ui?.bus ?? deps.uiBridge?.bus ?? undefined;
+  // ADR-TD-009：localStorage 是同步 API，同步读档让永久成长 / 武器等级在重载后立即生效。
+  const initialSave: SaveDataV3 = save.loadSync?.() ?? defaultSaveV3();
   const combat = new CombatRuntime({
-    save: defaultSaveV3(),
+    save: initialSave,
     bus: sharedBus,
     projectileOptions: { spreadDeg: DEMO_PROJECTILE_SPREAD_DEG, maxRangeM: DEMO_MAX_RANGE_M },
     onAttack: vfxOnAttack,
   });
+
+  // ── TASK-04 经济系统运行时接线（ADR-TD-009 / D-207）────────────
+  // bus 适配：EconomySystem 自己发的 run.settled / boss.defeated 由本场景唯一发布，
+  // 避免结算屏重复弹出与 Boss 胜利链重入；其余事件照常进入共享总线。
+  const economyBus: EventBusApi = {
+    publish: <K extends GameEventType>(type: K, payload: GameEventMap[K]): void => {
+      if (type === 'run.settled' || type === 'boss.defeated') return;
+      combat.bus.publish(type, payload);
+    },
+    subscribe: <K extends GameEventType>(type: K, handler: (payload: GameEventMap[K]) => void) =>
+      combat.bus.subscribe(type, handler),
+    clearAll: () => undefined,
+    listenerCount: (type: GameEventType) => combat.bus.listenerCount(type),
+  };
+  const economy = new EconomySystem(new SavePortV3Bridge(save), economyBus, combat.rng);
+  // DEF-004：economyView 的本地别名，供本场景的局内读档 / QA 取证 / 对外出口共用，
+  // 使 ADR「UI / 重开数据源」有真实消费者，而非只暴露不用。
+  const economyView = (): Readonly<SaveDataV3> => economy.saveView;
+  void economy.boot().then((report) => {
+    if (report.issues.length > 0) {
+      console.warn('[save] 启动存档校验问题，已按兜底档启动：', report.issues);
+    }
+  }).catch((err: unknown) => {
+    // DEF-005：读档异步兜底，避免极端时序下产生 unhandled rejection。
+    console.error('[save] 启动读档失败：', err);
+  });
+  // 显式初始化局内状态（registry / ledger / Boss 登记）；重开走整页重建，
+  // 同实例内若未来接入局内重置也以本方法为唯一入口。
+  economy.beginRun();
+
+  // ── 统一掉落权威（方案 A）：EconomySystem 摇取 + 地面标记 + 最小自动拾取 ──
+  // 集成层常量：domain/config 未定义拾取半径，取玩家直径的 3 倍；非平衡数值，不进 config。
+  const PICKUP_RADIUS_M = PLAYER_MESH_DIAMETER_M * 3;
+  const groundDrops = new Map<string, Mesh>();
+  const groundDropHex = (drop: DropInstance): string => {
+    if (drop.kind === 'gem') return '#8B5CF6';
+    switch (drop.currencyId) {
+      case 'gold': return '#F2C14E';
+      case 'forestMaterial': return '#8FD14F';
+      case 'forestCore': return '#5FD3BC';
+      default: return '#6BA8FF'; // 四元素碎片共用冷色（纯视觉标记，不参与判定）
+    }
+  };
+  /** 由 EconomySystem 的摇取结果铺地面可视标记；dropId 唯一锚点在 economy registry 内。 */
+  const spawnGroundDrops = (drops: readonly DropInstance[]): void => {
+    for (const drop of drops) {
+      const mesh = MeshBuilder.CreateSphere(`drop_${drop.dropId}`, { diameter: 0.3, segments: 8 }, scene);
+      const mat = new StandardMaterial(`dropMat_${drop.dropId}`, scene);
+      const hex = groundDropHex(drop);
+      mat.diffuseColor = Color3.FromHexString(hex);
+      mat.emissiveColor = Color3.FromHexString(hex).scale(0.55);
+      mat.specularColor = Color3.Black();
+      mesh.material = mat;
+      mesh.position.set(drop.pos.x, 0.2, drop.pos.z);
+      mesh.isPickable = false;
+      groundDrops.set(drop.dropId, mesh);
+    }
+  };
+  /**
+   * 击杀 → 经济摇取。掉落数值全部读冻结 config（damageConfig.loot），
+   * 这里只把 defId / 控制档位映射成掉落表键（分类，不是平衡数值）。
+   */
+  const rollKillDrops = (defId: EnemyId, controlTier: 'normal' | 'elite' | 'boss', pos: Vec3): void => {
+    let tier: LootTier = 'normal';
+    if (controlTier === 'boss') tier = 'boss';
+    else if (controlTier === 'elite') tier = 'elite';
+    else if (defId === 'riftSpitter') tier = 'elemental';
+    else if (defId === 'umbraDasher' || defId === 'riftNourisher') tier = 'reinforced';
+    spawnGroundDrops(economy.rollDropsForKill({ tier, defId, pos }).drops);
+  };
 
   // ?t= 快进：只推进唯一权威时钟，RunClock 会自行翻转 510/600 边沿标记（RUN_TIMELINE）。
   // SpawnDirector 在下方构造，因此它读到的 elapsedSec 已是快进后的值。
@@ -312,6 +406,10 @@ export function createBootstrapScene(deps: BootstrapSceneDeps): BootstrapSceneRe
     clock: combat.progression.clock,
     rng: combat.rng,
     arena,
+    // 方案 A：停用 TASK-05 的 defaultDropTable（另有硬编码 DROP_BASE，与 damageConfig.loot
+    // 形成两张竞争掉落表）。保留 enemy.killed 事件形状不变，drops 恒空；
+    // 唯一掉落来源改为场景层调 economy.rollDropsForKill，杜绝重复掉落。
+    dropTable: () => [],
   });
   const director = new SpawnDirector({
     manager,
@@ -392,10 +490,16 @@ export function createBootstrapScene(deps: BootstrapSceneDeps): BootstrapSceneRe
   combat.registry.applyDamage = (entityId, dealt, _atSec) => {
     if (entityId === BOSS_BRIDGE_ENTITY_ID && bossBridge.agent.state === 'active') {
       bossBridge.applyResolvedDamage(dealt, combat.weapons.current);
-      // 击杀/奖励已由 BossAgent.defeat → VictorySettler 处理，不再广播 enemy.killed。
+      // 击杀/奖励已由 BossAgent.defeat → VictorySettler 处理，不再广播 enemy.killed；
+      // Boss 掉落由 EconomySystem 构造时的 boss.defeated 订阅直接入账（DEF-006，不铺地面）。
       return null;
     }
-    return applyDamageNormal(entityId, dealt, _atSec);
+    const target = combat.registry.get(entityId);
+    const kill = applyDamageNormal(entityId, dealt, _atSec);
+    // 方案 A：registry 是击杀判定权威，EconomySystem 是掉落权威。
+    // 击杀这一帧生成地面掉落（dropId 由 economy registry 分配，防重入由 ledger 保证）。
+    if (kill) rollKillDrops(kill.defId, target?.tier ?? 'normal', kill.position);
+    return kill;
   };
 
   // 刷怪事件 → combat.registry 镜像目标 + Mesh。
@@ -414,14 +518,23 @@ export function createBootstrapScene(deps: BootstrapSceneDeps): BootstrapSceneRe
   const publishSettlement = (victory: boolean): void => {
     if (settled) return;
     settled = true;
-    // 本试玩未接 TASK-04 经济系统：本局确实没有「已拾取」资源，如实给 0，不伪造战利品。
-    const loot: SaveRunLoot = {
-      gold: 0,
-      forestMaterial: 0,
-      shards: { fire: 0, ice: 0, lightning: 0, shadow: 0 },
-      gems: [],
-    };
-    combat.bus.publish('run.settled', { victory, pickedResources: loot });
+    // ADR-TD-009：结算落盘交给 EconomySystem；UI 的 run.settled 仍由本场景唯一发布。
+    // 风险1 修复：bossDefeated 由入参显式表达，删除原先 onBossDefeated() 置位绕过；
+    // settleRun 内部与「内部标志」取或，兼容既有调用点且不重复记 bossKills。
+    void economy.settleRun({
+      victory,
+      bossDefeated: victory,
+      elapsedSec: combat.progression.clock.elapsedSec,
+    }).then((report) => {
+      // DEF-002：落盘失败不误报成功；EconomySystem 已吞掉存储异常，这里只做可见提示。
+      if (!report.persisted) {
+        console.error('[save] 结算落盘失败，本局进度未保存（金币/宝石/成长保持上一档）');
+      }
+    }).catch((err: unknown) => {
+      console.error('[save] 结算出现未预期错误：', err);
+    });
+    // 结算屏读本局账本真实数据（与 settleRun 入账同源），不再硬编码 0。
+    combat.bus.publish('run.settled', { victory, pickedResources: economy.runLootView });
   };
   const offPhase = combat.bus.subscribe('run.phaseChanged', (p) => {
     if (p.to === 'defeat') publishSettlement(false);
@@ -458,6 +571,11 @@ export function createBootstrapScene(deps: BootstrapSceneDeps): BootstrapSceneRe
     else if (debugBossHp !== null) bossBridge.debugSetHp(debugBossHp);
   };
   const offBossSpawned = combat.bus.subscribe('boss.spawned', () => spawnBoss());
+  // DEF-006：Boss 掉落不再在此处铺地面。原先本订阅晚于 bossBridge 的
+  // boss.defeated→setPhase('victory')→settleRun 快照注册，掉落生成永远晚于结算账本快照，
+  // 且 Boss 在 z=-8、拾取半径 2.1m 玩家拾不到，导致 Boss 掉落永不入账。
+  // 现将 Boss 掉落改由 EconomySystem 构造时抢先订阅 boss.defeated 并直接入账（跳过地面）；
+  // 普通击杀的地面拾取链（rollKillDrops → spawnGroundDrops → 半径拾取）不受影响。
   const syncTimeline = (): void => {
     bossBridge.syncClock();
   };
@@ -519,7 +637,8 @@ export function createBootstrapScene(deps: BootstrapSceneDeps): BootstrapSceneRe
     radiusM: INTEGRATION_PLAYER_RADIUS_M,
     hp: 0,
     maxHp: 0,
-    gold: 0,
+    // DEF-004：局内玩家金币初值来自 economyView()（已落盘的永久档），不再是写死的 0。
+    gold: economyView().currencies.gold,
   };
   let pendingDamage = 0;
   const tickCtx: EnemyTickContext = {
@@ -658,13 +777,24 @@ export function createBootstrapScene(deps: BootstrapSceneDeps): BootstrapSceneRe
       });
     }
 
+    // 8.5) 最小可用地面拾取：玩家半径内自动 pickup，不引入复杂物理。
+    //      dropId 防重入由 EconomySystem + RunLedger 保证；重复拾取只入账一次。
+    for (const [dropId, mesh] of groundDrops) {
+      const drop = economy.registryView.get(dropId);
+      if (!drop || drop.picked) {
+        mesh.dispose();
+        groundDrops.delete(dropId);
+        continue;
+      }
+      if (Math.hypot(drop.pos.x - p.x, drop.pos.z - p.z) <= PICKUP_RADIUS_M) {
+        economy.pickup(dropId);
+        mesh.dispose();
+        groundDrops.delete(dropId);
+      }
+    }
+
     // 9) TASK-07 UI：放在 combat.step 之后，读本帧最新快照
     ui.tick();
-  });
-
-  // 持久化接线（V2 mock adapter，与骨架一致；V3 由 TASK-04 接管）
-  void save.load().then((data) => {
-    if (!data) void save.save(defaultSave());
   });
 
   return {
@@ -674,6 +804,7 @@ export function createBootstrapScene(deps: BootstrapSceneDeps): BootstrapSceneRe
     projectiles,
     combat,
     ui,
+    economyView,
     bossTarget: () => bossTargetRef,
     probe: () => ({
       phase: combat.progression.phase,
@@ -699,6 +830,13 @@ export function createBootstrapScene(deps: BootstrapSceneDeps): BootstrapSceneRe
       bossHp: bossBridge.agent.hp,
       bossDamageDealt: bossBridge.playerDamageDealt,
       choices: combat.progression.choices.map((c) => c.id),
+      economy: {
+        gold: economyView().currencies.gold,
+        forestMaterial: economyView().currencies.forestMaterial,
+        gems: economyView().gemInventory.length,
+        runsPlayed: economyView().stats.runsPlayed,
+        bossKills: economyView().stats.bossKills,
+      },
     }),
     dispose: () => {
       // 战斗 / 场景 / boss / UI 事件订阅逐层退订
@@ -713,6 +851,8 @@ export function createBootstrapScene(deps: BootstrapSceneDeps): BootstrapSceneRe
       canvas.removeEventListener('pointermove', onPointerMove);
       ui.dispose();
       combat.bus.clearAll();
+      for (const mesh of groundDrops.values()) mesh.dispose();
+      groundDrops.clear();
       for (const mesh of enemyMeshes.values()) mesh.dispose();
       enemyMeshes.clear();
       scene.dispose();

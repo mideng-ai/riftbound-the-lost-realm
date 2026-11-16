@@ -1,6 +1,6 @@
 /**
  * Game configuration. Numbers marked PROVISIONAL are pending owner decisions
- * (D-207 save adapter, D-210 performance budget, final rendering direction)
+ * (D-210 performance budget, final rendering direction; D-207 已由 ADR-TD-009 关闭)
  * and MUST NOT be treated as confirmed targets.
  */
 export const gameConfig = {
@@ -12,8 +12,8 @@ export const gameConfig = {
     desktopTargetFps: 60,
   } as const,
 
-  /** D-207: save backend NOT decided. 'mock' is the only wired adapter. */
-  saveAdapter: 'mock' as 'mock', // future: 'localstorage' | 'indexeddb' after D-207
+  /** ADR-TD-009 / D-207 已关闭：生产后端为 localStorage（SavePort v3）。 */
+  saveAdapter: 'localstorage' as 'localstorage',
 
   /** Rendering: PROVISIONAL toon pipeline (ST2-002 path B GLSL cel). Owner has
    *  not made the final rendering-direction decision; swap via ToonMaterial. */

@@ -1,0 +1,103 @@
+{
+  "phase": "defeat",
+  "economy": {
+    "gold": 0,
+    "forestMaterial": 0,
+    "gems": 0,
+    "runsPlayed": 1,
+    "bossKills": 0
+  },
+  "aliveEnemies": 3,
+  "settlement": {
+    "visible": true,
+    "rows": [
+      [
+        "Gold",
+        "0"
+      ],
+      [
+        "Wildwood",
+        "0"
+      ],
+      [
+        "Fire Shard",
+        "0"
+      ],
+      [
+        "Frost Shard",
+        "0"
+      ],
+      [
+        "Storm Shard",
+        "0"
+      ],
+      [
+        "Shadow Shard",
+        "0"
+      ],
+      [
+        "Gems",
+        "0"
+      ]
+    ]
+  },
+  "saved": {
+    "schemaVersion": 3,
+    "savedAt": "2026-11-16T12:31:41.431Z",
+    "weapons": {
+      "staff": {
+        "level": 1,
+        "sockets": [
+          null,
+          null,
+          null
+        ]
+      },
+      "sword": {
+        "level": 1,
+        "sockets": [
+          null,
+          null,
+          null
+        ]
+      }
+    },
+    "gemInventory": [],
+    "currencies": {
+      "gold": 0,
+      "forestMaterial": 0,
+      "elementalShards": {
+        "fire": 0,
+        "ice": 0,
+        "lightning": 0,
+        "shadow": 0
+      },
+      "forestCore": 0
+    },
+    "metaProgress": {
+      "staffMastery": 0,
+      "swordMastery": 0,
+      "forestSurvival": 0
+    },
+    "settings": {
+      "volumes": {
+        "sfx": 1,
+        "music": 1
+      },
+      "quality": "high",
+      "colorblind": false,
+      "language": "zh-CN"
+    },
+    "stats": {
+      "runsPlayed": 1,
+      "bossKills": 0,
+      "bestTimeSec": null
+    }
+  },
+  "console_tail": [
+    "[log] BJS - [20:31:22]: Babylon.js v9.36.0 - WebGL2",
+    "[log] [s2g] real UI data source wired: combat.snapshot + combat.bus + UI command sink",
+    "[log] BJS - [20:31:24]: Babylon.js v9.36.0 - WebGL2",
+    "[log] [s2g] real UI data source wired: combat.snapshot + combat.bus + UI command sink"
+  ]
+}

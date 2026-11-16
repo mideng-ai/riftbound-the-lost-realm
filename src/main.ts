@@ -9,7 +9,7 @@
  */
 import { EngineHost } from './engine/EngineHost';
 import { InputSystem } from './input/InputSystem';
-import { MockSaveAdapter } from './save/MockSaveAdapter';
+import { LocalStorageSaveAdapter } from './save/LocalStorageSaveAdapter.ts';
 import { PerfMonitor } from './debug/PerfMonitor';
 import { createBootstrapScene } from './scenes/BootstrapScene';
 import { CombatUiBridge } from './scenes/CombatUiBridge';
@@ -59,8 +59,8 @@ input.bindActionButton('btnDash', 'dash');
 input.bindActionButton('btnQ', 'skill1');
 input.bindActionButton('btnE', 'skill2');
 
-// D-207 gate: only the mock adapter exists until the owner decides.
-const save = new MockSaveAdapter();
+// ADR-TD-009 / D-207 关闭：生产入口使用 localStorage 真后端（经 SavePort v3）。
+const save = new LocalStorageSaveAdapter();
 
 // ── 真实数据源接线 ─────────────────────────────────────────────
 // bridge 持有共享领域总线（同时注入 CombatRuntime 与 UiRoot），
@@ -112,7 +112,7 @@ setInterval(() => {
     `staff Lv${v.staffLevel} cd=${v.staffCd.toFixed(2)}s | sword Lv${v.swordLevel} cd=${v.swordCd.toFixed(2)}s`,
     `layers A=${v.A.toFixed(3)} B=${v.B.toFixed(3)} C=${v.C.toFixed(3)}  proj=${v.projectileCount} arc=${v.arcAngleDeg.toFixed(0)}°`,
     `move x=${mv.x.toFixed(2)} y=${mv.y.toFixed(2)}  suspended=${st.suspended}  VFX proj=${boot.projectiles.liveCount}`,
-    `saveAdapter=${gameConfig.saveAdapter} (D-207 pending)  [Tab]切换武器 [1/2/3]选卡`,
+    `saveAdapter=${gameConfig.saveAdapter} (ADR-TD-009)  [Tab]切换武器 [1/2/3]选卡`,
   ].join('\n');
 }, 300);
 

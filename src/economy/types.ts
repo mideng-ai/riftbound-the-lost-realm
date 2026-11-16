@@ -81,6 +81,11 @@ export interface SettleRunInput {
 
 export interface SettlementReport {
   readonly victory: boolean;
+  /**
+   * 本局结算是否真的落盘成功。false = 后端写失败（如配额触顶），
+   * 此时 credited 仅表示「本应入账」，存档未被修改；调用方据此避免误报成功。
+   */
+  readonly persisted: boolean;
   /** 结算入账的已拾取资源（SaveRunLoot 契约形状） */
   readonly credited: SaveRunLoot;
   /** 地面未拾取、被丢弃的资源明细 */
