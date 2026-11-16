@@ -3,7 +3,7 @@
 > **Documentation map (2026-11-14 reorganization, Chinese names with category prefixes):**
 > - Master plan: `docs/总纲-项目规划书V1.md`
 > - Game brief: `总纲-游戏简报.md` · Design bible: `docs/设计-设计总纲.md`
-> - Agent tasks: `docs/设计-Agent任务分配.md` · Numeric baseline: `docs/设计-数值定案表.md`
+> - Agent tasks: `docs/设计-Agent任务分配.md` · Numeric sources: `docs/总纲-项目规划书V1.md` §2, `docs/设计-D09-D08-R01数值锚点仲裁书.md`, and `docs/设计-QNEW3数值重标定裁决书.md`
 > - Narrative: `docs/叙事-世界观与文案.md` · Art bible: `docs/美术-美术圣经V0.5.md`
 > - Audio: `docs/音频-音效事件表.md` / `docs/音频-背景音乐.md`
 > - QA baseline: `docs/质量-QA验收基线.md` · Sprints: `docs/流程-冲刺排期.md`
