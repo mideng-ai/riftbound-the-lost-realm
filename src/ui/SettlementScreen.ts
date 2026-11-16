@@ -6,7 +6,7 @@
  */
 import type { EventBusApi, RunSnapshot } from '../domain/index.ts';
 import type { UiCommandSink } from './commands.ts';
-import { el, shapeBadge } from './dom.ts';
+import { el, setIfChanged, shapeBadge, textCell, type TextCell } from './dom.ts';
 import { CURRENCY_THEME, TAP_MIN_PX } from './theme.ts';
 import { formatTime } from './format.ts';
 import { UI_TEXT_KEYS, type TextResolver } from './uiText.ts';
@@ -14,6 +14,7 @@ import { UI_TEXT_KEYS, type TextResolver } from './uiText.ts';
 export class SettlementScreen {
   readonly root: HTMLElement;
   private readonly body: HTMLElement;
+  private readonly subCell: TextCell = textCell(el('span', { class: 'rb-st-sub' }));
   private readonly unsubs: (() => void)[] = [];
 
   constructor(
@@ -79,11 +80,20 @@ export class SettlementScreen {
 
     this.body.replaceChildren(
       el('h2', { class: p.victory ? 'rb-st-win' : 'rb-st-lose' }, this.text(p.victory ? UI_TEXT_KEYS.settleVictory : UI_TEXT_KEYS.settleDefeat)),
-      el('p', { class: 'rb-st-sub' }, `${this.text(UI_TEXT_KEYS.settleSurvived)} ${formatTime(this.snapshot().elapsedSec)}`),
+      this.subCell.node,
       table,
       restart,
     );
     this.root.classList.remove('rb-hidden');
+    // run.settled 从 run.phaseChanged 同步发出，早于 combat.step 末尾的 refreshSnapshot，
+    // 事件当场读 snapshot 会拿到上一帧（快进试玩里就是 0:00）。显示后立刻补一次。
+    this.refreshTime(this.snapshot().elapsedSec);
+  }
+
+  /** 每帧由 UiRoot.tick() 调用：修正结算事件早于快照刷新导致的 0:00。 */
+  refreshTime(elapsedSec: number): void {
+    if (this.root.classList.contains('rb-hidden')) return;
+    setIfChanged(this.subCell, `${this.text(UI_TEXT_KEYS.settleSurvived)} ${formatTime(elapsedSec)}`);
   }
 
   hide(): void {

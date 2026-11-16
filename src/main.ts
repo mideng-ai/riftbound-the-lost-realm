@@ -14,6 +14,8 @@ import { PerfMonitor } from './debug/PerfMonitor';
 import { createBootstrapScene } from './scenes/BootstrapScene';
 import { CombatUiBridge } from './scenes/CombatUiBridge';
 import { gameConfig } from './config/gameConfig';
+// 文案表注入（叙事规格 §5）：真实运行路径用 enResolver，不再走 keyLabel 反推标签。
+import { enResolver } from './text/resolver.ts';
 
 const canvas = document.getElementById('renderCanvas') as HTMLCanvasElement;
 const hud = document.getElementById('hud')!;
@@ -71,6 +73,7 @@ const boot = createBootstrapScene({
   ui: bridge.sources,
   onUiCommand: bridge.onCommand,
   uiBridge: bridge,
+  text: enResolver,
 });
 host.useScene(boot.scene);
 

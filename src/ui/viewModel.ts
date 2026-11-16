@@ -19,7 +19,8 @@ import { clamp01, formatCount, formatPct, formatTime, hpDisplayTier } from './fo
 import { BOSS_PHASE_THEME, BOSS_WARN_SHAPE, CURRENCY_THEME } from './theme.ts';
 import { UI_TEXT_KEYS } from './uiText.ts';
 
-const CURRENCY_LABEL_KEY: Readonly<Record<CurrencyId, string>> = {
+/** 货币 ID → 文案 key（HudLayer 的拾取 toast 也复用，避免把 config ID 直接显示给玩家）。 */
+export const CURRENCY_LABEL_KEY: Readonly<Record<CurrencyId, string>> = {
   gold: UI_TEXT_KEYS.currencyGold,
   forestMaterial: UI_TEXT_KEYS.currencyForestMaterial,
   fireShard: UI_TEXT_KEYS.currencyFireShard,

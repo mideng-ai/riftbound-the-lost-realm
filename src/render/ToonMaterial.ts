@@ -7,16 +7,28 @@
  * (e.g. NME variant) without touching scene code.
  *
  * Unified equation (validated in ST2-002): final = baseColor * (ambient + light * band)
- * band = 0.30*step(0.08,N·L) + 0.32*step(0.44,N·L) + 0.38*step(0.78,N·L)
+ * band = 0.30*step(t1,N·L) + 0.32*step(t2,N·L) + 0.38*step(t3,N·L)
+ *
+ * 阈值默认来自冻结 config 的 PROVISIONAL 值；美术圣经 §2 定案 0.22/0.55/0.85
+ * 由集成层（BootstrapScene）通过构造参数覆盖 —— src/config/ 冻结契约保持零改动。
  */
 import { ShaderMaterial, Scene, Color3, Vector3 } from '@babylonjs/core';
 import { gameConfig } from '../config/gameConfig';
 
+export interface ToonMaterialOptions {
+  /** 硬边三档阈值；缺省沿用冻结 config 的 PROVISIONAL 值。 */
+  readonly bands?: readonly [number, number, number];
+  /** 暗部基色；美术规格 §5.2 要求向雾霭青偏移，默认偏蓝灰。 */
+  readonly ambientColor?: Color3;
+  /** 主光颜色；缺省沿用旧临时暖灰。 */
+  readonly lightColor?: Color3;
+}
+
 export class ToonMaterial {
   readonly material: ShaderMaterial;
 
-  constructor(name: string, scene: Scene, baseColor: Color3) {
-    const [t1, t2, t3] = gameConfig.render.toonBands;
+  constructor(name: string, scene: Scene, baseColor: Color3, options: ToonMaterialOptions = {}) {
+    const [t1, t2, t3] = options.bands ?? gameConfig.render.toonBands;
     const [w1, w2, w3] = gameConfig.render.bandWeights;
 
     const vertexSource = `
@@ -61,8 +73,8 @@ void main() {
       },
     );
     this.material.setColor3('baseColor', baseColor);
-    this.material.setColor3('lightColor', new Color3(0.85, 0.82, 0.78));
-    this.material.setColor3('ambientColor', new Color3(0.22, 0.24, 0.3));
+    this.material.setColor3('lightColor', options.lightColor ?? new Color3(0.85, 0.82, 0.78));
+    this.material.setColor3('ambientColor', options.ambientColor ?? new Color3(0.22, 0.24, 0.3));
     this.setLightDirection(new Vector3(-0.4, -0.85, 0.3));
     this.material.backFaceCulling = true;
   }

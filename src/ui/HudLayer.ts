@@ -4,7 +4,7 @@
  */
 import type { EventBusApi } from '../domain/index.ts';
 import type { UiCommandSink } from './commands.ts';
-import type { HudViewModel } from './viewModel.ts';
+import { CURRENCY_LABEL_KEY, type HudViewModel } from './viewModel.ts';
 import type { TextResolver } from './uiText.ts';
 import { el, setIfChanged, shapeBadge, textCell, type TextCell } from './dom.ts';
 import { TAP_MIN_PX } from './theme.ts';
@@ -91,7 +91,9 @@ export class HudLayer {
     // 离散事件：最近一次拾取（金额来自事件 payload，UI 不累加资源）
     this.unsubs.push(
       bus.subscribe('resource.picked_up', (p) => {
-        setIfChanged(this.pickupCell, `${text(UI_TEXT_KEYS.pickedResources)}: ${p.currencyId} +${p.amount}`);
+        // 适配：payload 里是 config ID，先过 CURRENCY_LABEL_KEY 再走 resolver，
+        // 否则 toast 会漏出 'gold' 这类标识符（叙事规格 §5 的动态拼 key 兜底同类问题）。
+        setIfChanged(this.pickupCell, `${text(UI_TEXT_KEYS.pickedResources)}: ${text(CURRENCY_LABEL_KEY[p.currencyId])} +${p.amount}`);
       }),
     );
   }

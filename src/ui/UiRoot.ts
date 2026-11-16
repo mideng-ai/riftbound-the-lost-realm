@@ -104,6 +104,8 @@ export class UiRoot {
     this.bossHud.update(vm);
     this.upgradeOverlay.update(s);
     this.gemPanel.update();
+    // 结算事件早于本帧快照刷新，显示后由这里持续同步存活时间（见 SettlementScreen.refreshTime）。
+    this.settlement.refreshTime(s.elapsedSec);
   }
 
   /** 验收用：直接打开宝石面板（等效 gem:open 命令）。 */

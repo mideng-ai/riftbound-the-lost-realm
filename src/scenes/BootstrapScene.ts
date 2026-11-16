@@ -38,14 +38,20 @@ import {
   Engine,
   Vector3,
   Color3,
-  Color4,
   MeshBuilder,
   StandardMaterial,
-  HemisphericLight,
 } from '@babylonjs/core';
 import type { Mesh } from '@babylonjs/core';
 import { CameraRig } from '../render/CameraRig';
 import { ToonMaterial } from '../render/ToonMaterial';
+// 美术规格 §2/§3/§4 的参数原文落地（色值/尺寸/seed/光雾/障碍/边界）。
+import {
+  FOREST_HEX,
+  applyForestAtmosphere,
+  createForestGround,
+  createForestLights,
+  createForestProps,
+} from './forestEnvironment.ts';
 import { InputSystem } from '../input/InputSystem';
 import { ProjectileSystem } from '../vfx/Projectile';
 import type { SavePort } from '../save/SavePort';
@@ -71,6 +77,9 @@ import { waveTimelineConfig } from '../config/waveTimelineConfig.ts';
 import { UiRoot } from '../ui/UiRoot.ts';
 import type { UiDataSources } from '../ui/dataSources.ts';
 import type { UiCommandSink } from '../ui/commands.ts';
+import type { TextResolver } from '../ui/uiText.ts';
+// 文案表接线：场景作为 UI 组合根，宿主未显式传 resolver 时也默认注入正式英文表。
+import { enResolver } from '../text/resolver.ts';
 import { CombatUiBridge } from './CombatUiBridge.ts';
 // ── TASK-06 Boss 真 AI 接线（适配层 + 预警渲染） ──
 import { BossCombatBridge, BOSS_BRIDGE_ENTITY_ID } from '../combat/BossCombatBridge.ts';
@@ -92,6 +101,12 @@ export interface BootstrapSceneDeps {
   onUiCommand?: UiCommandSink;
   /** 集成层 adapter：注入 combat 引用、提供 Boss 血条来源、消费 UI 命令队列。 */
   uiBridge?: CombatUiBridge;
+  /**
+   * 玩家可见文本解析器。宿主（main.ts）注入 enResolver；
+   * 兜底也用正式文案表，绝不退回 keyLabel 调试标签。
+   * ?debug=1 只控制旧 #hud 调试面板显示，不改变真 UI 的文案来源。
+   */
+  text?: TextResolver;
 }
 
 export interface BootstrapSceneResult {
@@ -147,22 +162,30 @@ const DEMO_TARGET_POS = { x: 0, y: 0, z: -4 };
 const DEMO_TARGET_ID: EnemyId = 'riftHound';
 
 const PLAYER_MESH_DIAMETER_M = 0.7;
+/** 美术圣经 §9 推荐案：玩家焰橙主体 + 米白点缀（待所有者拍板，此处取规格默认值）。 */
+const PLAYER_BODY_HEX = '#FF7A2F';
+const PLAYER_ACCENT_HEX = '#F5EFE0';
 /** 集成层几何参数：domain/config 未定义玩家碰撞半径，取渲染球半径，仅供 TASK-05 AI 接触判定。 */
 const INTEGRATION_PLAYER_RADIUS_M = PLAYER_MESH_DIAMETER_M / 2;
 /** 集成层：Boss 站位距离（米），非平衡数值。 */
 const BOSS_STANDOFF_M = 8;
 /** Boss 镜像目标 id 段复用适配层常量（避免与 EnemyManager 的 entityId 自增相撞）。 */
 
-/** 视觉配色（纯渲染，不是玩法数值）。 */
-function enemyColor(defId: EnemyId): Color3 {
+/** 实体辨识色（美术规格 §5.1 原文 HEX；纯渲染，不是玩法数值）。 */
+interface EnemyLook {
+  readonly hex: string;
+  readonly emissiveScale: number;
+  readonly alpha: number;
+}
+function enemyLook(defId: EnemyId): EnemyLook {
   switch (defId) {
-    case 'riftSpitter': return new Color3(0.45, 0.8, 0.45);
-    case 'umbraDasher': return new Color3(0.65, 0.4, 0.82);
-    case 'riftNourisher': return new Color3(0.85, 0.7, 0.35);
-    case 'riftRavager':
-    case 'riftCaller': return new Color3(0.92, 0.45, 0.22);
-    case 'riftWarden': return new Color3(0.95, 0.22, 0.28);
-    default: return new Color3(0.85, 0.32, 0.32); // riftHound
+    case 'riftHound': return { hex: '#1E2A24', emissiveScale: 0.35, alpha: 1 }; // 炭黑绿（紫条纹未做，见报告）
+    case 'riftSpitter': return { hex: '#8FD14F', emissiveScale: 0.2, alpha: 1 }; // 嫩芽绿
+    case 'umbraDasher': return { hex: '#8B5CF6', emissiveScale: 0.2, alpha: 0.7 }; // 裂隙紫半透明
+    case 'riftNourisher': return { hex: '#7A5230', emissiveScale: 0.25, alpha: 1 }; // 泥土棕
+    case 'riftRavager': return { hex: '#2E7D4F', emissiveScale: 0.3, alpha: 1 }; // 精英：深林绿
+    case 'riftCaller': return { hex: '#8B5CF6', emissiveScale: 0.3, alpha: 1 }; // 精英：裂隙紫
+    case 'riftWarden': return { hex: '#2E7D4F', emissiveScale: 0.25, alpha: 1 }; // Boss：树皮绿 + 紫核
   }
 }
 
@@ -188,32 +211,50 @@ export function createBootstrapScene(deps: BootstrapSceneDeps): BootstrapSceneRe
   const debugKillBoss = params.get('killboss') === '1';
 
   const scene = new Scene(engine);
-  scene.clearColor = new Color4(0.043, 0.051, 0.071, 1);
+  // 美术规格 §2.3：雾霭青清屏 + LINEAR 雾 25→55m，虚空黑底彻底消失。
+  applyForestAtmosphere(scene);
 
   const cameraRig = new CameraRig(scene, canvas);
-  // 集成层取景：TASK-05 的安全生成红线是「距玩家 ≥12m」，旧取景（radius 14 / beta 0.9）
-  // 只能看见 ±10m，怪会刷在画面外。放宽相机上限并改为近俯视，让 12–20m 的怪潮可见。
-  // 只改相机实例参数，不改 CameraRig 模块内部。
+  // 美术规格 §2.1：beta 0.3→0.56（俯角 72.8°→58°），radius 34→30；
+  // 收紧 beta 上下限锁定俯视角。只改相机实例参数，不改 CameraRig 模块内部。
   cameraRig.camera.upperRadiusLimit = 48;
-  cameraRig.camera.radius = 34;
-  cameraRig.camera.beta = 0.3;
-  new HemisphericLight('hemi', new Vector3(0.2, 1, 0.1), scene).intensity = 0.6;
+  cameraRig.camera.radius = 30;
+  cameraRig.camera.beta = 0.56;
+  cameraRig.camera.lowerBetaLimit = 0.45;
+  cameraRig.camera.upperBetaLimit = 0.75;
+  // 美术规格 §2.2：补主光（旧场景只有一盏白色 hemi，是平涂根因）。
+  createForestLights(scene);
 
   const arena = new Arena();
-  const ground = MeshBuilder.CreateGround(
-    'ground',
-    { width: arena.halfSizeM * 2, height: arena.halfSizeM * 2 },
-    scene,
-  );
-  const gm = new StandardMaterial('groundMat', scene);
-  gm.diffuseColor = new Color3(0.09, 0.11, 0.14);
-  gm.specularColor = Color3.Black();
-  ground.material = gm;
+  // 美术规格 §3/§4：单张 68×68 顶点色地面 + 8 个固定障碍 + ±30 边界可视化。
+  const ground = createForestGround(scene, arena.obstacles);
+  ground.isPickable = false;
+  createForestProps(scene, arena.obstacles, arena.halfSizeM);
 
   const player = MeshBuilder.CreateSphere('player', { diameter: PLAYER_MESH_DIAMETER_M, segments: 16 }, scene);
   player.position.y = INTEGRATION_PLAYER_RADIUS_M;
-  const toon = new ToonMaterial('toonPlayer', scene, new Color3(0.45, 0.6, 0.85));
+  // 圣经 §9 推荐案：玩家焰橙主体 + 米白点缀。三档阈值用圣经定案 [0.22,0.55,0.85]，
+  // 通过构造参数覆盖冻结 config 的 PROVISIONAL 旧值，不碰 src/config/。
+  const sunLightDir = new Vector3(0.29, -0.82, 0.5);
+  const toon = new ToonMaterial('toonPlayer', scene, Color3.FromHexString(PLAYER_BODY_HEX), {
+    bands: [0.22, 0.55, 0.85],
+    ambientColor: new Color3(0.28, 0.33, 0.32),
+    lightColor: Color3.FromHexString(FOREST_HEX.sun),
+  });
+  // 适配：DirectionalLight 的 direction 是「光传播方向」，而 toon shader 的 N·L 需要
+  // 「指向光源的向量」，两者相反；不取反会让所有朝上法线 band=0，玩家发黑。
+  toon.bindLight(sunLightDir.scale(-1));
   player.material = toon.material;
+  // 米白点缀：不重新设计剪影，只加一顶小「兜帽」，仍受 toon 主光统一方向驱动。
+  const accent = MeshBuilder.CreateSphere('playerAccent', { diameter: 0.28, segments: 10 }, scene);
+  const accentMat = new StandardMaterial('playerAccentMat', scene);
+  accentMat.diffuseColor = Color3.FromHexString(PLAYER_ACCENT_HEX);
+  accentMat.emissiveColor = Color3.FromHexString(PLAYER_ACCENT_HEX).scale(0.2);
+  accentMat.specularColor = Color3.Black();
+  accent.material = accentMat;
+  accent.parent = player;
+  accent.position.y = 0.24;
+  accent.isPickable = false;
 
   const dummy = MeshBuilder.CreateBox('dummy', { size: 0.8 }, scene);
   dummy.position.set(DEMO_TARGET_POS.x, 0.4, DEMO_TARGET_POS.z);
@@ -288,15 +329,30 @@ export function createBootstrapScene(deps: BootstrapSceneDeps): BootstrapSceneRe
       ? MeshBuilder.CreateSphere('boss', { diameter: size, segments: 20 }, scene)
       : MeshBuilder.CreateBox('enemy', { size }, scene);
     const mat = new StandardMaterial(`enemyMat_${defId}_${meshSeq++}`, scene);
-    // 自发光纯色：暗色场地 + 0.6 强度半球光下，纯 diffuse 的怪几乎看不见。
-    // 这是渲染层可见性修正，不影响任何玩法数值。
-    const color = enemyColor(defId);
+    // 美术规格 §5.1：圣经辨识色 + 低强度 emissive 微光；受主光/半球光产生明暗，
+    // 不再 disableLighting 平涂（旧红方块/蓝球的根因）。
+    const look = enemyLook(defId);
+    const color = Color3.FromHexString(look.hex);
     mat.diffuseColor = color;
-    mat.emissiveColor = color;
+    mat.emissiveColor = color.scale(look.emissiveScale);
     mat.specularColor = Color3.Black();
-    mat.disableLighting = true;
+    mat.alpha = look.alpha;
     mesh.material = mat;
     mesh.position.set(pos.x, radiusM, pos.z);
+
+    if (defId === 'riftWarden') {
+      // 规格 §5.1：树皮躯干 + 裂隙紫发光核心。核心只做视觉，不参与任何判定。
+      const core = MeshBuilder.CreateSphere('bossCore', { diameter: radiusM * 0.8, segments: 12 }, scene);
+      const coreMat = new StandardMaterial('bossCoreMat', scene);
+      coreMat.diffuseColor = Color3.Black();
+      coreMat.emissiveColor = Color3.FromHexString('#8B5CF6').scale(0.8);
+      coreMat.specularColor = Color3.Black();
+      core.material = coreMat;
+      core.parent = mesh;
+      // 相机在 -z 侧且俯视（alpha=-π/2, beta=0.56），核心朝 -z 并抬高才不被球体挡住。
+      core.position.set(0, radiusM * 0.25, -radiusM * 0.75);
+      core.isPickable = false;
+    }
     return mesh;
   };
 
@@ -449,6 +505,9 @@ export function createBootstrapScene(deps: BootstrapSceneDeps): BootstrapSceneRe
   const uiSources: UiDataSources = deps.ui ?? { bus: combat.bus, snapshot: () => combat.snapshot };
   const ui = new UiRoot(document.body, {
     ...uiSources,
+    // 文案 resolver 优先级：宿主显式注入 > 数据源自带 > 正式英文表兜底。
+    // 不接 ?debug=1：调试标签只属于骨架验收路径，正式画面必须是玩家可见英文。
+    text: deps.text ?? uiSources.text ?? enResolver,
     // 领域总线是共享的：接线后只做逐层退订，不用 clearAll 清掉其它系统监听器。
     clearAllOnDispose: deps.ui ? false : true,
     onCommand: deps.onUiCommand ?? ((cmd) => console.debug('[ui] command (host not wired):', cmd.type)),
@@ -582,11 +641,12 @@ export function createBootstrapScene(deps: BootstrapSceneDeps): BootstrapSceneRe
     if (dash || attackEdge || skill1 || skill2) dashPulse = 1;
     if (dashPulse > 0) dashPulse = Math.max(0, dashPulse - dt * 2);
     const dashing = combat.player.runtime.dashActiveTimerSec > 0;
+    // 圣经色反馈：法杖=焰橙主体，剑=米白点缀，冲刺=雾霭青高亮；不再是蓝球/粉球。
     const color = dashPulse > 0 || dashing
-      ? new Color3(0.9, 0.75, 0.4)
+      ? Color3.FromHexString(FOREST_HEX.mist)
       : combat.weapons.current === 'sword'
-        ? new Color3(0.85, 0.5, 0.6)
-        : new Color3(0.45, 0.6, 0.85);
+        ? Color3.FromHexString(PLAYER_ACCENT_HEX)
+        : Color3.FromHexString(PLAYER_BODY_HEX);
     toon.material.setColor3('baseColor', color);
 
     // 8) ⚠ DEMO 桩：纯视觉自动开火，仅 ?demo=1 启用（默认关闭，不产生伤害）
