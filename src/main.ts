@@ -16,6 +16,8 @@ import { CombatUiBridge } from './scenes/CombatUiBridge';
 import { gameConfig } from './config/gameConfig';
 // 文案表注入（叙事规格 §5）：真实运行路径用 enResolver，不再走 keyLabel 反推标签。
 import { enResolver } from './text/resolver.ts';
+// 程序化音频运行时（ADR-TD-008）：零外部资产，首次手势解锁。
+import { createAudioRuntime } from './audio/index.ts';
 
 const canvas = document.getElementById('renderCanvas') as HTMLCanvasElement;
 const hud = document.getElementById('hud')!;
@@ -65,6 +67,13 @@ const save = new MockSaveAdapter();
 // 把 combat.snapshot 适配成 RunSnapshot（补齐 Boss 血条字段），
 // 并把 UI 命令转成下一帧的 CombatFrameInput（升级选卡 / 武器切换）。
 const bridge = new CombatUiBridge();
+// 与 combat/UI 共享同一条 bus；?mute=1 供 QA/调试静音，不进玩法逻辑。
+const audio = createAudioRuntime({ bus: bridge.bus, muted: params.get('mute') === '1' });
+(window as unknown as { __rbAudio: () => unknown }).__rbAudio = () => ({
+  muted: audio.isMuted,
+  voices: audio.activeVoices,
+  track: audio.currentTrack,
+});
 const boot = createBootstrapScene({
   engine: host.engine,
   canvas,

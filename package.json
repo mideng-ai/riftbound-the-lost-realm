@@ -19,7 +19,8 @@
     "test:qa": "tsc -p tsconfig.test.json && node tests/prepare.cjs && node --test tests/qa-regression.test.mjs",
     "test:ui": "tsc -p tsconfig.test.json && node tests/prepare.cjs && node --experimental-strip-types --no-warnings --test tests/ui-contract.test.mjs",
     "test:text": "tsc -p tsconfig.test.json && node tests/prepare.cjs && node --experimental-strip-types --no-warnings --test tests/localization-table.test.mjs",
-    "test": "npm run test:domain && npm run test:input && npm run test:task02 && npm run test:gems && npm run test:economy && npm run test:task05 && npm run test:boss && npm run test:boss-integration && npm run test:qa && npm run test:ui && npm run test:text"
+    "test:audio": "tsc -p tsconfig.test.json && node tests/prepare.cjs && node --experimental-strip-types --no-warnings --test tests/audio-contract.test.mjs",
+    "test": "npm run test:domain && npm run test:input && npm run test:task02 && npm run test:gems && npm run test:economy && npm run test:task05 && npm run test:boss && npm run test:boss-integration && npm run test:qa && npm run test:ui && npm run test:text && npm run test:audio"
   },
   "dependencies": {
     "@babylonjs/core": "9.36.0"
