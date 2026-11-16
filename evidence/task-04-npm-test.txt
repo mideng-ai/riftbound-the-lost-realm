@@ -1,0 +1,736 @@
+
+> riftbound-the-lost-realm@0.1.0 test
+> npm run test:domain && npm run test:input && npm run test:economy
+
+
+> riftbound-the-lost-realm@0.1.0 test:domain
+> tsc -p tsconfig.test.json && node tests/prepare.cjs && node --test tests/domain-contract.test.mjs
+
+TAP version 13
+# [domain/save] 无法识别的存档版本 999，已回退为默认存档
+# [EventBus] handler 抛错（事件 boss.defeated），已隔离以免中断其余监听: Error: boom
+#     at file:///workspace/riftbound-the-lost-realm/tests/domain-contract.test.mjs:473:13
+#     at EventBus.publish (/workspace/riftbound-the-lost-realm/.testbuild/domain/events.js:31:17)
+#     at file:///workspace/riftbound-the-lost-realm/tests/domain-contract.test.mjs:476:35
+#     at getActual (node:assert:805:5)
+#     at Function.doesNotThrow (node:assert:971:32)
+#     at TestContext.<anonymous> (file:///workspace/riftbound-the-lost-realm/tests/domain-contract.test.mjs:476:12)
+#     at Test.runInAsyncScope (node:async_hooks:211:14)
+#     at Test.run (node:internal/test_runner/test:931:25)
+#     at Suite.processPendingSubtests (node:internal/test_runner/test:629:18)
+#     at Test.postRun (node:internal/test_runner/test:1042:19)
+# Subtest: AC-1 基准算例：三层乘区锚点 24.2659 / DPS 48.53
+    # Subtest: A×B×C 与配置表自洽，单发 = 24.2659
+    ok 1 - A×B×C 与配置表自洽，单发 = 24.2659
+      ---
+      duration_ms: 0.873993
+      ...
+    # Subtest: 法杖 DPS = 48.53（单发 ÷ 0.5s 间隔）
+    ok 2 - 法杖 DPS = 48.53（单发 ÷ 0.5s 间隔）
+      ---
+      duration_ms: 0.12498
+      ...
+    1..2
+ok 1 - AC-1 基准算例：三层乘区锚点 24.2659 / DPS 48.53
+  ---
+  duration_ms: 1.569166
+  type: 'suite'
+  ...
+# Subtest: AC-2 强化表等差性：相邻差恒为 0.08
+    # Subtest: weaponUpgradePctByLevel 逐级差 = 0.08
+    ok 1 - weaponUpgradePctByLevel 逐级差 = 0.08
+      ---
+      duration_ms: 0.195971
+      ...
+    1..1
+ok 2 - AC-2 强化表等差性：相邻差恒为 0.08
+  ---
+  duration_ms: 0.289781
+  type: 'suite'
+  ...
+# Subtest: AC-3 熟练 Lv10 = 25%
+    # Subtest: masteryPctOfLevel(10) === 0.25（含里程碑 +5%）
+    ok 1 - masteryPctOfLevel(10) === 0.25（含里程碑 +5%）
+      ---
+      duration_ms: 0.12616
+      ...
+    1..1
+ok 3 - AC-3 熟练 Lv10 = 25%
+  ---
+  duration_ms: 0.185731
+  type: 'suite'
+  ...
+# Subtest: AC-4 熟练 Lv9 / Lv10 断层
+    # Subtest: Lv9 = 0.18，Lv10 = 0.25，差 0.07
+    ok 1 - Lv9 = 0.18，Lv10 = 0.25，差 0.07
+      ---
+      duration_ms: 0.1409
+      ...
+    1..1
+ok 4 - AC-4 熟练 Lv9 / Lv10 断层
+  ---
+  duration_ms: 0.280931
+  type: 'suite'
+  ...
+# Subtest: AC-5 A 区满配 = 1.57
+    # Subtest: 1 + 0.32 + 0.25 = 1.57
+    ok 1 - 1 + 0.32 + 0.25 = 1.57
+      ---
+      duration_ms: 0.165861
+      ...
+    1..1
+ok 5 - AC-5 A 区满配 = 1.57
+  ---
+  duration_ms: 0.298891
+  type: 'suite'
+  ...
+# Subtest: AC-6 Boss TTK（×0.7 口径）落在 2–3 分钟
+    # Subtest: 6000 / (48.5318 × 0.7) ≈ 176.6s
+    ok 1 - 6000 / (48.5318 × 0.7) ≈ 176.6s
+      ---
+      duration_ms: 0.178741
+      ...
+    1..1
+ok 6 - AC-6 Boss TTK（×0.7 口径）落在 2–3 分钟
+  ---
+  duration_ms: 0.224761
+  type: 'suite'
+  ...
+# Subtest: AC-7 破甲不被双计
+    # Subtest: Boss 满破甲：单发 = A×B×C × 1.5（不是 ×1.5×1.5）
+    ok 1 - Boss 满破甲：单发 = A×B×C × 1.5（不是 ×1.5×1.5）
+      ---
+      duration_ms: 0.165271
+      ...
+    # Subtest: 普通怪不吃破甲
+    ok 2 - 普通怪不吃破甲
+      ---
+      duration_ms: 0.09494
+      ...
+    1..2
+ok 7 - AC-7 破甲不被双计
+  ---
+  duration_ms: 0.390231
+  type: 'suite'
+  ...
+# Subtest: AC-8 C_ZONE_DERIVED_CATEGORIES === ["damage"]
+    # Subtest: 常量仍是单元素 damage，armorBreak 未被加入
+    ok 1 - 常量仍是单元素 damage，armorBreak 未被加入
+      ---
+      duration_ms: 0.479781
+      ...
+    1..1
+ok 8 - AC-8 C_ZONE_DERIVED_CATEGORIES === ["damage"]
+  ---
+  duration_ms: 0.521622
+  type: 'suite'
+  ...
+# Subtest: AC-9 totalOverflowPct 恒为 0（总上限不可达被固化）
+    # Subtest: 合法与超限输入下 totalOverflowPct 恒 = 0
+    ok 1 - 合法与超限输入下 totalOverflowPct 恒 = 0
+      ---
+      duration_ms: 0.317022
+      ...
+    # Subtest: damage 单类上限 +100% 真实生效（超限部分进 damageOverflowPct）
+    ok 2 - damage 单类上限 +100% 真实生效（超限部分进 damageOverflowPct）
+      ---
+      duration_ms: 0.07681
+      ...
+    1..2
+ok 9 - AC-9 totalOverflowPct 恒为 0（总上限不可达被固化）
+  ---
+  duration_ms: 0.448532
+  type: 'suite'
+  ...
+# Subtest: AC-10 强化 Lv5 = 32%（规划书算例 / 总纲表 / playerConfig 三处一致）
+    # Subtest: weaponUpgradePctByLevel[4] === 0.32
+    ok 1 - weaponUpgradePctByLevel[4] === 0.32
+      ---
+      duration_ms: 0.06138
+      ...
+    1..1
+ok 10 - AC-10 强化 Lv5 = 32%（规划书算例 / 总纲表 / playerConfig 三处一致）
+  ---
+  duration_ms: 0.098011
+  type: 'suite'
+  ...
+# Subtest: Boss 阶段：8 个血线点（100/70/65/50/30/29/10/0%）
+    # Subtest: 边界语义：65% 归 corruption、30% 归 coreFrenzy（右开）
+    ok 1 - 边界语义：65% 归 corruption、30% 归 coreFrenzy（右开）
+      ---
+      duration_ms: 0.20424
+      ...
+    1..1
+ok 11 - Boss 阶段：8 个血线点（100/70/65/50/30/29/10/0%）
+  ---
+  duration_ms: 0.236421
+  type: 'suite'
+  ...
+# Subtest: 精英窗口 [360, 509]
+    # Subtest: eliteAllowedAt 六个边界点
+    ok 1 - eliteAllowedAt 六个边界点
+      ---
+      duration_ms: 0.158281
+      ...
+    1..1
+ok 12 - 精英窗口 [360, 509]
+  ---
+  duration_ms: 0.190111
+  type: 'suite'
+  ...
+# Subtest: 穿透不污染吸血（lifesteal = 0）
+    # Subtest: pierce 类 buff 进快照后 lifestealPctMaxHp 仍为 0
+    ok 1 - pierce 类 buff 进快照后 lifestealPctMaxHp 仍为 0
+      ---
+      duration_ms: 0.179711
+      ...
+    # Subtest: 吸血只认 vampiricBlade 白名单
+    ok 2 - 吸血只认 vampiricBlade 白名单
+      ---
+      duration_ms: 0.06786
+      ...
+    1..2
+ok 13 - 穿透不污染吸血（lifesteal = 0）
+  ---
+  duration_ms: 0.291361
+  type: 'suite'
+  ...
+# Subtest: 选卡：恒 3 张 / 不重复 / scope 过滤 / 满级过滤
+    # Subtest: 空 buff + staff：恒 3 张、无重复、全部为 staff 或 generic
+    ok 1 - 空 buff + staff：恒 3 张、无重复、全部为 staff 或 generic
+      ---
+      duration_ms: 0.429322
+      ...
+    # Subtest: sword 局不出现 staff 专属卡
+    ok 2 - sword 局不出现 staff 专属卡
+      ---
+      duration_ms: 0.11933
+      ...
+    # Subtest: 满级卡（heavyShot ×3）被过滤
+    ok 3 - 满级卡（heavyShot ×3）被过滤
+      ---
+      duration_ms: 0.095351
+      ...
+    # Subtest: 同 seed 选卡序列可复现
+    ok 4 - 同 seed 选卡序列可复现
+      ---
+      duration_ms: 0.08214
+      ...
+    1..4
+ok 14 - 选卡：恒 3 张 / 不重复 / scope 过滤 / 满级过滤
+  ---
+  duration_ms: 0.796283
+  type: 'suite'
+  ...
+# Subtest: Rng：同 seed 一致、不同 seed 不同
+    # Subtest: createMulberry32 确定性
+    ok 1 - createMulberry32 确定性
+      ---
+      duration_ms: 0.10192
+      ...
+    # Subtest: snapshot / restore 可复现中间状态
+    ok 2 - snapshot / restore 可复现中间状态
+      ---
+      duration_ms: 0.07041
+      ...
+    1..2
+ok 15 - Rng：同 seed 一致、不同 seed 不同
+  ---
+  duration_ms: 0.213431
+  type: 'suite'
+  ...
+# Subtest: 存档：v3 schema / socket = itemInstanceId / v2→v3 迁移
+    # Subtest: SAVE_SCHEMA_VERSION === 3，默认存档自洽
+    ok 1 - SAVE_SCHEMA_VERSION === 3，默认存档自洽
+      ---
+      duration_ms: 0.554262
+      ...
+    # Subtest: socket 存 itemInstanceId，引用完整则校验通过
+    ok 2 - socket 存 itemInstanceId，引用完整则校验通过
+      ---
+      duration_ms: 0.09858
+      ...
+    # Subtest: 悬空 socket ID 被校验拦截（Q6 的直接后果）
+    ok 3 - 悬空 socket ID 被校验拦截（Q6 的直接后果）
+      ---
+      duration_ms: 0.185371
+      ...
+    # Subtest: v2→v3 迁移：只迁移 gold，音量重置为默认 1
+    ok 4 - v2→v3 迁移：只迁移 gold，音量重置为默认 1
+      ---
+      duration_ms: 0.13469
+      ...
+    # Subtest: migrateSave：v2 直通 / null 兜底 / 未知版本回退默认
+    ok 5 - migrateSave：v2 直通 / null 兜底 / 未知版本回退默认
+      ---
+      duration_ms: 0.506192
+      ...
+    1..5
+ok 16 - 存档：v3 schema / socket = itemInstanceId / v2→v3 迁移
+  ---
+  duration_ms: 1.573305
+  type: 'suite'
+  ...
+# Subtest: RunClock：freeze 不累计、resume 恢复
+    # Subtest: 冻结期间 advance 无效，resume 后继续累计
+    ok 1 - 冻结期间 advance 无效，resume 后继续累计
+      ---
+      duration_ms: 0.143211
+      ...
+    # Subtest: reset 清零并解除冻结；Boss 阈值边沿标记 510/600
+    ok 2 - reset 清零并解除冻结；Boss 阈值边沿标记 510/600
+      ---
+      duration_ms: 0.06052
+      ...
+    1..2
+ok 17 - RunClock：freeze 不累计、resume 恢复
+  ---
+  duration_ms: 0.250531
+  type: 'suite'
+  ...
+# Subtest: EventBus：退订 / clearAll / 异常隔离
+    # Subtest: 退订后不再收到事件（幂等退订）
+    ok 1 - 退订后不再收到事件（幂等退订）
+      ---
+      duration_ms: 0.15863
+      ...
+    # Subtest: clearAll 清空全部监听器
+    ok 2 - clearAll 清空全部监听器
+      ---
+      duration_ms: 0.05269
+      ...
+    # Subtest: 单个 handler 抛错不中断其余监听
+    ok 3 - 单个 handler 抛错不中断其余监听
+      ---
+      duration_ms: 0.462102
+      ...
+    1..3
+ok 18 - EventBus：退订 / clearAll / 异常隔离
+  ---
+  duration_ms: 0.737093
+  type: 'suite'
+  ...
+# Subtest: 森林生存 Lv10 = 15%（不是 14%）
+    # Subtest: Lv9 = 9%，Lv10 = 10% + 5% 里程碑 = 15%
+    ok 1 - Lv9 = 9%，Lv10 = 10% + 5% 里程碑 = 15%
+      ---
+      duration_ms: 0.09799
+      ...
+    1..1
+ok 19 - 森林生存 Lv10 = 15%（不是 14%）
+  ---
+  duration_ms: 0.131591
+  type: 'suite'
+  ...
+# Subtest: C_ZONE_DERIVED_CATEGORIES 仍为 ["damage"]（AC-8 的固化副本）
+    # Subtest: 与 ADR-TD-007 一致：armorBreak 不在 C 区总量表内
+    ok 1 - 与 ADR-TD-007 一致：armorBreak 不在 C 区总量表内
+      ---
+      duration_ms: 0.055891
+      ...
+    1..1
+ok 20 - C_ZONE_DERIVED_CATEGORIES 仍为 ["damage"]（AC-8 的固化副本）
+  ---
+  duration_ms: 0.084691
+  type: 'suite'
+  ...
+# Subtest: caps 单一来源与 XP 曲线
+    # Subtest: damageConfig.caps 与 DAMAGE_CAPS_CONST / upgradePoolConfig.caps 三处同源
+    ok 1 - damageConfig.caps 与 DAMAGE_CAPS_CONST / upgradePoolConfig.caps 三处同源
+      ---
+      duration_ms: 0.08535
+      ...
+    # Subtest: 选卡数量契约 choicesPerLevel = 3；15 张卡齐全
+    ok 2 - 选卡数量契约 choicesPerLevel = 3；15 张卡齐全
+      ---
+      duration_ms: 0.03589
+      ...
+    # Subtest: XP 曲线按公式 round(40 × L^1.35)
+    ok 3 - XP 曲线按公式 round(40 × L^1.35)
+      ---
+      duration_ms: 0.06873
+      ...
+    1..3
+ok 21 - caps 单一来源与 XP 曲线
+  ---
+  duration_ms: 0.233301
+  type: 'suite'
+  ...
+# Subtest: AC-Q1 P1 面板 / 阶段 1 / 猎犬：2 发、1.00s
+    # Subtest: 单发 11.4862、发数 2、TTK 1.00s ± 0.01
+    ok 1 - 单发 11.4862、发数 2、TTK 1.00s ± 0.01
+      ---
+      duration_ms: 0.216971
+      ...
+    1..1
+ok 22 - AC-Q1 P1 面板 / 阶段 1 / 猎犬：2 发、1.00s
+  ---
+  duration_ms: 0.263911
+  type: 'suite'
+  ...
+# Subtest: AC-Q2 P1 面板 6 阶段 × 4 怪 15 格：发数逐格写死 ∈ [2,5]
+    # Subtest: 15 格全部 assertEquals 到 §3.4 中位矩阵，且落在 [2,5]
+    ok 1 - 15 格全部 assertEquals 到 §3.4 中位矩阵，且落在 [2,5]
+      ---
+      duration_ms: 0.257681
+      ...
+    1..1
+ok 23 - AC-Q2 P1 面板 6 阶段 × 4 怪 15 格：发数逐格写死 ∈ [2,5]
+  ---
+  duration_ms: 0.293231
+  type: 'suite'
+  ...
+# Subtest: AC-Q3 P2 面板 15 格：发数 ∈ [2,3]
+    # Subtest: 满配不发一击必杀（≥2），且不超过 3 发
+    ok 1 - 满配不发一击必杀（≥2），且不超过 3 发
+      ---
+      duration_ms: 0.656972
+      ...
+    1..1
+ok 24 - AC-Q3 P2 面板 15 格：发数 ∈ [2,3]
+  ---
+  duration_ms: 0.700352
+  type: 'suite'
+  ...
+# Subtest: AC-Q4 P0 面板（C 恒 1.00）阶段 1–3：发数 ≤ 6，其中阶段 1–2 的 3 格 ≤ 4
+    # Subtest: 新档前 7:30 必须活得下去（阶段 1–3 共 6 格）
+    ok 1 - 新档前 7:30 必须活得下去（阶段 1–3 共 6 格）
+      ---
+      duration_ms: 0.16747
+      ...
+    1..1
+ok 25 - AC-Q4 P0 面板（C 恒 1.00）阶段 1–3：发数 ≤ 6，其中阶段 1–2 的 3 格 ≤ 4
+  ---
+  duration_ms: 0.204021
+  type: 'suite'
+  ...
+# Subtest: AC-Q5（反向断言）P0 面板阶段 4–5 共 8 格：发数 = 表列值
+    # Subtest: 影跃者 8 发 / 滋养体 9 发 / 猎犬 6 发 / 投射者 5 发
+    ok 1 - 影跃者 8 发 / 滋养体 9 发 / 猎犬 6 发 / 投射者 5 发
+      ---
+      duration_ms: 0.09403
+      ...
+    1..1
+ok 26 - AC-Q5（反向断言）P0 面板阶段 4–5 共 8 格：发数 = 表列值
+  ---
+  duration_ms: 0.122821
+  type: 'suite'
+  ...
+# Subtest: AC-Q6 P1 猎犬连续 TTK 漂移 P4 ÷ P1 = 1.556
+    # Subtest: 漂移 1.556 ± 0.02，∈ [1.2, 1.6]
+    ok 1 - 漂移 1.556 ± 0.02，∈ [1.2, 1.6]
+      ---
+      duration_ms: 0.09273
+      ...
+    1..1
+ok 27 - AC-Q6 P1 猎犬连续 TTK 漂移 P4 ÷ P1 = 1.556
+  ---
+  duration_ms: 0.11704
+  type: 'suite'
+  ...
+# Subtest: AC-Q6s P1 全阶段漂移快照：1.00 / 1.30 / 1.66 / 1.55 / 1.21 / 1.21，最大 ≤ 2.0
+    # Subtest: DPS 倍率 = (C_阶段 ÷ C_1) × (intMul_1 ÷ intMul_阶段)
+    ok 1 - DPS 倍率 = (C_阶段 ÷ C_1) × (intMul_1 ÷ intMul_阶段)
+      ---
+      duration_ms: 0.119781
+      ...
+    1..1
+ok 28 - AC-Q6s P1 全阶段漂移快照：1.00 / 1.30 / 1.66 / 1.55 / 1.21 / 1.21，最大 ≤ 2.0
+  ---
+  duration_ms: 0.147831
+  type: 'suite'
+  ...
+# Subtest: AC-Q7 P1 阶段 4：KPS 2.56、CT 7.81s ≤ 12s
+    # Subtest: 吞吐 135.2 ÷ 加权 HP 52.8 = 2.56；20 ÷ 2.56 = 7.81s
+    ok 1 - 吞吐 135.2 ÷ 加权 HP 52.8 = 2.56；20 ÷ 2.56 = 7.81s
+      ---
+      duration_ms: 0.10399
+      ...
+    1..1
+ok 29 - AC-Q7 P1 阶段 4：KPS 2.56、CT 7.81s ≤ 12s
+  ---
+  duration_ms: 0.12922
+  type: 'suite'
+  ...
+# Subtest: AC-Q7s（反向断言）P0 阶段 4：CT > 12s
+    # Subtest: 吞吐 66.3 = 法杖 17.4 + 剑 48.9 → KPS 1.26 → CT 15.93s > 12s
+    ok 1 - 吞吐 66.3 = 法杖 17.4 + 剑 48.9 → KPS 1.26 → CT 15.93s > 12s
+      ---
+      duration_ms: 0.096481
+      ...
+    1..1
+ok 30 - AC-Q7s（反向断言）P0 阶段 4：CT > 12s
+  ---
+  duration_ms: 0.120861
+  type: 'suite'
+  ...
+# Subtest: AC-Q8 阶段 4 满编 20 只同时攻击 + 0.5s 无敌帧 → TTD 3.85s ≥ 3.0s
+    # Subtest: TDD = 100 ÷ (最大单击 13.0 ÷ 0.5) = 3.85s
+    ok 1 - TDD = 100 ÷ (最大单击 13.0 ÷ 0.5) = 3.85s
+      ---
+      duration_ms: 0.09625
+      ...
+    1..1
+ok 31 - AC-Q8 阶段 4 满编 20 只同时攻击 + 0.5s 无敌帧 → TTD 3.85s ≥ 3.0s
+  ---
+  duration_ms: 0.12084
+  type: 'suite'
+  ...
+# Subtest: AC-Q9（反向断言）关闭无敌帧：Σ DPS 破线、TTD 0.72s
+    # Subtest: 等权口径 Σ DPS 188.5、TTD 0.53s，必须远破 3s 红线
+    ok 1 - 等权口径 Σ DPS 188.5、TTD 0.53s，必须远破 3s 红线
+      ---
+      duration_ms: 0.075101
+      ...
+    1..1
+ok 32 - AC-Q9（反向断言）关闭无敌帧：Σ DPS 破线、TTD 0.72s
+  ---
+  duration_ms: 0.100871
+  type: 'suite'
+  ...
+# Subtest: AC-Q10 P1 M2s 余量 R 与占用率 O 快照（监控，非 pass/fail）
+    # Subtest: R = 43.8/26.9/15.1/8.5/12.1/81.6；O = 6.6%/7.7%/8.1%/8.6%/12.5%/5.8%
+    ok 1 - R = 43.8/26.9/15.1/8.5/12.1/81.6；O = 6.6%/7.7%/8.1%/8.6%/12.5%/5.8%
+      ---
+      duration_ms: 0.15413
+      ...
+    1..1
+ok 33 - AC-Q10 P1 M2s 余量 R 与占用率 O 快照（监控，非 pass/fail）
+  ---
+  duration_ms: 0.179561
+  type: 'suite'
+  ...
+# Subtest: AC-Q11 满配锚点 × 0.7 → Boss TTK 176.6s ∈ [120,180]（= 既有 AC-6）
+    # Subtest: 6000 ÷ (48.5318 × 0.7) = 176.6s
+    ok 1 - 6000 ÷ (48.5318 × 0.7) = 176.6s
+      ---
+      duration_ms: 0.090841
+      ...
+    1..1
+ok 34 - AC-Q11 满配锚点 × 0.7 → Boss TTK 176.6s ∈ [120,180]（= 既有 AC-6）
+  ---
+  duration_ms: 0.116791
+  type: 'suite'
+  ...
+# Subtest: AC-Q12 xpCurve 累计 Lv6/Lv7/Lv8 + 2420 XP → Lv8、7 张卡
+    # Subtest: 累计 Lv6=929 / Lv7=1379 / Lv8=1932；111×20 + 2×100 = 2420 → Lv8、7 张
+    ok 1 - 累计 Lv6=929 / Lv7=1379 / Lv8=1932；111×20 + 2×100 = 2420 → Lv8、7 张
+      ---
+      duration_ms: 0.15661
+      ...
+    1..1
+ok 35 - AC-Q12 xpCurve 累计 Lv6/Lv7/Lv8 + 2420 XP → Lv8、7 张卡
+  ---
+  duration_ms: 0.18473
+  type: 'suite'
+  ...
+# Subtest: AC-Q13（安全阀）C ≤ 1.72 时满配 Boss TTK ≥ 120s；C = 2.00 时 = 103s < 120s
+    # Subtest: damage 单类上限（C=2.00）与 Boss 2 分钟下界不能共存（供 Q-NEW-4 引用）
+    ok 1 - damage 单类上限（C=2.00）与 Boss 2 分钟下界不能共存（供 Q-NEW-4 引用）
+      ---
+      duration_ms: 0.135391
+      ...
+    1..1
+ok 36 - AC-Q13（安全阀）C ≤ 1.72 时满配 Boss TTK ≥ 120s；C = 2.00 时 = 103s < 120s
+  ---
+  duration_ms: 0.163801
+  type: 'suite'
+  ...
+1..36
+# tests 53
+# suites 36
+# pass 53
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 75.019856
+
+> riftbound-the-lost-realm@0.1.0 test:input
+> tsc -p tsconfig.test.json && node tests/prepare.cjs && node tests/input-regression.cjs
+
+PASS R2-1 mousedown on bound button produces one dash intent — intent consumed
+PASS R2-1b intent not duplicated — second poll returns false
+PASS R2-2 touchstart on bound button produces one dash intent — intent consumed
+PASS R2-3 normalAttack press emits held=true — held state true
+PASS R2-4 dispose cancels pending hold-release timer — held events delta=1 (expected 1 = the press only)
+PASS R2-5 disposed instance receives no button intents — consumeIntent=false
+PASS R2-6 disposed instance records no events — events=0
+PASS R2-7 re-attached instance gets exactly one intent — count=1
+PASS R2-8 re-attached instance consumes the intent — consumed
+PASS R3-1 blur sets suspended=true — suspended=true
+PASS R3-2 blur → touchcancel keeps suspended=true — touchcancel must not resume
+PASS R3-3 visibility resume clears suspension — suspended=false
+PASS R3-4 blur → focus clears suspension — suspended=false
+PASS R3-5 hidden sets suspended=true — suspended=true
+PASS R3-6 hidden → touchcancel keeps suspended=true — still suspended
+PASS R3-7 visibility recovery after touchcancel resumes — suspended=false
+PASS R3-8 touchcancel alone does not suspend — suspended stays false
+PASS R3-9 touchcancel still releases joystick movement — moved=(1.00,0.00) → released=(0,0)
+
+summary: 18 passed, 0 failed, 18 checks
+
+> riftbound-the-lost-realm@0.1.0 test:economy
+> tsc -p tsconfig.test.json && node tests/prepare.cjs && node --test tests/economy.test.mjs
+
+TAP version 13
+# [domain/save] 无法识别的存档版本 undefined，已回退为默认存档
+# [domain/save] 无法识别的存档版本 undefined，已回退为默认存档
+# [domain/save] 无法识别的存档版本 9，已回退为默认存档
+# [domain/save] 无法识别的存档版本 undefined，已回退为默认存档
+# [domain/save] 无法识别的存档版本 undefined，已回退为默认存档
+# [domain/save] 无法识别的存档版本 9，已回退为默认存档
+# Subtest: AC-1a | 掉落产出由冻结 config 掉落表逐规则推导（数量区间与概率）
+ok 1 - AC-1a | 掉落产出由冻结 config 掉落表逐规则推导（数量区间与概率）
+  ---
+  duration_ms: 4.538507
+  ...
+# Subtest: AC-1b | 改 config（damageConfig.loot）即生效 —— 数据驱动
+ok 2 - AC-1b | 改 config（damageConfig.loot）即生效 —— 数据驱动
+  ---
+  duration_ms: 0.195791
+  ...
+# Subtest: AC-1c | 元素维度决定碎片种类；Boss 宝石品质取 enemyConfig.bossReward.minGemQuality
+ok 3 - AC-1c | 元素维度决定碎片种类；Boss 宝石品质取 enemyConfig.bossReward.minGemQuality
+  ---
+  duration_ms: 0.294521
+  ...
+# Subtest: AC-1d | Rng 同 seed 产出完全一致的掉落序列（可复现）
+ok 4 - AC-1d | Rng 同 seed 产出完全一致的掉落序列（可复现）
+  ---
+  duration_ms: 0.497092
+  ...
+# Subtest: AC-2a | 同一 dropId 拾取两次只入账一次
+ok 5 - AC-2a | 同一 dropId 拾取两次只入账一次
+  ---
+  duration_ms: 1.125894
+  ...
+# Subtest: AC-2b | 未知 dropId 拒绝且零副作用
+ok 6 - AC-2b | 未知 dropId 拒绝且零副作用
+  ---
+  duration_ms: 0.150691
+  ...
+# Subtest: AC-2c | 拾取宝石实例只入库存一次
+ok 7 - AC-2c | 拾取宝石实例只入库存一次
+  ---
+  duration_ms: 0.227721
+  ...
+# Subtest: AC-3 | 死亡（victory=false）结算保留已拾取资源与宝石
+ok 8 - AC-3 | 死亡（victory=false）结算保留已拾取资源与宝石
+  ---
+  duration_ms: 0.720722
+  ...
+# Subtest: AC-4 | 地面未拾取物不结算
+ok 9 - AC-4 | 地面未拾取物不结算
+  ---
+  duration_ms: 0.566231
+  ...
+# Subtest: AC-5 | 本局经验不误存为永久经验（结构 + 行为双断言）
+ok 10 - AC-5 | 本局经验不误存为永久经验（结构 + 行为双断言）
+  ---
+  duration_ms: 0.538292
+  ...
+# Subtest: 结算 | run.settled 事件 payload 为 {victory, pickedResources: SaveRunLoot}
+ok 11 - 结算 | run.settled 事件 payload 为 {victory, pickedResources: SaveRunLoot}
+  ---
+  duration_ms: 0.272701
+  ...
+# Subtest: Boss 规则 | 森林核心与击败进度只在 victory && bossDefeated 入账
+ok 12 - Boss 规则 | 森林核心与击败进度只在 victory && bossDefeated 入账
+  ---
+  duration_ms: 0.241911
+  ...
+# Subtest: AC-6a | 成本 C(L) = base + step×(L−1)，取自冻结 getter；单线总投入 3250
+ok 13 - AC-6a | 成本 C(L) = base + step×(L−1)，取自冻结 getter；单线总投入 3250
+  ---
+  duration_ms: 0.12038
+  ...
+# Subtest: AC-6b | 熟练度 Lv10 = 25%（2%×10 + 里程碑 5%）；Lv9 = 18%
+ok 14 - AC-6b | 熟练度 Lv10 = 25%（2%×10 + 里程碑 5%）；Lv9 = 18%
+  ---
+  duration_ms: 0.131231
+  ...
+# Subtest: AC-6c | 森林生存 Lv10 = 15% 而非 14%（里程碑陷阱）；MaxHp = 115
+ok 15 - AC-6c | 森林生存 Lv10 = 15% 而非 14%（里程碑陷阱）；MaxHp = 115
+  ---
+  duration_ms: 0.11072
+  ...
+# Subtest: AC-6d | 等级边界夹取（负数 / NaN / 10.9 / 100）
+ok 16 - AC-6d | 等级边界夹取（负数 / NaN / 10.9 / 100）
+  ---
+  duration_ms: 0.06259
+  ...
+# Subtest: AC-6e | 购买成长端到端：三条线买满恰花 3250×3，金币归零，Lv10 封顶
+ok 17 - AC-6e | 购买成长端到端：三条线买满恰花 3250×3，金币归零，Lv10 封顶
+  ---
+  duration_ms: 0.863234
+  ...
+# Subtest: AC-6f | 余额不足拒绝且零副作用
+ok 18 - AC-6f | 余额不足拒绝且零副作用
+  ---
+  duration_ms: 0.20391
+  ...
+# Subtest: AC-7a | 武器强化成本序列与总量（10/20/35/55、单武器 120、双武器 240）
+ok 19 - AC-7a | 武器强化成本序列与总量（10/20/35/55、单武器 120、双武器 240）
+  ---
+  duration_ms: 0.438742
+  ...
+# Subtest: AC-7b | 材料不足拒绝且零副作用；weapon.upgraded 事件形状正确
+ok 20 - AC-7b | 材料不足拒绝且零副作用；weapon.upgraded 事件形状正确
+  ---
+  duration_ms: 0.19223
+  ...
+# Subtest: AC-7c | 制作配方数值来自 gemConfig.craft（8 碎片 + 5 材料 → common 元素宝石）
+ok 21 - AC-7c | 制作配方数值来自 gemConfig.craft（8 碎片 + 5 材料 → common 元素宝石）
+  ---
+  duration_ms: 0.325041
+  ...
+# Subtest: AC-7d | 存档落盘 schemaVersion=3；socket 字段为 itemInstanceId（非模板 gemId）
+ok 22 - AC-7d | 存档落盘 schemaVersion=3；socket 字段为 itemInstanceId（非模板 gemId）
+  ---
+  duration_ms: 0.199291
+  ...
+# Subtest: AC-8a | v2→v3 迁移：profile.gold 正确保留到 currencies.gold
+ok 23 - AC-8a | v2→v3 迁移：profile.gold 正确保留到 currencies.gold
+  ---
+  duration_ms: 0.08916
+  ...
+# Subtest: AC-8b | 畸形存档（migrateSave / boot）均不抛错
+ok 24 - AC-8b | 畸形存档（migrateSave / boot）均不抛错
+  ---
+  duration_ms: 0.874963
+  ...
+# Subtest: AC-8c | boot 全链路：V2 存档经系统加载后 gold 保留并可继续游玩
+ok 25 - AC-8c | boot 全链路：V2 存档经系统加载后 gold 保留并可继续游玩
+  ---
+  duration_ms: 0.183031
+  ...
+# Subtest: AC-8d | SavePortV3Bridge：V3 经 V2 抽象存取、V2 原样交 migrateSave（不决定后端）
+ok 26 - AC-8d | SavePortV3Bridge：V3 经 V2 抽象存取、V2 原样交 migrateSave（不决定后端）
+  ---
+  duration_ms: 0.228861
+  ...
+# Subtest: AC-8e | 温和畸形 V3 修复后 gold 保留；重度畸形兜底默认档
+ok 27 - AC-8e | 温和畸形 V3 修复后 gold 保留；重度畸形兜底默认档
+  ---
+  duration_ms: 0.210871
+  ...
+# Subtest: REG-1 | 连续局：beginRun 重置地面/账本/Boss 登记
+ok 28 - REG-1 | 连续局：beginRun 重置地面/账本/Boss 登记
+  ---
+  duration_ms: 0.14322
+  ...
+# Subtest: REG-2 | 冻结契约纪律：经济模块只读 config，业务数值全部来自配置
+ok 29 - REG-2 | 冻结契约纪律：经济模块只读 config，业务数值全部来自配置
+  ---
+  duration_ms: 0.05741
+  ...
+1..29
+# tests 29
+# suites 0
+# pass 29
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 70.684051

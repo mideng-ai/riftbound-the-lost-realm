@@ -10,5 +10,5 @@
     "rootDir": "src",
     "outDir": ".testbuild"
   },
-  "include": ["src/input", "src/domain", "src/config"]
+  "include": ["src/input", "src/domain", "src/config", "src/player", "src/weapons", "src/combat", "src/progression", "src/gems", "src/economy", "src/boss"]
 }

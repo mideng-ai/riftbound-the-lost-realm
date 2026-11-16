@@ -29,8 +29,8 @@ export class InputSystem {
     this.touch.attach(zone);
   }
 
-  /** wire DOM action buttons (mobile right zone) */
-  bindActionButton(id: string, action: 'normalAttack' | 'skill1' | 'skill2' | 'dash') {
+  /** wire DOM action buttons (mobile right zone); TASK-02: 现在也接受 weaponSwitch */
+  bindActionButton(id: string, action: InstantAction) {
     const el = document.getElementById(id);
     if (!el) return;
     // One shared handler for touch + mouse preview; the reference is retained so

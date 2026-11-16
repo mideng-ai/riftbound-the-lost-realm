@@ -50,6 +50,10 @@ export class KeyboardMouseAdapter {
       this.emit({ kind: 'intent', action: 'skill1', source: 'kbm' });
     } else if (e.code === 'KeyE') {
       this.emit({ kind: 'intent', action: 'skill2', source: 'kbm' });
+    } else if (e.code === 'Tab') {
+      // TASK-02 双武器快速切换：Tab 会抢走焦点，必须阻止默认行为
+      e.preventDefault();
+      this.emit({ kind: 'intent', action: 'weaponSwitch', source: 'kbm' });
     }
   };
 

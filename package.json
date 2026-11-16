@@ -10,7 +10,14 @@
     "typecheck": "tsc --noEmit",
     "test:domain": "tsc -p tsconfig.test.json && node tests/prepare.cjs && node --test tests/domain-contract.test.mjs",
     "test:input": "tsc -p tsconfig.test.json && node tests/prepare.cjs && node tests/input-regression.cjs",
-    "test": "npm run test:domain && npm run test:input"
+    "test:task02": "tsc -p tsconfig.test.json && node tests/prepare.cjs && node --test tests/task02-combat.test.mjs",
+    "test:gems": "tsc -p tsconfig.test.json && node tests/prepare.cjs && node --test tests/gems.test.mjs",
+    "test:economy": "tsc -p tsconfig.test.json && node tests/prepare.cjs && node --test tests/economy.test.mjs",
+    "test:task05": "tsc -p tsconfig.test.json && node tests/prepare.cjs && node --experimental-strip-types --no-warnings --test tests/task05.test.mjs",
+    "test:boss": "tsc -p tsconfig.test.json && node tests/prepare.cjs && node --test tests/boss.test.mjs",
+    "test:qa": "tsc -p tsconfig.test.json && node tests/prepare.cjs && node --test tests/qa-regression.test.mjs",
+    "test:ui": "tsc -p tsconfig.test.json && node tests/prepare.cjs && node --experimental-strip-types --no-warnings --test tests/ui-contract.test.mjs",
+    "test": "npm run test:domain && npm run test:input && npm run test:task02 && npm run test:gems && npm run test:economy && npm run test:task05 && npm run test:boss && npm run test:qa && npm run test:ui"
   },
   "dependencies": {
     "@babylonjs/core": "9.36.0"
