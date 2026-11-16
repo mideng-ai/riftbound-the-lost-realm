@@ -1,0 +1,127 @@
+=== 独立复核执行记录（QA 甄无漏） ===
+日期: 2026-11-16
+分支/HEAD: main / cce2c11
+工作树: 1 处改动
+
+===== [1] npx tsc --noEmit =====
+EXIT=0
+
+===== [2] npm run test:audio =====
+> riftbound-the-lost-realm@0.1.0 test:audio
+> tsc -p tsconfig.test.json && node tests/prepare.cjs && node --experimental-strip-types --no-warnings --test tests/audio-contract.test.mjs
+# Subtest: A. 配方表 48 覆盖与结构合法性
+    # Subtest: A1 键集合 == 冻结契约展开的 48 个具体 ID，零缺口零越界
+    # Subtest: A2 每条配方字段合法（ADSR/增益/扫频/优先级/时长）
+    # Subtest: A3 冻结契约里所有可达音效都有配方（动态映射全覆盖）
+    # Subtest: A4 BGM 配方 = 4 曲目 + 2 环境层，转调半音 0/+2/+5
+ok 1 - A. 配方表 48 覆盖与结构合法性
+# Subtest: B. 事件接线（含 proc / pickup / boss.phase 动态事件）
+    # Subtest: B1 静态映射事件逐一进入播放路径
+    # Subtest: B2 动态事件由冻结解析函数决定，桥不复制映射逻辑
+    # Subtest: B3 空映射事件不产生音效，但 BGM 控制仍被消费
+ok 2 - B. 事件接线（含 proc / pickup / boss.phase 动态事件）
+# Subtest: C. 生命周期与退订归零
+    # Subtest: C1 dispose 后所有订阅 listenerCount=0，且从不调用 clearAll
+    # Subtest: C2 start 幂等；dispose 后再 start 不重复订阅、ctx 关闭一次
+ok 3 - C. 生命周期与退订归零
+# Subtest: D. 16 音源上限与优先级抢占
+    # Subtest: D1 连续 play 20 条 normal，活跃声部恒 <= 16
+    # Subtest: D2 池满后 bossWarn(40) 抢占 normal(10) 中最老的一个；同级不抢占
+ok 4 - D. 16 音源上限与优先级抢占
+# Subtest: E. 静音开关
+    # Subtest: E1 muted 时不建 ctx、不产生 voice；解除后恢复；再静音 master=0
+ok 5 - E. 静音开关
+# Subtest: F. BGM 选曲与 Boss 转调
+    # Subtest: F1 事件驱动选曲 + 转调半音 0/+2/+5，dispose 清定时器
+    # Subtest: F2 Bus 事件路径：boss.phase_changed 同时驱动 SFX 与 BGM 转调
+ok 6 - F. BGM 选曲与 Boss 转调
+# Subtest: G. AudioContext 解锁与可见性
+    # Subtest: G1 懒创建 + 首手势 resume + 移除手势监听 + 可见性挂起/恢复 + dispose
+    # Subtest: G2 静音 buffer 只生成一次；ensure 幂等
+ok 7 - G. AudioContext 解锁与可见性
+# Subtest: H. 红线护栏
+    # Subtest: H1 合成层没有音色魔法数字常量表（数值都在 recipes）
+ok 8 - H. 红线护栏
+# tests 17
+# suites 8
+# pass 17
+# fail 0
+# skipped 0
+# duration_ms 294.835679
+
+===== [3] npm test (全量) =====
+> riftbound-the-lost-realm@0.1.0 test
+> riftbound-the-lost-realm@0.1.0 test:domain
+# tests 53
+# suites 36
+# pass 53
+# fail 0
+> riftbound-the-lost-realm@0.1.0 test:input
+PASS R2-1 mousedown on bound button produces one dash intent — intent consumed
+PASS R2-1b intent not duplicated — second poll returns false
+PASS R2-2 touchstart on bound button produces one dash intent — intent consumed
+PASS R2-3 normalAttack press emits held=true — held state true
+PASS R2-4 dispose cancels pending hold-release timer — held events delta=1 (expected 1 = the press only)
+PASS R2-5 disposed instance receives no button intents — consumeIntent=false
+PASS R2-6 disposed instance records no events — events=0
+PASS R2-7 re-attached instance gets exactly one intent — count=1
+PASS R2-8 re-attached instance consumes the intent — consumed
+PASS R3-1 blur sets suspended=true — suspended=true
+PASS R3-2 blur → touchcancel keeps suspended=true — touchcancel must not resume
+PASS R3-3 visibility resume clears suspension — suspended=false
+PASS R3-4 blur → focus clears suspension — suspended=false
+PASS R3-5 hidden sets suspended=true — suspended=true
+PASS R3-6 hidden → touchcancel keeps suspended=true — still suspended
+PASS R3-7 visibility recovery after touchcancel resumes — suspended=false
+PASS R3-8 touchcancel alone does not suspend — suspended stays false
+PASS R3-9 touchcancel still releases joystick movement — moved=(1.00,0.00) → released=(0,0)
+> riftbound-the-lost-realm@0.1.0 test:task02
+# tests 45
+# suites 7
+# pass 45
+# fail 0
+> riftbound-the-lost-realm@0.1.0 test:gems
+# tests 24
+# suites 5
+# pass 24
+# fail 0
+> riftbound-the-lost-realm@0.1.0 test:economy
+# tests 29
+# suites 0
+# pass 29
+# fail 0
+> riftbound-the-lost-realm@0.1.0 test:task05
+# tests 27
+# suites 6
+# pass 27
+# fail 0
+> riftbound-the-lost-realm@0.1.0 test:boss
+# tests 46
+# suites 6
+# pass 46
+# fail 0
+> riftbound-the-lost-realm@0.1.0 test:boss-integration
+# tests 6
+# suites 1
+# pass 6
+# fail 0
+> riftbound-the-lost-realm@0.1.0 test:qa
+# tests 21
+# suites 8
+# pass 21
+# fail 0
+> riftbound-the-lost-realm@0.1.0 test:ui
+# tests 12
+# suites 0
+# pass 12
+# fail 0
+> riftbound-the-lost-realm@0.1.0 test:text
+# tests 4
+# suites 0
+# pass 4
+# fail 0
+> riftbound-the-lost-realm@0.1.0 test:audio
+# tests 17
+# suites 8
+# pass 17
+# fail 0
