@@ -3,6 +3,12 @@
 > ⚠ **上一轮 REBUILD 版全部作废**：按统一工作流，本次从 git 仓库 `main` 切分支重做。
 > `src/domain/` 与 `src/config/` 为冻结契约，只读引用，`git diff --name-only -- src/domain src/config` 为空。
 > 上一轮沙箱里凭记忆重建的契约与业务代码未纳入本仓库，不参与任何验收。
+>
+> **后续订正（2026-11-16，主理人）**：本文是 TASK-04 交付当时的状态快照。文中
+> 「D-207 OPEN / SavePort V2 / SavePortV3Bridge 套壳 / 未引入 localStorage」均已过时——
+> 其后 D-207 由 **ADR-TD-009** 定案关闭：`SavePort` 升级承载 `SaveDataV3`，生产后端为
+> `LocalStorageSaveAdapter`，桥的套壳方案已被直连 v3 取代；经济入账链与 DEF-006 亦已补齐。
+> 当前状态以 `docs/流程-决策日志.md` §四 ADR-TD-009/010、`docs/质量-D207终验报告.md` 与源码为准。
 
 ## 结论
 
@@ -24,7 +30,7 @@
 | `growth.ts` | 金币三线成长（成本读 `metaGrowthCost` getter） |
 | `weaponUpgrade.ts` | 森林材料强化 Lv1→5 |
 | `crafting.ts` | 元素碎片制作（读 `gemConfig.craft`） |
-| `saveBridge.ts` | `SavePort`（V2 抽象）→ V3 存档桥；**未决定任何存储后端**（D-207 OPEN） |
+| `saveBridge.ts` | 交付当时：`SavePort`（V2 抽象）→ V3 存档桥（D-207 当时 OPEN）。**现已改为直连 v3 + LocalStorageSaveAdapter（ADR-TD-009）** |
 | `economyConfig.ts` | 仅补冻结 config 缺口的数据表（见下） |
 | `types.ts` / `index.ts` | 类型契约与桶导出 |
 
@@ -63,7 +69,9 @@
 
 ## 持久化方案（不越权决定后端）
 
-`SavePort` 当前只接受 `SaveDataV2`（D-207 OPEN）。`SavePortV3Bridge` 把 V3 存档原样装进 V2 的 `stash` 并加标记键 `__riftboundSaveV3`；`load` 优先解出 V3，纯 V2 则原样交给 `migrateSave` 迁移 `profile.gold`。**未修改 `src/save/SavePort.ts`，未引入 localStorage/IndexedDB**。
+**交付当时（历史快照）**：`SavePort` 只接受 `SaveDataV2`（D-207 OPEN）；`SavePortV3Bridge` 把 V3 存档原样装进 V2 的 `stash` 并加标记键 `__riftboundSaveV3`；`load` 优先解出 V3，纯 V2 则原样交给 `migrateSave` 迁移 `profile.gold`；未引入 localStorage/IndexedDB。
+
+**当前（ADR-TD-009 定案后）**：`SavePort` 已升级直接承载 `SaveDataV3`，`SavePortV3Bridge` 退化为直传；生产后端 `LocalStorageSaveAdapter`（损坏隔离 + 写前临时键协议）；冻结契约 `src/domain/save.ts` 的 `migrateSave`/`validateSaveV3`/`defaultSaveV3` 被复用。详见 `docs/流程-决策日志.md` §四 ADR-TD-009 与 `docs/质量-D207终验报告.md`。
 
 ## 需主理人过目 / 未解决问题
 
